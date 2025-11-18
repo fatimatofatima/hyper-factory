@@ -38,7 +38,7 @@ done
 echo "🚀 بدء مزامنة Hyper Factory"
 echo "📁 ROOT      : $ROOT"
 echo "🌐 REPO      : $REPO_URL"
-echo "🌿 BRANCH    : ${BRANCH_OVERRIDE:-'(auto)'}"
+echo "🌿 BRANCH    : ${BRANCH_OVERRIDE:-'master (fixed)'}"
 echo "🧪 DRY-RUN   : $DRY_RUN"
 
 # =============[ فحص البيئة الأساسية ]==============
@@ -195,33 +195,22 @@ else
   echo "🧪 [DRY-RUN] git commit -m 'Sync: <timestamp>' (في حالة وجود تغييرات)"
 fi
 
-# =============[ Push إلى GitHub ]==============
+# =============[ Push إلى GitHub (master فقط) ]==============
 if [[ $DRY_RUN -eq 0 ]]; then
   if git rev-parse --verify HEAD >/dev/null 2>&1; then
-    # تحديد الفرع المستهدف
-    if [[ -n "$BRANCH_OVERRIDE" ]]; then
-      TARGET_BRANCH="$BRANCH_OVERRIDE"
-    else
-      TARGET_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || echo main)"
-    fi
-
-    echo "🔄 محاولة الدفع إلى origin/$TARGET_BRANCH ..."
+    TARGET_BRANCH="${BRANCH_OVERRIDE:-master}"
+    echo "🔄 دفع التغييرات إلى origin/$TARGET_BRANCH فقط..."
     if git push -u origin "$TARGET_BRANCH"; then
       echo "🎉 تم دفع التغييرات إلى origin/$TARGET_BRANCH بنجاح!"
     else
-      echo "⚠️ فشل الدفع إلى $TARGET_BRANCH، سيتم تجربة master..."
-      if git push -u origin master; then
-        echo "🎉 تم دفع التغييرات إلى origin/master بنجاح!"
-      else
-        echo "❌ فشل push إلى كلٍ من $TARGET_BRANCH و master، راجع الرسائل أعلاه."
-        exit 1
-      fi
+      echo "❌ فشل push إلى origin/$TARGET_BRANCH، راجع الرسائل أعلاه."
+      exit 1
     fi
   else
     echo "ℹ️ لا يوجد HEAD (لم يتم إنشاء commit بعد)، لا يوجد ما يُدفع."
   fi
 else
-  echo "🧪 [DRY-RUN] git push -u origin <branch>"
+  echo "🧪 [DRY-RUN] git push -u origin master"
 fi
 
 echo "✅ انتهت المزامنة - الأسرار والبيانات الثقيلة خارج الريبو."
