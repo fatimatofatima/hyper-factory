@@ -1,13 +1,36 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
+
+# Envs
 .env
+.env.*
 venv/
+apps/*/venv/
+
+# Logs & reports
 logs/
 reports/
-ai/datasets/
-ai/pdfs/
+audit/
 *.log
+
+# Datasets & PDFs (تحفظ محليًا)
+ai/pdfs/
+ai/datasets/
+ai/knowledge/
+ai/raw_knowledge/
+
+# Cache & tmp
+.tmp/
+.cache/
+*.swp
+
+# Docker & compose overrides
+docker-compose.override.yml
+
+# OS/Editor
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
