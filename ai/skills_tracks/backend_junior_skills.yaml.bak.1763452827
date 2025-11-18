@@ -1,0 +1,160 @@
+track:
+  id: "backend_junior"
+  name: "مسار Backend Junior"
+  description: "مسار تطوير مهارات Backend من الصفر حتى التشغيل"
+
+phases:
+  - id: "phase_0"
+    name: "أساسيات العمل كمبرمج"
+    skills:
+      - id: "computer_basics"
+        name: "أساسيات الكمبيوتر والملفات"
+        description: "التعامل مع الملفات، المسارات، الـ ZIP، فك/ضغط، تنصيب برامج"
+        max_score: 100
+
+      - id: "terminal_basics"
+        name: "أساسيات الـ Terminal"
+        description: "أوامر cd, ls, mkdir, rm, python, pip بشكل يومي"
+        max_score: 100
+
+      - id: "git_basics"
+        name: "أساسيات Git"
+        description: "git init / add / commit / push / clone + GitHub والـ branches"
+        max_score: 100
+
+  - id: "phase_1"
+    name: "أساسيات بايثون"
+    skills:
+      - id: "python_syntax_basics"
+        name: "تركيب لغة بايثون"
+        description: "متغيرات، أنواع بيانات، عمليات منطقية وحسابية"
+        max_score: 100
+
+      - id: "python_control_flow"
+        name: "التحكم في سير التنفيذ"
+        description: "if / elif / else + for / while + فهم indentation"
+        max_score: 100
+
+      - id: "python_functions_basics"
+        name: "الدوال الأساسية"
+        description: "تعريف دالة، parameters, return, scope بسيط"
+        max_score: 100
+
+      - id: "python_collections_basics"
+        name: "التراكيب (قوائم، قواميس، مجموعات)"
+        description: "list / dict / set / tuple + العمليات الأساسية عليهم"
+        max_score: 100
+
+  - id: "phase_2"
+    name: "بايثون المتقدمة للمشاريع"
+    skills:
+      - id: "python_oop_basics"
+        name: "أساسيات الكائنات"
+        description: "class / object / __init__ / attributes / methods"
+        max_score: 100
+
+      - id: "python_errors_handling"
+        name: "التعامل مع الأخطاء"
+        description: "try/except/finally + raise + فهم Traceback"
+        max_score: 100
+
+      - id: "python_modules_packages"
+        name: "الوحدات والحزم"
+        description: "import / from / إنشاء module واستخدام مكتبات خارجية"
+        max_score: 100
+
+      - id: "python_venv_pip"
+        name: "بيئات العمل الافتراضية"
+        description: "venv / pip / requirements.txt"
+        max_score: 100
+
+  - id: "phase_3"
+    name: "أساسيات الـ Backend Web"
+    skills:
+      - id: "web_http_fundamentals"
+        name: "أساسيات HTTP"
+        description: "request/response, methods (GET/POST/PUT/DELETE), status codes"
+        max_score: 100
+
+      - id: "rest_api_concepts"
+        name: "مفاهيم REST API"
+        description: "resources, endpoints, JSON, stateless"
+        max_score: 100
+
+      - id: "backend_framework_intro"
+        name: "التعرف على إطار Backend"
+        description: "FastAPI أو Django وفهم فكرة المشروع"
+        max_score: 100
+
+      - id: "request_response_handling"
+        name: "التعامل مع الطلب/الاستجابة"
+        description: "JSON بسيط، قراءة body، إرجاع response منظّم"
+        max_score: 100
+
+  - id: "phase_4"
+    name: "قواعد بيانات"
+    skills:
+      - id: "db_relational_basics"
+        name: "أساسيات قواعد البيانات العلاقية"
+        description: "tables, rows, columns, primary key, foreign key"
+        max_score: 100
+
+      - id: "sql_query_basics"
+        name: "أساسيات SQL"
+        description: "SELECT / INSERT / UPDATE / DELETE + WHERE + ORDER BY + LIMIT"
+        max_score: 100
+
+      - id: "db_modeling_basic"
+        name: "نمذجة البيانات البسيطة"
+        description: "نمذجة (Users, Tasks, Orders...)"
+        max_score: 100
+
+      - id: "orm_basics"
+        name: "أساسيات ORM"
+        description: "التعامل مع DB من خلال كود Python (Django ORM أو SQLAlchemy)"
+        max_score: 100
+
+  - id: "phase_5"
+    name: "Backend Craft"
+    skills:
+      - id: "auth_basics"
+        name: "أساسيات التحقق من الهوية"
+        description: "حماية login/logout, tokens/session بسيطة, حماية endpoints"
+        max_score: 100
+
+      - id: "validation_and_schemas"
+        name: "التحقق من البيانات"
+        description: "استخدام Pydantic/Schemas لضمان صحة الـ input"
+        max_score: 100
+
+      - id: "logging_basics"
+        name: "تسجيل الأحداث"
+        description: "تسجيل أخطاء وأحداث مهمة في السيرفر"
+        max_score: 100
+
+      - id: "testing_basics"
+        name: "أساسيات الاختبارات"
+        description: "unit tests بسيطة، اختبار endpoint واحد على الأقل"
+        max_score: 100
+
+  - id: "phase_6"
+    name: "التشغيل (Deployment)"
+    skills:
+      - id: "environments_config"
+        name: "بيئات التشغيل والإعدادات"
+        description: "ملفات إعداد dev / staging / prod + env vars"
+        max_score: 100
+
+      - id: "basic_deployment_vps"
+        name: "نشر بسيط على VPS"
+        description: "تشغيل مشروع باك إند على VPS (gunicorn/uvicorn + reverse proxy بسيط)"
+        max_score: 100
+
+      - id: "container_intro"
+        name: "مقدمة Docker"
+        description: "مفهوم container، بناء صورة بسيطة وتشغيلها"
+        max_score: 100
+
+progression_rules:
+  phase_completion_threshold: 70
+  skill_mastery_threshold: 80

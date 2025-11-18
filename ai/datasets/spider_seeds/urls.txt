@@ -1,0 +1,4 @@
+https://docs.python.org/3/tutorial/
+https://fastapi.tiangolo.com/
+https://docs.djangoproject.com/
+https://realpython.com/

@@ -1,0 +1,22 @@
+apps:
+  - id: backend_coach
+    name: "Backend Coach API"
+    category: "ai_coach"
+    path: "apps/backend_coach"
+    entry_script: "run.sh"
+    required_stacks:
+      - ai_services
+    ports:
+      - "9090"
+    description: "API لتدريب المبرمجين على مسار Backend Junior"
+
+  - id: factory_dashboard
+    name: "Factory Dashboard"
+    category: "monitoring"
+    path: "apps/factory_dashboard"
+    entry_script: "run.sh"
+    required_stacks:
+      - core_services
+    ports:
+      - "8080"
+    description: "لوحة تحكم المصنع"

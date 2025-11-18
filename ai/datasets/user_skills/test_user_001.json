@@ -1,0 +1,167 @@
+{
+  "user_id": "test_user_001",
+  "track_id": "backend_junior",
+  "current_phase": "phase_0",
+  "created_at": "2025-11-18T07:47:58.128186",
+  "updated_at": "2025-11-18T08:31:49.574419",
+  "skills": {
+    "computer_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "terminal_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "git_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_syntax_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_control_flow": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_functions_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_collections_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_oop_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_errors_handling": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_modules_packages": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "python_venv_pip": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "web_http_fundamentals": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "rest_api_concepts": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "backend_framework_intro": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "request_response_handling": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "db_relational_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "sql_query_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "db_modeling_basic": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "orm_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "auth_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "validation_and_schemas": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "logging_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "testing_basics": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "environments_config": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "basic_deployment_vps": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    },
+    "container_intro": {
+      "score": 0,
+      "confidence": 0.0,
+      "last_updated": null,
+      "practice_count": 0
+    }
+  },
+  "sessions_count": 0,
+  "overall_progress": 0.0
+}

@@ -1,0 +1,15 @@
+agents:
+  - id: debug_expert
+    name: "Debug Expert"
+    prompt_file: "ai/prompts/agent_debug_expert.md"
+    skills_focus: ["python_errors_handling", "debug_skills"]
+    
+  - id: system_architect
+    name: "System Architect"
+    prompt_file: "ai/prompts/agent_system_architect.md"
+    skills_focus: ["rest_api_concepts", "db_modeling_basic"]
+    
+  - id: technical_coach
+    name: "Technical Coach"
+    prompt_file: "ai/prompts/agent_technical_coach.md"
+    skills_track_file: "ai/skills_tracks/backend_junior_skills.yaml"

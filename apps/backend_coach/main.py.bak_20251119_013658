@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import os
+import sys
+from datetime import datetime
+from typing import Any, Dict
+
+from fastapi import FastAPI, Query, HTTPException, Body
+from fastapi.middleware.cors import CORSMiddleware
+
+APP_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.abspath(os.path.join(APP_DIR, "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from scripts.ai.llm.llm_orchestrator import LLMOrchestrator
+from scripts.ai.skills_manager import SkillsManager
+
+app = FastAPI(title="Hyper Factory - Backend Coach")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+_orch = LLMOrchestrator()
+_skills = SkillsManager(track_id="backend_junior")
+
+
+@app.get("/api/health")
+def health() -> Dict[str, Any]:
+    return {
+        "status": "healthy",
+        "service": "backend_coach",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+    }
+
+
+@app.get("/api/skills/state")
+def skills_state(user_id: str = Query("anonymous")) -> Dict[str, Any]:
+    try:
+        return _skills.get_state(user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/skills/update")
+def skills_update(
+    user_id: str = Query(...),
+    skill_id: str = Query(...),
+    new_score: int = Query(..., ge=0, le=100),
+) -> Dict[str, Any]:
+    try:
+        return _skills.update_skill(user_id, skill_id, new_score)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/orchestrator/analyze")
+def orchestrator_analyze(
+    user_id: str = Query("anonymous"),
+    message: str = Query(...),
+) -> Dict[str, Any]:
+    try:
+        return _orch.analyze_message(user_id, message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/orchestrator/smart_answer")
+def orchestrator_smart_answer(
+    user_id: str = Query("anonymous"),
+    payload: Dict[str, Any] = Body(...),
+) -> Dict[str, Any]:
+    msg = payload.get("message")
+    if not msg:
+        raise HTTPException(status_code=400, detail="field 'message' is required")
+    try:
+        return _orch.smart_answer(user_id, msg)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("apps.backend_coach.main:app", host="0.0.0.0", port=9090, reload=True)

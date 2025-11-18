@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+import os
+import sys
+from datetime import datetime
+from typing import Any, Dict
+
+from fastapi import FastAPI, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
+
+# ضبط المسارات
+APP_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.abspath(os.path.join(APP_DIR, "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from scripts.ai.llm.llm_orchestrator import LLMOrchestrator
+from scripts.ai.skills_manager import SkillsManager
+
+app = FastAPI(title="Hyper Factory - Backend Coach")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# تهيئة الأوركستريتور ومدير المهارات
+_orch = LLMOrchestrator()
+skills_manager = SkillsManager()
+
+
+@app.get("/api/health")
+async def health_check():
+    return {
+        "status": "healthy ✅",
+        "service": "backend_coach",
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+
+@app.get("/api/skills/state")
+async def get_skills_state(user_id: str = Query(...)):
+    """
+    قراءة حالة مهارات مستخدم.
+    """
+    return skills_manager.get_skills_state(user_id)
+
+
+@app.post("/api/skills/update")
+async def update_skill(
+    user_id: str = Query(...),
+    skill_id: str = Query(...),
+    new_score: int = Query(...),
+):
+    """
+    تحديث سكِل معيّن لمستخدم.
+    """
+    return skills_manager.update_skill(user_id, skill_id, new_score)
+
+
+@app.get("/api/orchestrator/analyze")
+async def analyze_message(
+    user_id: str = Query(...),
+    message: str = Query(...),
+):
+    """
+    إرجاع تحليل الرسالة (نوع الوكيل + معلومات إضافية).
+    """
+    return _orch.analyze_message(user_id, message)
+
+
+@app.post("/api/orchestrator/smart_answer")
+async def smart_answer(
+    user_id: str = Query(...),
+    data: Dict[str, Any] = Body(...),
+):
+    """
+    توليد إجابة ذكية بناءً على الرسالة + الـ RAG + قواعد الـ Orchestrator.
+    """
+    message = data.get("message", "")
+    return _orch.generate_smart_response(user_id, message)

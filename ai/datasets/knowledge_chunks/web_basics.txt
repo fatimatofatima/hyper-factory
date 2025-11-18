@@ -1,0 +1,9 @@
+HTTP Methods:
+- GET: لجلب البيانات
+- POST: لإرسال البيانات
+- PUT: لتحديث البيانات
+- DELETE: لحذف البيانات
+
+REST API:
+- استخدام JSON
+- تصميم endpoints تمثل موارد (users, tasks, orders)

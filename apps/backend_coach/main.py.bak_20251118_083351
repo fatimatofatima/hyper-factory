@@ -1,0 +1,259 @@
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, List
+import logging
+from pathlib import Path
+from datetime import datetime
+import subprocess
+
+# ===== الإعدادات الأساسية =====
+BASE_DIR = Path("/root/hyper-factory")
+KNOWLEDGE_DIR = BASE_DIR / "ai" / "datasets" / "knowledge_chunks"
+LOGS_DIR = BASE_DIR / "logs"
+ORCHESTRATOR_LOG = LOGS_DIR / "orchestrator" / "decisions.log"
+PDF_DIR = BASE_DIR / "ai" / "pdfs"
+PDF_INGEST_SCRIPT = BASE_DIR / "scripts" / "ai" / "pdf_processor" / "pdf_ingest.sh"
+
+# إعداد السجل
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("backend_coach")
+
+app = FastAPI(
+    title="🏭 مصنع العمال الأذكياء - Backend Coach",
+    description="API لتدريب المبرمجين على مسار Backend Junior وربط المصنع بالمعرفة",
+    version="2.0.0"
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ===== نماذج البيانات =====
+class DebugRequest(BaseModel):
+    code: str
+    error: Optional[str] = None
+    language: str = "python"
+
+
+# ===== دوال مساعدة =====
+def count_knowledge_chunks() -> int:
+    if not KNOWLEDGE_DIR.exists():
+        return 0
+    return len([p for p in KNOWLEDGE_DIR.glob("*") if p.is_file()])
+
+
+def knowledge_quality(total: int) -> str:
+    if total == 0:
+        return "لا توجد معرفة بعد ❌"
+    if total < 10:
+        return "تحتاج تحسين ⚠️"
+    return "جيدة ✅"
+
+
+def read_decisions(limit: int) -> List[str]:
+    if not ORCHESTRATOR_LOG.exists():
+        return []
+    with ORCHESTRATOR_LOG.open("r", encoding="utf-8", errors="ignore") as f:
+        lines = f.readlines()
+    return [line.rstrip("\n") for line in lines[-limit:]]
+
+
+# ===== Endpoints أساسية =====
+@app.get("/")
+def root():
+    return {
+        "message": "🏭 مصنع العمال الأذكياء - Backend Coach API",
+        "version": "2.0.0",
+        "status": "يعمل 🚀",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@app.get("/api/health")
+def health():
+    return {
+        "status": "healthy ✅",
+        "service": "backend_coach",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@app.get("/api/factory/status")
+def factory_status():
+    chunks = count_knowledge_chunks()
+    return {
+        "factory": {
+            "name": "مصنع العمال الأذكياء",
+            "status": "operational 🏭",
+            "version": "1.0.0",
+            "agents_count": 4,
+            "knowledge_chunks": chunks,
+            "last_updated": datetime.now().isoformat(),
+        }
+    }
+
+
+@app.get("/api/knowledge/stats")
+def knowledge_stats():
+    total = count_knowledge_chunks()
+    return {
+        "total_chunks": total,
+        "last_updated": datetime.now().isoformat(),
+        "quality": knowledge_quality(total),
+    }
+
+
+@app.get("/api/orchestrator/decisions")
+def orchestrator_decisions(limit: int = Query(10, ge=1, le=100)):
+    items = read_decisions(limit)
+    return {
+        "limit": limit,
+        "count": len(items),
+        "items": items,
+    }
+
+
+@app.get("/api/agents")
+def list_agents():
+    chunks = count_knowledge_chunks()
+    return {
+        "agents": [
+            {
+                "id": "debug_expert",
+                "name": "خبير تصحيح الأخطاء",
+                "status": "active 🟢",
+                "description": "متخصص في تحليل وتصحيح أخطاء البرمجة",
+            },
+            {
+                "id": "system_architect",
+                "name": "مهندس النظام",
+                "status": "active 🟢",
+                "description": "متخصص في تصميم وهندسة الأنظمة",
+            },
+            {
+                "id": "technical_coach",
+                "name": "المدرب التقني",
+                "status": "active 🟢",
+                "description": "متخصص في تدريب المبرمجين وتحسين مهاراتهم",
+            },
+            {
+                "id": "knowledge_spider",
+                "name": "عنكبوت المعرفة",
+                "status": "active 🟢",
+                "description": "متخصص في جمع وتنظيم المعرفة التقنية",
+            },
+        ],
+        "knowledge": {
+            "chunks": chunks,
+        },
+    }
+
+
+@app.post("/api/debug")
+def debug_code(payload: DebugRequest):
+    logger.info(f"طلب تصحيح كود: {payload.language}")
+
+    analysis = f"🔍 تحليل كود {payload.language}"
+    if payload.error:
+        analysis += f": {payload.error}"
+
+    suggestions = [
+        "✅ تحقق من أسماء المتغيرات والأساليب",
+        "✅ تأكد من الأقواس وعلامات التنصيص",
+        "✅ جرب تشغيل الكود جزء جزء لاكتشاف الخطأ",
+        "✅ استخدم print للمتغيرات للتتبع",
+    ]
+
+    return {
+        "success": True,
+        "analysis": analysis,
+        "suggestions": suggestions,
+        "fixed_code": "# الكود المصحح سيظهر هنا\n" + payload.code,
+    }
+
+
+@app.post("/api/knowledge/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    """رفع ملف PDF ومعالجته في معالج PDF الخارجي"""
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="يجب أن يكون الملف بصيغة PDF")
+
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
+    pdf_path = PDF_DIR / file.filename
+
+    try:
+        content = await file.read()
+        with pdf_path.open("wb") as f:
+            f.write(content)
+    finally:
+        await file.close()
+
+    # تشغيل معالج PDF إن وجد
+    if PDF_INGEST_SCRIPT.exists():
+        try:
+            subprocess.run([str(PDF_INGEST_SCRIPT)], check=True)
+        except Exception as e:
+            logger.exception("خطأ في معالج PDF")
+            raise HTTPException(
+                status_code=500,
+                detail=f"تم حفظ الملف لكن فشل معالج PDF: {e}",
+            )
+    else:
+        logger.warning("لم يتم العثور على سكربت pdf_ingest.sh")
+
+    total = count_knowledge_chunks()
+    return {
+        "message": "تم رفع ومعالجة الملف (إن أمكن)",
+        "filename": file.filename,
+        "total_chunks": total,
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=9090, reload=False)
+
+# ===== التحليل الذكي لرسائل المستخدمين باستخدام LLMOrchestrator =====
+@app.get("/api/orchestrator/analyze")
+async def analyze_message(
+    message: str = Query(..., description="نص رسالة المستخدم"),
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    تحليل الرسالة وتحديد العامل المناسب (Debug / Architect / Coach / Spider)
+    مع سبب الاختيار.
+    """
+    try:
+        import sys
+        sys.path.append("/root/hyper-factory/scripts/ai/llm")
+        from llm_orchestrator import LLMOrchestrator
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"فشل في تحميل LLMOrchestrator: {str(e)}",
+        )
+
+    try:
+        orchestrator = LLMOrchestrator()
+        analysis = orchestrator.analyze_message(message, user_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"فشل في تحليل الرسالة: {str(e)}",
+        )
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "message": message,
+        "target_agent": analysis.get("target_agent"),
+        "confidence": analysis.get("confidence"),
+        "reason": analysis.get("reason"),
+    }

@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""
+Backend Coach API - Hyper Factory
+- /api/health
+- /api/skills/state
+- /api/skills/update
+- /api/orchestrator/analyze
+- /api/orchestrator/smart_answer
+- /api/knowledge/stats
+"""
+
+import os
+import sys
+from datetime import datetime
+from typing import Optional
+
+from fastapi import FastAPI, Query, HTTPException, Body
+from fastapi.middleware.cors import CORSMiddleware
+
+APP_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.abspath(os.path.join(APP_DIR, "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from scripts.ai.skills_manager import SkillsManager  # type: ignore
+from scripts.ai.llm.llm_orchestrator import LLMOrchestrator  # type: ignore
+from scripts.ai.rag_engine import DEFAULT_KNOWLEDGE_DIR  # type: ignore
+
+app = FastAPI(
+    title="Hyper Factory - Backend Coach",
+    description="Backend Coach API with Skills + Orchestrator + RAG Stats",
+    version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+skills_manager = SkillsManager()
+orchestrator = LLMOrchestrator()
+
+
+@app.get("/api/health")
+async def health_check():
+    return {
+        "status": "healthy ✅",
+        "service": "backend_coach",
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+
+
+@app.get("/api/knowledge/stats")
+async def knowledge_stats():
+    try:
+        knowledge_dir = DEFAULT_KNOWLEDGE_DIR
+        if os.path.exists(knowledge_dir):
+            files = [f for f in os.listdir(knowledge_dir) if f.endswith(".txt")]
+            total = len(files)
+            sample_preview = ""
+            if files:
+                sample_path = os.path.join(knowledge_dir, files[0])
+                with open(sample_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    sample_preview = content[:200]
+            return {
+                "total_chunks": total,
+                "sample_preview": sample_preview,
+                "status": "ok" if total > 0 else "empty",
+                "knowledge_dir": knowledge_dir,
+            }
+        else:
+            return {
+                "total_chunks": 0,
+                "sample_preview": "",
+                "status": "missing",
+                "knowledge_dir": knowledge_dir,
+            }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"knowledge_stats error: {e}")
+
+
+# -------- Skills Endpoints --------
+
+@app.get("/api/skills/state")
+async def get_skills_state(
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    try:
+        profile = skills_manager.get_user_skills(user_id)
+        weak_skills = skills_manager.get_weak_skills(user_id, limit=5)
+        return {
+            "success": True,
+            "user_id": user_id,
+            "profile": {
+                "track": profile["track_id"],
+                "current_phase": profile["current_phase"],
+                "overall_progress": profile["overall_progress"],
+                "sessions_count": profile["sessions_count"],
+            },
+            "weak_skills": weak_skills,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"skills_state error: {e}")
+
+
+@app.post("/api/skills/update")
+async def update_skill_score(
+    user_id: str = Query(..., description="معرّف المستخدم"),
+    skill_id: str = Query(..., description="معرّف المهارة"),
+    new_score: int = Query(..., ge=0, le=100, description="الدرجة الجديدة 0-100"),
+):
+    try:
+        profile = skills_manager.update_skill_score(user_id, skill_id, new_score)
+        return {
+            "success": True,
+            "user_id": user_id,
+            "skill_id": skill_id,
+            "new_score": new_score,
+            "profile": {
+                "current_phase": profile["current_phase"],
+                "overall_progress": profile["overall_progress"],
+                "sessions_count": profile["sessions_count"],
+            },
+        }
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"skills_update error: {e}")
+
+
+# -------- Orchestrator Endpoints --------
+
+@app.get("/api/orchestrator/analyze")
+async def analyze_message(
+    message: str = Query(..., description="نص الرسالة للتحليل"),
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    try:
+        result = orchestrator.analyze_message(message, user_id=user_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"analyze error: {e}")
+
+
+@app.post("/api/orchestrator/smart_answer")
+async def smart_answer(payload: dict = Body(...)):
+    try:
+        message = payload.get("message", "")
+        user_id = payload.get("user_id", "anonymous")
+        result = orchestrator.smart_answer(message, user_id=user_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"smart_answer error: {e}")
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=9090,
+        reload=False,
+        log_level="info",
+    )

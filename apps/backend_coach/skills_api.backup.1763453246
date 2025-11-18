@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""
+skills_api.py
+
+Router موحّد يربط:
+- LLMOrchestrator (Routing + RAG-MVP)
+- SkillsManager (نظام المهارات)
+ويعرّض 3 endpoints تحت prefix /api:
+- POST /api/orchestrator/answer
+- GET  /api/skills/state
+- POST /api/skills/update
+"""
+
+from fastapi import APIRouter, Query, HTTPException
+from typing import Optional, Dict, Any
+import os
+import sys
+
+router = APIRouter()
+
+# إعداد المسار لرؤية scripts/ai/*
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from scripts.ai.llm.llm_orchestrator import LLMOrchestrator  # type: ignore
+from scripts.ai.skills_manager import SkillsManager          # type: ignore
+
+orchestrator = LLMOrchestrator()
+skills_manager = SkillsManager()
+
+# خريطة: أي Agent → مهارات يتم تحسينها مع كل Session
+AGENT_SKILL_MAP = {
+    "technical_coach": ["python_control_flow", "python_functions_basics"],
+    "debug_expert": ["python_errors_handling"],
+    "system_architect": ["backend_framework_intro", "db_modeling_basic"],
+    "knowledge_spider": ["web_http_fundamentals"],
+}
+
+
+def _auto_update_skills(user_id: str, target_agent: Optional[str]) -> None:
+    """
+    تحديث أوتوماتيك لمجموعة مهارات بناء على الـ agent.
+
+    سياسة بسيطة:
+    - لو score < 40 → +15
+    - لو 40 <= score < 70 → +10
+    - لو score >= 70 → +5
+    """
+    if not target_agent:
+        return
+
+    skills_ids = AGENT_SKILL_MAP.get(target_agent, [])
+    if not skills_ids:
+        return
+
+    profile = skills_manager.get_user_skills(user_id)
+
+    for skill_id in skills_ids:
+        current = profile["skills"].get(skill_id, {}).get("score", 0)
+        if current < 40:
+            delta = 15
+        elif current < 70:
+            delta = 10
+        else:
+            delta = 5
+
+        new_score = min(current + delta, 100)
+        skills_manager.update_skill_score(
+            user_id,
+            skill_id,
+            new_score,
+            practice_context={"source": "auto_session", "agent": target_agent},
+        )
+
+
+@router.post("/orchestrator/answer")
+async def orchestrator_answer(payload: Dict[str, Any]):
+    """
+    واجهة المصنع الموحدة:
+    - input: { "message": "...", "user_id": "..." }
+    - output: routing + RAG contexts + metadata
+    - يقوم بتحديث المهارات أوتوماتيكياً حسب الـ agent
+    """
+    message = (payload or {}).get("message", "")
+    user_id = (payload or {}).get("user_id", "anonymous")
+
+    if not message:
+        raise HTTPException(status_code=400, detail="message مطلوب")
+
+    orchestration = orchestrator.answer_with_rag(message, user_id=user_id)
+    target_agent = orchestration.get("routing", {}).get("target_agent")
+
+    _auto_update_skills(user_id, target_agent)
+
+    return orchestration
+
+
+@router.get("/skills/state")
+async def get_skills_state(
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    الحصول على حالة مهارات المستخدم + أهم المهارات الضعيفة
+    """
+    profile = skills_manager.get_user_skills(user_id)
+    weak_skills = skills_manager.get_weak_skills(user_id)
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "profile": {
+            "track": profile["track_id"],
+            "current_phase": profile["current_phase"],
+            "overall_progress": profile["overall_progress"],
+            "sessions_count": profile["sessions_count"],
+            "weak_skills_count": len(weak_skills),
+        },
+        "weak_skills": weak_skills[:3],
+    }
+
+
+@router.post("/skills/update")
+async def manual_update_skill(
+    user_id: str = Query(..., description="معرّف المستخدم"),
+    skill_id: str = Query(..., description="معرّف المهارة (كما في YAML)"),
+    new_score: int = Query(..., ge=0, le=100, description="الدرجة الجديدة (0-100)"),
+):
+    """
+    تحديث يدوي لدرجة مهارة معينة للمستخدم
+    """
+    profile = skills_manager.update_skill_score(
+        user_id,
+        skill_id,
+        new_score,
+        practice_context={"source": "manual_update"},
+    )
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "skill_id": skill_id,
+        "new_score": new_score,
+        "overall_progress": profile["overall_progress"],
+        "current_phase": profile["current_phase"],
+    }

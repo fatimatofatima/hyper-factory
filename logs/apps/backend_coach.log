@@ -1,0 +1,31 @@
+🚀 بدء تشغيل Backend Coach API v2.0...
+📦 تثبيت المتطلبات...
+Requirement already satisfied: fastapi==0.104.1 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 1)) (0.104.1)
+Requirement already satisfied: uvicorn==0.24.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 2)) (0.24.0)
+Requirement already satisfied: pydantic==2.5.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 3)) (2.5.0)
+Requirement already satisfied: python-multipart==0.0.6 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 4)) (0.0.6)
+Requirement already satisfied: anyio<4.0.0,>=3.7.1 in ./venv/lib/python3.10/site-packages (from fastapi==0.104.1->-r requirements.txt (line 1)) (3.7.1)
+Requirement already satisfied: starlette<0.28.0,>=0.27.0 in ./venv/lib/python3.10/site-packages (from fastapi==0.104.1->-r requirements.txt (line 1)) (0.27.0)
+Requirement already satisfied: typing-extensions>=4.8.0 in ./venv/lib/python3.10/site-packages (from fastapi==0.104.1->-r requirements.txt (line 1)) (4.15.0)
+Requirement already satisfied: click>=7.0 in ./venv/lib/python3.10/site-packages (from uvicorn==0.24.0->-r requirements.txt (line 2)) (8.3.1)
+Requirement already satisfied: h11>=0.8 in ./venv/lib/python3.10/site-packages (from uvicorn==0.24.0->-r requirements.txt (line 2)) (0.16.0)
+Requirement already satisfied: annotated-types>=0.4.0 in ./venv/lib/python3.10/site-packages (from pydantic==2.5.0->-r requirements.txt (line 3)) (0.7.0)
+Requirement already satisfied: pydantic-core==2.14.1 in ./venv/lib/python3.10/site-packages (from pydantic==2.5.0->-r requirements.txt (line 3)) (2.14.1)
+Requirement already satisfied: idna>=2.8 in ./venv/lib/python3.10/site-packages (from anyio<4.0.0,>=3.7.1->fastapi==0.104.1->-r requirements.txt (line 1)) (3.11)
+Requirement already satisfied: exceptiongroup in ./venv/lib/python3.10/site-packages (from anyio<4.0.0,>=3.7.1->fastapi==0.104.1->-r requirements.txt (line 1)) (1.3.0)
+Requirement already satisfied: sniffio>=1.1 in ./venv/lib/python3.10/site-packages (from anyio<4.0.0,>=3.7.1->fastapi==0.104.1->-r requirements.txt (line 1)) (1.3.1)
+🌐 تشغيل الخادم على http://0.0.0.0:9090
+📝 السجلات: /root/hyper-factory/logs/apps/backend_coach.log
+🔄 إعادة التحميل التلقائي مفعل
+INFO:     Started server process [2199405]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 9090): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+🚀 تحميل Hyper Factory Backend Coach من: /root/hyper-factory/apps/backend_coach
+✅ SkillsManager جاهز للعمل
+✅ LLMOrchestrator جاهز للعمل
+🎉 تم تهيئة جميع المكونات بنجاح
+🎯 جميع مسارات الـAPI مسجلة وجاهزة!
+🚀 تشغيل خادم FastAPI على port 9090...

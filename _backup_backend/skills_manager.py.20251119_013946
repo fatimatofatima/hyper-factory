@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+import os
+import json
+from datetime import datetime
+from typing import Dict, Any, List
+
+import yaml
+
+_THIS_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.abspath(os.path.join(_THIS_DIR, "..", ".."))
+SKILLS_TRACKS_DIR = os.path.join(ROOT_DIR, "ai", "skills_tracks")
+USER_SKILLS_DIR = os.path.join(ROOT_DIR, "ai", "datasets", "user_skills")
+
+
+class SkillsManager:
+    def __init__(self, track_id: str = "backend_junior") -> None:
+        self.track_id = track_id
+        os.makedirs(USER_SKILLS_DIR, exist_ok=True)
+        track_path = os.path.join(SKILLS_TRACKS_DIR, f"{track_id}_skills.yaml")
+        if not os.path.exists(track_path):
+            raise FileNotFoundError(f"Track file not found: {track_path}")
+        with open(track_path, "r", encoding="utf-8") as f:
+            self.track = yaml.safe_load(f)
+        self._skills_index: Dict[str, Dict[str, Any]] = {}
+        for phase in self.track.get("phases", []):
+            for s in phase.get("skills", []):
+                self._skills_index[s["id"]] = s
+
+    def _user_state_path(self, user_id: str) -> str:
+        safe = user_id.replace("/", "_")
+        return os.path.join(USER_SKILLS_DIR, f"{safe}_{self.track_id}.json")
+
+    def _initial_state(self, user_id: str) -> Dict[str, Any]:
+        skills: List[Dict[str, Any]] = []
+        for phase in self.track.get("phases", []):
+            for s in phase.get("skills", []):
+                skills.append(
+                    {
+                        "skill_id": s["id"],
+                        "score": 0,
+                        "max_score": s.get("max_score", 100),
+                        "last_update": None,
+                        "phase_id": phase["id"],
+                    }
+                )
+        return {
+            "user_id": user_id,
+            "track_id": self.track_id,
+            "skill_states": skills,
+            "created_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+    def load_user_state(self, user_id: str) -> Dict[str, Any]:
+        path = self._user_state_path(user_id)
+        if not os.path.exists(path):
+            state = self._initial_state(user_id)
+            self.save_user_state(state)
+            return state
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def save_user_state(self, state: Dict[str, Any]) -> None:
+        path = self._user_state_path(state["user_id"])
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+
+    def get_state(self, user_id: str) -> Dict[str, Any]:
+        return self.load_user_state(user_id)
+
+    def update_skill(self, user_id: str, skill_id: str, new_score: int) -> Dict[str, Any]:
+        if skill_id not in self._skills_index:
+            raise ValueError(f"Unknown skill_id: {skill_id}")
+        if not (0 <= new_score <= 100):
+            raise ValueError("new_score must be 0–100")
+        state = self.load_user_state(user_id)
+        now = datetime.utcnow().isoformat() + "Z"
+        updated = False
+        for s in state["skill_states"]:
+            if s["skill_id"] == skill_id:
+                s["score"] = new_score
+                s["last_update"] = now
+                updated = True
+                break
+        if not updated:
+            meta = self._skills_index[skill_id]
+            state["skill_states"].append(
+                {
+                    "skill_id": skill_id,
+                    "score": new_score,
+                    "max_score": meta.get("max_score", 100),
+                    "last_update": now,
+                    "phase_id": meta.get("phase_id"),
+                }
+            )
+        self.save_user_state(state)
+        return state
+
+
+if __name__ == "__main__":
+    import argparse
+    import json as _json
+
+    p = argparse.ArgumentParser()
+    p.add_argument("--user", required=True)
+    p.add_argument("--skill")
+    p.add_argument("--score", type=int)
+    a = p.parse_args()
+    sm = SkillsManager()
+    if a.skill and a.score is not None:
+        st = sm.update_skill(a.user, a.skill, a.score)
+    else:
+        st = sm.get_state(a.user)
+    print(_json.dumps(st, ensure_ascii=False, indent=2))

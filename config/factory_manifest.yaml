@@ -1,0 +1,21 @@
+factory:
+  id: hyper_factory_v1
+  name: "مصنع العمال الأذكياء"
+  owner: "root"
+  environment: "production"
+  version: "1.0.0"
+
+orchestrator:
+  decision_engine: "scripts/core/orchestrator_decision_engine.sh"
+  rules_file: "config/orchestrator_rules.yaml"
+
+agents:
+  - debug_expert
+  - system_architect  
+  - technical_coach
+  - knowledge_spider
+
+knowledge_base:
+  raw_dir: "ai/datasets/raw_content"
+  cleaned_dir: "ai/datasets/cleaned_content" 
+  chunks_dir: "ai/datasets/knowledge_chunks"

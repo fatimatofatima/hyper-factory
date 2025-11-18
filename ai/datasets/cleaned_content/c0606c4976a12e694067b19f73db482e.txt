@@ -1,0 +1,5 @@
+🔗 المصدر: /root/hyper-factory/ai/datasets/raw_content/fastapi.tiangolo.com/c0606c4976a12e694067b19f73db482e.html
+📅 تم الجلب: Tue Nov 18 07:47:02 +03 2025
+==========================================
+FastAPI
+📄 محتوى HTML (استخدم lynx لاستخراج أفضل)

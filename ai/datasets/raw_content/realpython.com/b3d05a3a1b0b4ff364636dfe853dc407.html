@@ -1,0 +1,1879 @@
+
+
+<!doctype html>
+<html lang="en">
+  <head>
+    
+    
+    <link href="https://files.realpython.com" rel="preconnect">
+
+    <title>Python Tutorials – Real Python</title>
+    <meta name="author" content="Real Python">
+    <meta name="description" content="Learn Python online: Python tutorials for developers of all skill levels, Python books and courses, Python news, code examples, articles, and more.">
+    <meta name="keywords" content="">
+
+    
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
+
+    
+      <link rel="stylesheet" href="/static/realpython.min.fe9eea5e59ad.css">
+      
+      <link rel="stylesheet" href="/static/gfonts/font.5ac42994de49.css">
+      <link rel="preload" href="/static/glightbox.min.9b438b29cef1.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="/static/glightbox.min.9b438b29cef1.css"></noscript>
+      
+    
+
+    
+
+    
+    
+      <link rel="canonical" href="https://realpython.com/">
+
+      
+      
+        
+
+<meta name="twitter:card" content="summary">
+<meta property="twitter:image" content="https://realpython.com/static/social-default-image.5e1aa4786b3a.png">
+<meta property="og:image" content="https://realpython.com/static/social-default-image.5e1aa4786b3a.png">
+
+      
+      <meta name="twitter:creator" content="@realpython">
+      <meta name="twitter:site" content="@realpython">
+      <meta property="og:title" content="Python Tutorials – Real Python">
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="https://realpython.com/">
+      <meta property="og:description" content="Learn Python online: Python tutorials for developers of all skill levels, Python books and courses, Python news, code examples, articles, and more.">
+    
+
+    <link href="/static/favicon.68cbf4197b0c.png" rel="icon">
+    <link href="https://realpython.com/atom.xml" rel="alternate" title="Real Python" type="application/atom+xml">
+    <link rel="manifest" href="/manifest.json">
+
+    
+
+    
+    
+
+    
+    <script id="icons-data" type="application/json">{"iconsUrl": "/static/icons.0fae35ff985f.svg"}</script>
+    <script id="optins-data" type="application/json">{"turnstileSiteKey": "0x4AAAAAAAQQUCLRXBi8NnUh"}</script>
+
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7L6L5F6Y6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L7L6L5F6Y6',{'content_group': 'frontpage'});
+
+  gtag('get', 'G-L7L6L5F6Y6', 'client_id', (clid) => {
+    document.cookie = 'gaclid=' + clid + ';max-age=86400000;path=/;secure';
+  });
+  
+</script>
+
+  </head>
+  <body data-authenticated="false">
+    
+      
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark flex-column  user-select-none">
+  <div class="container flex-row">
+
+    <a class="navbar-brand" href="/">
+      <img src="/static/real-python-logo.893c30edea53.svg" width="165" height="40" class="d-inline-block align-top" alt="Real Python">
+    </a>
+
+    
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse navbar-nav-scroll" id="navbarSupportedContent" role="navigation" aria-label="Main Navigation">
+
+      <ul class="navbar-nav mr-2">
+
+        <li class="nav-item">
+          <a class="nav-link rounded" href="/start-here/">Start&nbsp;Here</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link rounded dropdown-toggle" href="#" id="navbarDropdownLibrary" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#brands--python"/></svg></span> Learn Python
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownLibrary">
+            
+<a class="dropdown-item " href="/search?kind=article&kind=course&order=newest" style="color: #ff7e73; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--graduation-cap"/></svg></span>Python Tutorials&nbsp;→<br><small class="text-secondary">In-depth articles and video courses</small></a>
+
+
+            
+<a class="dropdown-item " href="/learning-paths/" style="color: #ffc873; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@learning-path"/></svg></span>Learning Paths&nbsp;→<br><small class="text-secondary">Guided study plans for accelerated learning</small></a>
+
+
+            
+<a class="dropdown-item " href="/quizzes/" style="color: #abe0e5; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@quiz"/></svg></span>Quizzes & Exercises&nbsp;→<br><small class="text-secondary">Check your learning progress</small></a>
+
+
+            
+<a class="dropdown-item " href="/tutorials/all/" style="color: #ccc; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>Browse Topics&nbsp;→<br><small class="text-secondary">Focus on a specific area or skill level</small></a>
+
+
+            
+<a class="dropdown-item " href="/community/" style="color: #e5c6ab; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--message-smile"/></svg></span>Community Chat&nbsp;→<br><small class="text-secondary">Learn with other Pythonistas</small></a>
+
+
+            
+<a class="dropdown-item " href="/office-hours/" style="color: #e5c6ab; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--users"/></svg></span>Office Hours&nbsp;→<br><small class="text-secondary">Live Q&A calls with Python experts</small></a>
+
+
+            
+<a class="dropdown-item " href="/podcasts/rpp/" style="color: #b8abe5; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@podcast"/></svg></span>Podcast&nbsp;→<br><small class="text-secondary">Hear what’s new in the world of Python</small></a>
+
+
+            
+<a class="dropdown-item " href="/products/books/" style="color: #abe5b1; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--book-heart"/></svg></span>Books&nbsp;→<br><small class="text-secondary">Round out your knowledge and learn offline</small></a>
+
+
+            
+<a class="dropdown-item " href="/ref/" style="color: #abe0e5; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@reference"/></svg></span>Reference&nbsp;→<br><small class="text-secondary">Concise definitions for common Python terms</small></a>
+
+
+            
+<a class="dropdown-item " href="/mentor/" style="color: #ffc873; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@code-mentor"/></svg></span>Code Mentor&nbsp;→<span class="float-right badge badge-pill badge-indigo">Beta</span><br><small class="text-secondary">Personalized code assistance &amp; learning tools</small></a>
+
+
+            
+              
+              
+<a class="dropdown-item border-top" href="/account/join/" style="color: #ffc107; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--star"/></svg></span>Unlock All Content&nbsp;→</a>
+
+              
+            
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link rounded dropdown-toggle" href="#" id="navbarDropdownMore" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            More
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMore">
+            <a class="dropdown-item" href="/learner-stories/">Learner Stories</a>
+            <a class="dropdown-item" href="/newsletter/">Python Newsletter</a>
+            <a class="dropdown-item" href="https://www.pythonjobshq.com" target="_blank">Python Job Board</a>
+            <a class="dropdown-item" href="/team/">Meet the Team</a>
+            <a class="dropdown-item" href="/write-for-us/">Become a Tutorial Writer</a>
+            <a class="dropdown-item" href="/become-an-instructor/">Become a Video Instructor</a>
+          </div>
+        </li>
+
+      </ul> 
+
+      
+      <div class="d-block d-lg-none"> 
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link rounded" href="/search" title="Search"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#v4--search"/></svg></span> Search</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="d-none d-lg-flex align-items-center mr-2 flex-fill">
+        <form class="form-inline w-100 position-relative" action="/search" method="GET">
+          <a class="js-search-form-submit position-absolute" href="/search" title="Search" aria-hidden="true" tabindex="-1"><span class="icon baseline text-muted pl-2" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#v4--search"/></svg></span></a>
+          <input class="search-autocomplete search-field form-control form-control-md mr-sm-1 mr-lg-2 w-100" style="padding-left: 2rem;" maxlength=50 type="search" placeholder="Search" aria-label="Search" aria-keyshortcuts="/ Control+J Meta+J" name="q" autocomplete="off">
+          <span class="search-hotkey-indicator position-absolute px-2 border border-input text-input rounded small user-select-none" style="right: 1em;" title="Press / (forward slash) or Ctrl+J to open search" aria-hidden="true">/</span>
+          <input type="hidden" name="_from" value="nav">
+        </form>
+      </div>
+      
+
+      <ul class="navbar-nav ml-auto">
+        
+          <li class="nav-item form-inline mr-2 my-2 ml-3 ml-lg-0">
+            <a class="btn btn-primary px-5 px-lg-3" href="/account/join/">Join</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link rounded mx-0 px-lg-2" href="/account/login/?next=%2F">Sign&#8209;In</a>
+          </li>
+        
+      </ul>
+
+    
+    </div>
+
+  </div>
+
+  
+
+</nav>
+
+    
+
+    <div class="container main-content">
+      
+
+      
+  <div class="row">
+    
+  <div class="col-md-12 col-lg-8">
+    <div class="row h-100 align-content-between">
+      
+
+      
+      <div class="col-12 mb-3">
+        <div class="card border-0">
+
+          <a href="/fastapi-jinja2-template/">
+            <div class="embed-responsive embed-responsive-16by9">
+              
+                <img class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #abe0e6;" src="https://files.realpython.com/media/How-to-Serve-HTML-With-FastAPI-Using-Jinja2-Templates.4fe3dea5b9bd.jpg" alt="How to Serve a Website With FastAPI Using HTML and Jinja2" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/How-to-Serve-HTML-With-FastAPI-Using-Jinja2-Templates.4fe3dea5b9bd.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/How-to-Serve-HTML-With-FastAPI-Using-Jinja2-Templates.4fe3dea5b9bd.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/How-to-Serve-HTML-With-FastAPI-Using-Jinja2-Templates.4fe3dea5b9bd.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/How-to-Serve-HTML-With-FastAPI-Using-Jinja2-Templates.4fe3dea5b9bd.jpg 1920w" sizes="(min-width: 1200px) 690px, (min-width: 1000px) 610px, (min-width: 780px) 690px, (min-width: 580px) 510px, calc(100vw - 30px)" >
+              
+              
+
+              <div class="shadow-sm p-0 bg-dark rounded-left border-left border-top border-bottom border-light text-center d-flex align-items-center justify-content-center" style="position:absolute; top:1em; right:0; width: 5em; height: 2em; ">
+                <span class="text-light m-0 p-0">NEW</span>
+              </div>
+
+            </div>
+          </a>
+
+          <div class="card-body m-0 p-0 pt-3">
+            <a href="/fastapi-jinja2-template/">
+              <h2 class="card-title h2 my-0 py-0">How to Serve a Website With FastAPI Using HTML and Jinja2</h2>
+            </a>
+            <p class="my-1">Use FastAPI to render Jinja2 templates and serve dynamic sites with HTML, CSS, and JavaScript, then add a color picker that copies hex codes.</p>
+            <p class="card-text">
+              <small class="text-muted">
+                
+                  <span class="mr-2">Nov 17, 2025</span>
+                
+                
+                <span class="icon baseline ml-2" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+                
+                  
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+                
+                  
+<a href="/tutorials/api/" class="badge badge-light text-muted" data-previewable>api</a>
+
+                
+                  
+<a href="/tutorials/front-end/" class="badge badge-light text-muted" data-previewable>front-end</a>
+
+                
+                  
+<a href="/tutorials/web-dev/" class="badge badge-light text-muted" data-previewable>web-dev</a>
+
+                
+              </small>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+
+      
+        <div class="col-12 mb-4 mb-lg-0">
+          <div class="d-flex justify-content-between align-items-center w-100 mt-0 mb-2">
+  <h2 class="my-0"><a href="/podcasts/rpp/" class="text-body">Podcasts</a></h2>
+  
+    <a href="/podcasts/rpp/" class="btn btn-secondary btn-sm">View&nbsp;All&nbsp;»</a>
+  
+</div>
+
+          
+
+
+
+
+<style>
+  podcast-player .shk {
+    --shadow-body: unset;
+    --shadow-body-mobile: unset;
+    --background-body: #f6f6f6;
+    --color-handle: rgb(108, 117, 125);
+    --color-bar-played: rgb(108, 117, 125);
+    
+    --border: 1px solid #dee2e6;
+    --border-radius: .25rem;
+  }
+  podcast-player .shk-player {
+    border: var(--border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+  podcast-player .shk-cover {
+    border-radius: var(--border-radius);
+  }
+  podcast-player .shk-artist, .shk-title {
+    
+    cursor: pointer;
+  }
+  podcast-player button:not(.shk-bar-handle):hover {
+    background-color: rgb(220.875,220.875,220.875);
+  }
+  podcast-player .shk-title_wrap[data-overflow], .shk-title, .shk-title_wrap[data-overflow] .shk-title_inner:after {
+    font-weight: inherit !important;
+  }
+  
+  podcast-player .shk-player .shk-btn:after,
+  podcast-player .shk-controls .shk-btn:after,
+  podcast-player .shk-btn:after {
+    transform: none !important;
+    -webkit-transform: none !important;
+    transition: none !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+  podcast-player .shk-chapter {
+    background-color: var(--background-body);
+    border-top: var(--border);
+    border-left: var(--border);
+    border-right: var(--border);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+  podcast-player .shk-btn_close {
+    border-radius: var(--border-radius);
+  }
+</style>
+<podcast-player class="d-block w-100"
+  audio-url="https://dts.podtrac.com/redirect.mp3/files.realpython.com/podcasts/RPP_E274_02_Khuyen.3960f4de8d36.mp3"
+  audio-duration="3552.0"
+  cover-image="/cdn-cgi/image/width=256,height=256,fit=crop,gravity=auto,format=auto/https://files.realpython.com/media/SQ_E_274_Podcast.87a02c62b655.jpg"
+  show-title="The Real Python Podcast"
+  episode-title="#274: Preparing Data Science Projects for Production"
+  show-url="https://realpython.com/podcasts/rpp/"
+  episode-url="https://realpython.com/podcasts/rpp/274/"
+  >
+
+  
+  <div style="height: 120px;" class="bg-light border rounded"></div>
+
+  
+    <script type="application/json">[{"title": "Introduction", "startTime": 0, "endTime": 87}, {"title": "Recent article about top six visualization libraries", "startTime": 87, "endTime": 139}, {"title": "How long have you been blogging?", "startTime": 139, "endTime": 235}, {"title": "What do you cover in your book?", "startTime": 235, "endTime": 427}, {"title": "Potential issues with notebooks", "startTime": 427, "endTime": 700}, {"title": "Structuring data science projects", "startTime": 700, "endTime": 912}, {"title": "Reproducibility and sharing notebooks", "startTime": 912, "endTime": 1233}, {"title": "Using Polars", "startTime": 1233, "endTime": 1563}, {"title": "Advantages of marimo notebooks", "startTime": 1563, "endTime": 2061}, {"title": "Video Course Spotlight", "startTime": 2061, "endTime": 2144}, {"title": "Shipping a project in data science", "startTime": 2144, "endTime": 2530}, {"title": "Advice on testing", "startTime": 2530, "endTime": 2990}, {"title": "Creating importable parameter values", "startTime": 2990, "endTime": 3235}, {"title": "Seeing the commit diff of a notebook", "startTime": 3235, "endTime": 3312}, {"title": "What are you excited about in the world of Python?", "startTime": 3312, "endTime": 3364}, {"title": "What do you want to learn next?", "startTime": 3364, "endTime": 3412}, {"title": "What's the best way to follow your work online?", "startTime": 3412, "endTime": 3508}, {"title": "Thanks and goodbye", "startTime": 3508, "endTime": 3552}]</script>
+  
+</podcast-player>
+
+        </div>
+      
+
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="row">
+      <div class="col-12">
+      
+
+
+
+
+<div class="card mb-3 bg-secondary">
+  <form class="card-body" action="/optins/process/" method="post">
+    <div class="form-group">
+      <p class="h5 text-muted text-center">— FREE Email Series —</p>
+      <p class="h3 text-center">🐍 Python Tricks 💌</p>
+      <p><img loading="lazy" class="img-fluid rounded" src="/static/pytrick-dict-merge.4201a0125a5e.png" width="738" height="490" alt="Python Tricks Dictionary Merge"></p>
+    </div>
+    <div class="form-group">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ucOUzw20PlvFb5HTSCemHnS24pStj44fvIGt2KZ2BBwwBwkY4GlHEhoTSyASXrQe">
+      <input type="hidden" name="slug" value="static-python-tricks-sidebar">
+      <input type="hidden" name="source_path" value="/">
+      <input type="email" class="form-control form-control-md" name="email" placeholder="Email&hellip;" required>
+    </div>
+    <button type="submit" name="submit" class="btn btn-primary btn-md btn-block">Get Python Tricks »</button>
+    <p class="mb-0 mt-2 text-muted text-center">🔒 No spam. Unsubscribe any time.</p>
+  </form>
+</div>
+
+
+      </div>
+      <div class="col-12">
+      
+
+
+<div class="sidebar-module sidebar-module-inset border mb-0">
+  <a href="/tutorials/all/" class="badge badge-light text-muted"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>Browse Topics</a>
+
+  <a href="/learning-paths/" class="badge badge-light text-muted"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--map-location-dot"/></svg></span>Guided Learning Paths</a>
+
+  <br>
+
+  <a href="/search?level=basics" class="badge badge-light text-muted"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@level"/></svg></span> Basics</a>
+
+  <a href="/search?level=intermediate" class="badge badge-light text-muted"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@level"/></svg></span><span class="icon baseline tight-left" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@level"/></svg></span> Intermediate</a>
+
+  <a href="/search?level=advanced" class="badge badge-light text-muted"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@level"/></svg></span><span class="icon baseline tight-left" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@level"/></svg></span><span class="icon baseline tight-left" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@level"/></svg></span> Advanced</a>
+
+  <hr class="my-2">
+
+  
+    
+  
+    
+  
+    
+  
+    
+      
+<a href="/tutorials/ai/" class="badge badge-light text-muted" data-previewable>ai</a>
+
+    
+  
+    
+      
+<a href="/tutorials/api/" class="badge badge-light text-muted" data-previewable>api</a>
+
+    
+  
+    
+      
+<a href="/tutorials/best-practices/" class="badge badge-light text-muted" data-previewable>best-practices</a>
+
+    
+  
+    
+      
+<a href="/tutorials/career/" class="badge badge-light text-muted" data-previewable>career</a>
+
+    
+  
+    
+      
+<a href="/tutorials/community/" class="badge badge-light text-muted" data-previewable>community</a>
+
+    
+  
+    
+      
+<a href="/tutorials/databases/" class="badge badge-light text-muted" data-previewable>databases</a>
+
+    
+  
+    
+      
+<a href="/tutorials/data-science/" class="badge badge-light text-muted" data-previewable>data-science</a>
+
+    
+  
+    
+      
+<a href="/tutorials/data-structures/" class="badge badge-light text-muted" data-previewable>data-structures</a>
+
+    
+  
+    
+      
+<a href="/tutorials/data-viz/" class="badge badge-light text-muted" data-previewable>data-viz</a>
+
+    
+  
+    
+      
+<a href="/tutorials/devops/" class="badge badge-light text-muted" data-previewable>devops</a>
+
+    
+  
+    
+      
+<a href="/tutorials/django/" class="badge badge-light text-muted" data-previewable>django</a>
+
+    
+  
+    
+      
+<a href="/tutorials/docker/" class="badge badge-light text-muted" data-previewable>docker</a>
+
+    
+  
+    
+      
+<a href="/tutorials/editors/" class="badge badge-light text-muted" data-previewable>editors</a>
+
+    
+  
+    
+      
+<a href="/tutorials/flask/" class="badge badge-light text-muted" data-previewable>flask</a>
+
+    
+  
+    
+      
+<a href="/tutorials/front-end/" class="badge badge-light text-muted" data-previewable>front-end</a>
+
+    
+  
+    
+      
+<a href="/tutorials/gamedev/" class="badge badge-light text-muted" data-previewable>gamedev</a>
+
+    
+  
+    
+      
+<a href="/tutorials/gui/" class="badge badge-light text-muted" data-previewable>gui</a>
+
+    
+  
+    
+      
+<a href="/tutorials/machine-learning/" class="badge badge-light text-muted" data-previewable>machine-learning</a>
+
+    
+  
+    
+      
+<a href="/tutorials/news/" class="badge badge-light text-muted" data-previewable>news</a>
+
+    
+  
+    
+      
+<a href="/tutorials/numpy/" class="badge badge-light text-muted" data-previewable>numpy</a>
+
+    
+  
+    
+      
+<a href="/tutorials/projects/" class="badge badge-light text-muted" data-previewable>projects</a>
+
+    
+  
+    
+      
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+    
+  
+    
+      
+<a href="/tutorials/testing/" class="badge badge-light text-muted" data-previewable>testing</a>
+
+    
+  
+    
+      
+<a href="/tutorials/tools/" class="badge badge-light text-muted" data-previewable>tools</a>
+
+    
+  
+    
+      
+<a href="/tutorials/web-dev/" class="badge badge-light text-muted" data-previewable>web-dev</a>
+
+    
+  
+    
+      
+<a href="/tutorials/web-scraping/" class="badge badge-light text-muted" data-previewable>web-scraping</a>
+
+    
+  
+</div>
+
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 mt-5">
+    <div class="d-flex justify-content-between align-items-center w-100 mt-0 mb-2">
+  <h2 class="my-0">Explore Real Python</h2>
+  
+</div>
+
+
+<div class="card-deck mb-3 pl-md-3 pl-sm-3">
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/learning-paths/" style="color: #ffc873; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--map-location-dot"/></svg></span>Learning Paths<br><small class="text-secondary text-wrap-balance">Guided study plans for accelerated learning</small></a>
+  </div>
+</div>
+
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/search?kind=article&kind=course&order=newest" style="color: #ff7e73; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--graduation-cap"/></svg></span>Python Tutorials<br><small class="text-secondary text-wrap-balance">In-depth articles and step-by-step video courses</small></a>
+  </div>
+</div>
+
+
+  <div class="w-100 mb-3 d-none d-sm-block d-lg-none"></div>
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/quizzes/" style="color: #abe0e5; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@quiz"/></svg></span>Quizzes & Exercises<br><small class="text-secondary text-wrap-balance">Evaluate your Python knowledge with quick tests</small></a>
+  </div>
+</div>
+
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/tutorials/all/" style="color: #ccc; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>Browse Topics<br><small class="text-secondary text-wrap-balance">Focus on a specific area or skill level</small></a>
+  </div>
+</div>
+
+
+  <div class="w-100 mb-3 d-none d-lg-block"></div>
+  <div class="w-100 mb-3 d-none d-sm-block d-lg-none"></div>
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/community/" style="color: #e5c6ab; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--message-smile"/></svg></span>Community Chat<br><small class="text-secondary text-wrap-balance">Learn with other Pythonistas</small></a>
+  </div>
+</div>
+
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/office-hours/" style="color: #e5c6ab; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--users"/></svg></span>Office Hours<br><small class="text-secondary text-wrap-balance">Live Q&A calls with experts from Real Python</small></a>
+  </div>
+</div>
+
+
+  <div class="w-100 mb-3 d-none d-sm-block d-lg-none"></div>
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/podcasts/rpp/" style="color: #b8abe5; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@podcast"/></svg></span>Podcast<br><small class="text-secondary text-wrap-balance">Hear what’s new in the world of Python</small></a>
+  </div>
+</div>
+
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/products/books/" style="color: #abe5b1; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--book-heart"/></svg></span>Books<br><small class="text-secondary text-wrap-balance">Round out your knowledge and learn offline</small></a>
+  </div>
+</div>
+
+
+  <div class="w-100 mb-3 d-none d-sm-block d-lg-none"></div>
+  <div class="w-100 mb-3 d-none d-lg-block"></div>
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/ref/" style="color: #abe0e5; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@reference"/></svg></span>Reference<br><small class="text-secondary text-wrap-balance">Concise definitions for common Python terms</small></a>
+  </div>
+</div>
+
+
+  
+<div class="card bg-dark border-0 ml-0 mr-md-3">
+  <div class="card-body text-center highlight-hover-dark rounded">
+    <a class="btn stretched-link" href="/mentor/" style="color: #ffc873; line-height: 110%;"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@code-mentor"/></svg></span>Code Mentor<span class="ml-1 badge badge-pill badge-indigo">Beta</span><br><small class="text-secondary text-wrap-balance">Personalized code assistance & intelligent learning tools</small></a>
+  </div>
+</div>
+
+
+</div>
+
+    
+
+
+<div class="d-flex mb-5">
+  <form class="form-inline col p-0" action="/search" method="GET" id="home-search-form">
+    <a class="js-search-form-submit position-absolute" href="/search" title="Search" aria-hidden="true" tabindex="-1"><span class="icon baseline text-muted pl-2" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@search"/></svg></span></a>
+    <input class="form-control form-control-lg w-100 " style="padding-left: 2rem;" maxlength=50 type="search" placeholder="Search Tutorials, Courses, Quizzes, Learning Paths&hellip;" aria-label="Search" name="q" autocomplete="off">
+    <input type="hidden" name="_from" value="home">
+    
+    
+  </form>
+  <button class="ml-3 btn btn-primary col-3 d-none d-lg-block" style="max-width: 250px;" type="submit" form="home-search-form">Search&nbsp;»</button>
+</div>
+
+    <div class="d-flex justify-content-between align-items-center w-100 mt-0 mb-2">
+  <h2 class="my-0"><a href="/search?order=newest" class="text-body">New Releases</a></h2>
+  
+    <a href="/search?order=newest" class="btn btn-secondary btn-sm">View&nbsp;All&nbsp;»</a>
+  
+</div>
+
+  </div>
+
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-repl/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #fe7e73;" alt="The Python Standard REPL: Try Out Code and Ideas Quickly" src="https://files.realpython.com/media/The-Python-Standard-REPL-Try-Out-Code-and-Ideas-Quickly_Watermarked.0a69de2c986d.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/The-Python-Standard-REPL-Try-Out-Code-and-Ideas-Quickly_Watermarked.0a69de2c986d.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/The-Python-Standard-REPL-Try-Out-Code-and-Ideas-Quickly_Watermarked.0a69de2c986d.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/The-Python-Standard-REPL-Try-Out-Code-and-Ideas-Quickly_Watermarked.0a69de2c986d.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/The-Python-Standard-REPL-Try-Out-Code-and-Ideas-Quickly_Watermarked.0a69de2c986d.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-repl/">
+      <h2 class="card-title h4 my-0 py-0">The Python Standard REPL: Try Out Code and Ideas Quickly</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Nov 12, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/tools/" class="badge badge-light text-muted" data-previewable>tools</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/courses/python-operators-expressions/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #abe0e6;" alt="Operators and Expressions in Python" src="https://files.realpython.com/media/Operators-and-Expressions-in-Python_Watermarked.651045da4031.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Operators-and-Expressions-in-Python_Watermarked.651045da4031.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Operators-and-Expressions-in-Python_Watermarked.651045da4031.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Operators-and-Expressions-in-Python_Watermarked.651045da4031.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Operators-and-Expressions-in-Python_Watermarked.651045da4031.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+      <div class="card-img-overlay d-flex align-items-center">
+        <div class="mx-auto">
+          <span class="text-light" style="opacity: 0.90;">
+            
+              <span class="icon baseline scale3x" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@play"/></svg></span>
+            
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/courses/python-operators-expressions/">
+      <h2 class="card-title h4 my-0 py-0">Python Operators and Expressions</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Nov 11, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/basics/" class="badge badge-light text-muted" data-previewable>basics</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-news-november-2025/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #ffc873;" alt="Python Monthly News" src="https://files.realpython.com/media/Monthly-Python-News_Yellow_Watermarked.e93be1baed14.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Monthly-Python-News_Yellow_Watermarked.e93be1baed14.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Monthly-Python-News_Yellow_Watermarked.e93be1baed14.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Monthly-Python-News_Yellow_Watermarked.e93be1baed14.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Monthly-Python-News_Yellow_Watermarked.e93be1baed14.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-news-november-2025/">
+      <h2 class="card-title h4 my-0 py-0">Python 3.14 Released and Other Python News for November 2025</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Nov 10, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/community/" class="badge badge-light text-muted" data-previewable>community</a>
+
+        
+          
+<a href="/tutorials/news/" class="badge badge-light text-muted" data-previewable>news</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-markitdown/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #b9abe6;" alt="Python MarkItDown: Convert Documents Into LLM-Ready Markdown" src="https://files.realpython.com/media/MarkItDown-Convert-Anything-to-Markdown-to-Feed-to-Your-LLM_Watermarked.201792042d8c.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/MarkItDown-Convert-Anything-to-Markdown-to-Feed-to-Your-LLM_Watermarked.201792042d8c.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/MarkItDown-Convert-Anything-to-Markdown-to-Feed-to-Your-LLM_Watermarked.201792042d8c.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/MarkItDown-Convert-Anything-to-Markdown-to-Feed-to-Your-LLM_Watermarked.201792042d8c.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/MarkItDown-Convert-Anything-to-Markdown-to-Feed-to-Your-LLM_Watermarked.201792042d8c.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-markitdown/">
+      <h2 class="card-title h4 my-0 py-0">Python MarkItDown: Convert Documents Into LLM-Ready Markdown</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Nov 05, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/ai/" class="badge badge-light text-muted" data-previewable>ai</a>
+
+        
+          
+<a href="/tutorials/tools/" class="badge badge-light text-muted" data-previewable>tools</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/courses/building-uis-terminal-python-textual/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #ffc973;" alt="Python Textual: Build Beautiful UIs in the Terminal" src="https://files.realpython.com/media/Showcase-Textual_Watermarked.2ccb0c0dd46e.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Showcase-Textual_Watermarked.2ccb0c0dd46e.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Showcase-Textual_Watermarked.2ccb0c0dd46e.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Showcase-Textual_Watermarked.2ccb0c0dd46e.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Showcase-Textual_Watermarked.2ccb0c0dd46e.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+      <div class="card-img-overlay d-flex align-items-center">
+        <div class="mx-auto">
+          <span class="text-light" style="opacity: 0.90;">
+            
+              <span class="icon baseline scale3x" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@play"/></svg></span>
+            
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/courses/building-uis-terminal-python-textual/">
+      <h2 class="card-title h4 my-0 py-0">Building UIs in the Terminal With Python Textual</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Nov 04, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/front-end/" class="badge badge-light text-muted" data-previewable>front-end</a>
+
+        
+          
+<a href="/tutorials/tools/" class="badge badge-light text-muted" data-previewable>tools</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/fastapi-python-web-apis/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #fe7e73;" alt="A Close Look at a FastAPI Example Application" src="https://files.realpython.com/media/FastAPI-Example-Application.9a5baa46c84b.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/FastAPI-Example-Application.9a5baa46c84b.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/FastAPI-Example-Application.9a5baa46c84b.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/FastAPI-Example-Application.9a5baa46c84b.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/FastAPI-Example-Application.9a5baa46c84b.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/fastapi-python-web-apis/">
+      <h2 class="card-title h4 my-0 py-0">A Close Look at a FastAPI Example Application</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Nov 03, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/api/" class="badge badge-light text-muted" data-previewable>api</a>
+
+        
+          
+<a href="/tutorials/web-dev/" class="badge badge-light text-muted" data-previewable>web-dev</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+
+  
+  <div class="col-12">
+    <div class="col-12 rounded p-0 w-100 mt-2 mb-4" style="overflow:hidden;">
+        
+
+<div style="display:block;position:relative;">
+  <div style="display:block;width:100%;padding-top:12.5%;"></div>
+  <div class="rpad rounded border" data-unit="8x1" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;"></div>
+</div>
+<a class="small text-muted" href="/account/join/" rel="nofollow"><span class="icon baseline mr-1" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--circle-info"/></svg></span>Remove ads</a>
+
+
+    </div>
+  </div>
+  
+
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-logging/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #e6c7ab;" alt="Logging in Python" src="https://files.realpython.com/media/Logging-in-Python_Watermarked.4ca8974dc55c.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Logging-in-Python_Watermarked.4ca8974dc55c.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Logging-in-Python_Watermarked.4ca8974dc55c.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Logging-in-Python_Watermarked.4ca8974dc55c.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Logging-in-Python_Watermarked.4ca8974dc55c.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-logging/">
+      <h2 class="card-title h4 my-0 py-0">Logging in Python</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 29, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/best-practices/" class="badge badge-light text-muted" data-previewable>best-practices</a>
+
+        
+          
+<a href="/tutorials/tools/" class="badge badge-light text-muted" data-previewable>tools</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/courses/speed-python-concurrency/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #abe5b2;" alt="Speed Up Your Python Program With Concurrency" src="https://files.realpython.com/media/An-Overview-of-Concurrency-in-Python_Watermarked.c54c399ccb32.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/An-Overview-of-Concurrency-in-Python_Watermarked.c54c399ccb32.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/An-Overview-of-Concurrency-in-Python_Watermarked.c54c399ccb32.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/An-Overview-of-Concurrency-in-Python_Watermarked.c54c399ccb32.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/An-Overview-of-Concurrency-in-Python_Watermarked.c54c399ccb32.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+      <div class="card-img-overlay d-flex align-items-center">
+        <div class="mx-auto">
+          <span class="text-light" style="opacity: 0.90;">
+            
+              <span class="icon baseline scale3x" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@play"/></svg></span>
+            
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/courses/speed-python-concurrency/">
+      <h2 class="card-title h4 my-0 py-0">Speed Up Python With Concurrency</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 28, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/advanced/" class="badge badge-light text-muted" data-previewable>advanced</a>
+
+        
+          
+<a href="/tutorials/best-practices/" class="badge badge-light text-muted" data-previewable>best-practices</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-optional-arguments/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #e5c5ac;" alt="Using Python Optional Arguments When Defining Functions" src="https://files.realpython.com/media/How-to-Create-Python-Functions-with-Optional-Arguments_Watermarked.f2c8b582aff0.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/How-to-Create-Python-Functions-with-Optional-Arguments_Watermarked.f2c8b582aff0.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/How-to-Create-Python-Functions-with-Optional-Arguments_Watermarked.f2c8b582aff0.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/How-to-Create-Python-Functions-with-Optional-Arguments_Watermarked.f2c8b582aff0.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/How-to-Create-Python-Functions-with-Optional-Arguments_Watermarked.f2c8b582aff0.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-optional-arguments/">
+      <h2 class="card-title h4 my-0 py-0">Using Python Optional Arguments When Defining Functions</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 27, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/basics/" class="badge badge-light text-muted" data-previewable>basics</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/what-can-i-do-with-python/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #abe5b2;" alt="What Can I Build With Python?" src="https://files.realpython.com/media/building_with_python_watermark.2ebe5beb5b1e.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/building_with_python_watermark.2ebe5beb5b1e.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/building_with_python_watermark.2ebe5beb5b1e.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/building_with_python_watermark.2ebe5beb5b1e.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/building_with_python_watermark.2ebe5beb5b1e.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/what-can-i-do-with-python/">
+      <h2 class="card-title h4 my-0 py-0">What Can I Do With Python?</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 22, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/basics/" class="badge badge-light text-muted" data-previewable>basics</a>
+
+        
+          
+<a href="/tutorials/career/" class="badge badge-light text-muted" data-previewable>career</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/courses/investigating-quasar-data-polars-marimo-notebooks/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #ffc973;" alt="Investigating Quasar Data With Polars and Interactive Marimo Notebooks" src="https://files.realpython.com/media/Investigating-Quasar-Data-with-Polars-and-Interactive-Marimo-Notebooks.81506c70c797.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Investigating-Quasar-Data-with-Polars-and-Interactive-Marimo-Notebooks.81506c70c797.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Investigating-Quasar-Data-with-Polars-and-Interactive-Marimo-Notebooks.81506c70c797.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Investigating-Quasar-Data-with-Polars-and-Interactive-Marimo-Notebooks.81506c70c797.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Investigating-Quasar-Data-with-Polars-and-Interactive-Marimo-Notebooks.81506c70c797.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+      <div class="card-img-overlay d-flex align-items-center">
+        <div class="mx-auto">
+          <span class="text-light" style="opacity: 0.90;">
+            
+              <span class="icon baseline scale3x" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@play"/></svg></span>
+            
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/courses/investigating-quasar-data-polars-marimo-notebooks/">
+      <h2 class="card-title h4 my-0 py-0">Investigating Quasar Data With Polars and Interactive marimo Notebooks</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 21, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/data-science/" class="badge badge-light text-muted" data-previewable>data-science</a>
+
+        
+          
+<a href="/tutorials/data-viz/" class="badge badge-light text-muted" data-previewable>data-viz</a>
+
+        
+          
+<a href="/tutorials/web-dev/" class="badge badge-light text-muted" data-previewable>web-dev</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-repr-vs-str/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #abe5b2;" alt="When Should You Use .__repr__() vs .__str__() in Python?" src="https://files.realpython.com/media/Pythons-.__repr__-vs-.__str__-Whats-the-Difference_Watermarked.a96767464f75.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Pythons-.__repr__-vs-.__str__-Whats-the-Difference_Watermarked.a96767464f75.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Pythons-.__repr__-vs-.__str__-Whats-the-Difference_Watermarked.a96767464f75.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Pythons-.__repr__-vs-.__str__-Whats-the-Difference_Watermarked.a96767464f75.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Pythons-.__repr__-vs-.__str__-Whats-the-Difference_Watermarked.a96767464f75.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-repr-vs-str/">
+      <h2 class="card-title h4 my-0 py-0">When Should You Use .__repr__() vs .__str__() in Python?</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 20, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/best-practices/" class="badge badge-light text-muted" data-previewable>best-practices</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/polars-vs-pandas/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #ffc873;" alt="Polars vs pandas: What&#x27;s the Difference?" src="https://files.realpython.com/media/Polars-vs-Pandas_Watermarked.0021a1a79975.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Polars-vs-Pandas_Watermarked.0021a1a79975.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Polars-vs-Pandas_Watermarked.0021a1a79975.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Polars-vs-Pandas_Watermarked.0021a1a79975.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Polars-vs-Pandas_Watermarked.0021a1a79975.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/polars-vs-pandas/">
+      <h2 class="card-title h4 my-0 py-0">Polars vs pandas: What&#x27;s the Difference?</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 15, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/data-science/" class="badge badge-light text-muted" data-previewable>data-science</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/courses/python-descriptors/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #fe7e73;" alt="Python Descriptors: An Introduction" src="https://files.realpython.com/media/Python-Descriptors_Watermarked.6e3274d987a2.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Python-Descriptors_Watermarked.6e3274d987a2.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Python-Descriptors_Watermarked.6e3274d987a2.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Python-Descriptors_Watermarked.6e3274d987a2.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Python-Descriptors_Watermarked.6e3274d987a2.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+      <div class="card-img-overlay d-flex align-items-center">
+        <div class="mx-auto">
+          <span class="text-light" style="opacity: 0.90;">
+            
+              <span class="icon baseline scale3x" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@play"/></svg></span>
+            
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/courses/python-descriptors/">
+      <h2 class="card-title h4 my-0 py-0">Python Descriptors</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 14, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-first-steps/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #ff7e74;" alt="How to Use Python: Your First Steps" src="https://files.realpython.com/media/UPDATE-First-Steps-With-Python_Watermarked.256721df5607.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/UPDATE-First-Steps-With-Python_Watermarked.256721df5607.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/UPDATE-First-Steps-With-Python_Watermarked.256721df5607.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/UPDATE-First-Steps-With-Python_Watermarked.256721df5607.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/UPDATE-First-Steps-With-Python_Watermarked.256721df5607.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-first-steps/">
+      <h2 class="card-title h4 my-0 py-0">How to Use Python: Your First Steps</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 13, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/basics/" class="badge badge-light text-muted" data-previewable>basics</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python314-new-features/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #e5c6aa;" alt="Python 3.14: Cool New Features for You to Try" src="https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python314-new-features/">
+      <h2 class="card-title h4 my-0 py-0">Python 3.14: Cool New Features for You to Try</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 08, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/news/" class="badge badge-light text-muted" data-previewable>news</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/courses/whats-new-python-314/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #e5c6aa;" alt="Python 3.14: Cool New Features for You to Try" src="https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Python-3.14-Cool-New-Features_Watermarked.1f256aff1d4b.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+      <div class="card-img-overlay d-flex align-items-center">
+        <div class="mx-auto">
+          <span class="text-light" style="opacity: 0.90;">
+            
+              <span class="icon baseline scale3x" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@play"/></svg></span>
+            
+          </span>
+        </div>
+      </div>
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/courses/whats-new-python-314/">
+      <h2 class="card-title h4 my-0 py-0">What&#x27;s New in Python 3.14</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 07, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/intermediate/" class="badge badge-light text-muted" data-previewable>intermediate</a>
+
+        
+          
+<a href="/tutorials/python/" class="badge badge-light text-muted" data-previewable>python</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+    <div class="col-12 col-md-6 col-lg-4 mb-5">
+      
+
+<div class="card border-0">
+  <a href="/python-news-october-2025/">
+    <div class="embed-responsive embed-responsive-16by9">
+      
+        <img loading="lazy" class="card-img-top m-0 p-0 embed-responsive-item rounded" style="object-fit: contain; background: #abe5b2;" alt="Python Monthly News" src="https://files.realpython.com/media/Monthly-Python-News_Green_Watermarked.dfc38b44f855.jpg" width="1920" height="1080" srcset="/cdn-cgi/image/width=480,format=auto/https://files.realpython.com/media/Monthly-Python-News_Green_Watermarked.dfc38b44f855.jpg 480w, /cdn-cgi/image/width=640,format=auto/https://files.realpython.com/media/Monthly-Python-News_Green_Watermarked.dfc38b44f855.jpg 640w, /cdn-cgi/image/width=960,format=auto/https://files.realpython.com/media/Monthly-Python-News_Green_Watermarked.dfc38b44f855.jpg 960w, /cdn-cgi/image/width=1920,format=auto/https://files.realpython.com/media/Monthly-Python-News_Green_Watermarked.dfc38b44f855.jpg 1920w" sizes="(min-width: 1200px) 330px, (min-width: 1000px) 290px, (min-width: 780px) 330px, (min-width: 580px) 510px, calc(100vw - 30px)">
+      
+      
+    </div>
+  </a>
+  <div class="card-body m-0 p-0 mt-2">
+    <a class=" " href="/python-news-october-2025/">
+      <h2 class="card-title h4 my-0 py-0">It&#x27;s Almost Time for Python 3.14 and Other Python News</h2>
+    </a>
+    <p class="card-text text-muted text-truncate small">
+      
+        <span class="mr-2">Oct 06, 2025</span>
+      
+      
+      
+        <span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@category"/></svg></span>
+        
+          
+<a href="/tutorials/community/" class="badge badge-light text-muted" data-previewable>community</a>
+
+        
+          
+<a href="/tutorials/news/" class="badge badge-light text-muted" data-previewable>news</a>
+
+        
+      
+    </p>
+  </div>
+</div>
+
+    </div>
+  
+
+  
+
+<div class="w-100 text-center" id="frontpageLoadMore">
+  <button class="btn btn-secondary btn-lg px-5 mb-5" hx-get="/api/v1/frontpage_tutorials/1759759200/?v2" hx-trigger="click" hx-target="#frontpageLoadMore" hx-swap="outerHTML" hx-ext="loading-states" data-loading-disable><span class="htmx-indicator mx-1"><span class="icon baseline spin" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@loading-spinner"/></svg></span></span>Load More</button>
+</div>
+
+
+
+  <div class="col-12 col-lg-9 mx-auto my-0">
+    
+
+
+<div class="d-flex mb-5">
+  <form class="form-inline col p-0" action="/search" method="GET" id="home-search-form-2">
+    <a class="js-search-form-submit position-absolute" href="/search" title="Search" aria-hidden="true" tabindex="-1"><span class="icon baseline text-muted pl-2" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#@search"/></svg></span></a>
+    <input class="form-control form-control-lg w-100 " style="padding-left: 2rem;" maxlength=50 type="search" placeholder="Search Tutorials, Courses, Quizzes, Learning Paths&hellip;" aria-label="Search" name="q" autocomplete="off">
+    <input type="hidden" name="_from" value="home">
+    
+    
+  </form>
+  <button class="ml-3 btn btn-primary col-3 d-none d-lg-block" style="max-width: 250px;" type="submit" form="home-search-form-2">Search&nbsp;»</button>
+</div>
+
+  </div>
+
+
+  </div>
+
+    </div>
+
+    
+    
+
+    
+    
+
+    
+      
+
+<footer class="footer pb-4">
+  <div class="mx-5">
+
+    <div class="row justify-content-lg-center">
+
+      <div class="mx-4 mt-5">
+        <h5>Learn Python</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/start-here/">Start Here</a></li>
+          <li><a href="/search">Learning Resources</a></li>
+          <li><a href="/mentor/">Code Mentor</a></li>
+          <li><a href="/ref/">Python Reference</a></li>
+          <li><a href="/cheatsheets/python/">Python Cheat Sheet</a></li>
+          <li><a href="https://support.realpython.com/">Support Center</a></li>
+        </ul>
+      </div>
+
+      <div class="mx-4 mt-5">
+        <h5>Courses &amp; Paths</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/learning-paths/">Learning Paths</a></li>
+          <li><a href="/quizzes/">Quizzes &amp; Exercises</a></li>
+          <li><a href="/tutorials/all/">Browse Topics</a></li>
+          <li><a href="/live/">Live Courses</a></li>
+          <li><a href="/books/">Books</a></li>
+        </ul>
+      </div>
+
+      <div class="mx-4 mt-5">
+        <h5>Community</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/podcasts/rpp/">Podcast</a></li>
+          <li><a href="/newsletter/">Newsletter</a></li>
+          <li><a href="/community/">Community Chat</a></li>
+          <li><a href="/office-hours/">Office Hours</a></li>
+          <li><a href="/learner-stories/">Learner Stories</a></li>
+        </ul>
+      </div>
+
+      <div class="mx-4 mt-5">
+        <h5>Membership</h5>
+        <ul class="list-unstyled mb-0">
+          
+            <li><a href="/account/join/">Plans &amp; Pricing</a></li>
+          
+          <li><a href="/account/join-team/">Team Plans</a></li>
+          <li><a href="/account/join-team/inquiry/">For Business</a></li>
+          <li><a href="/account/join-team/education-inquiry/">For Schools</a></li>
+          <li><a href="/learner-stories/">Reviews</a></li>
+        </ul>
+      </div>
+
+      <div class="mx-4 mt-5">
+        <h5>Company</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/about/">About Us</a></li>
+          <li><a href="/team/">Team</a></li>
+          <li><a href="/mission/">Mission &amp; Values</a></li>
+          <li><a href="/editorial-guidelines/">Editorial Guidelines</a></li>
+          <li><a href="/sponsorships/">Sponsorships</a></li>
+          <li><a href="https://realpython.workable.com">Careers</a></li>
+          <li><a href="/media-kit/">Press Kit</a></li>
+          <li><a href="/merch">Merch</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="flex-column flex-lg-row justify-content-center align-items-center mt-5 row ">
+
+      <div class="d-flex justify-content-center mx-4 text-muted flex-nowrap">
+        <a class="highlight-icon-hover-dark px-2 ml-n2" title="YouTube" href="https://www.youtube.com/realpython"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#brands--youtube"/></svg></span></a>
+        <a class="highlight-icon-hover-dark px-2" title="X/Twitter" href="https://x.com/realpython"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#brands--x-twitter"/></svg></span></a>
+        <a class="highlight-icon-hover-dark px-2" title="LinkedIn" href="https://www.linkedin.com/company/realpython-com"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#brands--linkedin"/></svg></span></a>
+        <a class="highlight-icon-hover-dark px-2" title="Facebook" href="https://www.facebook.com/LearnRealPython"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#brands--facebook"/></svg></span></a>
+        <a class="highlight-icon-hover-dark px-2 mr-n2" title="GitHub" href="https://github.com/realpython/"><span class="icon baseline" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#brands--github"/></svg></span></a>
+      </div>
+
+      <div class="mx-4 small text-muted text-center text-wrap-balance">
+        <a href="/privacy-policy/">Privacy Policy</a>&nbsp;⋅
+        <a href="/terms/">Terms of Use</a>&nbsp;⋅
+        
+        <a href="/security/">Security</a>&nbsp;⋅
+        
+        <a href="/contact/">Contact</a>
+      </div>
+
+      <div class="mx-4 small text-muted user-select-none text-center">
+        <span><span class="icon baseline text-color-red" aria-hidden="true"><svg aria-hidden="true"><use href="/static/icons.0fae35ff985f.svg#solid--heart"/></svg></span> Happy Pythoning!</span>
+      </div>
+
+    </div>
+
+    <div class="d-flex justify-content-center small mt-4">
+      <div class="text-muted text-center text-wrap-balance" style="line-height: 1.25;">
+        <small>
+          © 2012–2025 DevCademy Media Inc. DBA Real&nbsp;Python. All rights reserved.<br>
+          REALPYTHON™ is a trademark of DevCademy&nbsp;Media&nbsp;Inc.
+        </small>
+        <a href="/" class="d-flex justify-content-center mt-3 mx-auto w-50">
+          <img loading="lazy" src="/static/real-python-logo-primary.973743b6d39d.svg" class="img-fluid flex-grow-1" width="120" height="47" alt="Real Python - Online Python Training (logo)">
+        </a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+    
+
+    
+
+    
+    <script>
+      (function() {
+        var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+        if (!isAndroid) {
+          return;
+        }
+
+        var styles = `
+        @font-face {
+          font-family: 'DejaVu Sans Mono';
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+          src: url('/static/mfonts/dejavu-sans-mono.33f00225f915.woff2') format('woff2'),
+               url('/static/mfonts/dejavu-sans-mono.0da77d3739f3.woff') format('woff'),
+               url('/static/mfonts/dejavu-sans-mono.c2356fc49835.ttf') format('truetype');
+        }
+        code, kbd, pre, samp {
+          font-family: 'DejaVu Sans Mono', monospace;
+        }
+        `
+
+        var styleSheet = document.createElement("style")
+        styleSheet.type = "text/css"
+        styleSheet.innerText = styles
+        document.head.appendChild(styleSheet)
+      })();
+    </script>
+
+    
+    
+    <script src="/static/jquery.min.2c872dbe60f4.js"></script>
+    <script src="/static/popper.min.aeebb49d0b64.js"></script>
+    <script src="/static/bootstrap.min.248284cdd069.js"></script>
+
+    
+    
+
+
+    <script>
+    (function() {
+      document.querySelectorAll(".js-search-form-submit").forEach(function(el) {
+        el.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.currentTarget.parentElement.submit();
+        })
+      });
+    })();
+    </script>
+    <script src="/static/frontend/reader/lightbox.26c46bc9a761.js" async></script>
+    <script src="/static/frontend/reader/platforms-ui.d67cd648a799.js" async></script>
+    
+
+    <script src="/static/frontend/previews/popover.20b4ecd7f1c8.js" async></script>
+
+    
+      
+      
+        
+
+
+<exit-prompt>
+  <template>
+    <div class="card bg-secondary">
+      <div class="card-header h3 text-center bg-light">
+        Free Bonus: <strong>Python Cheat Sheet</strong>
+        <button type="button" class="float-right border-0 bg-transparent text-muted" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="card-body">
+        <p class="mb-0">Get a <strong>Python Cheat Sheet (PDF)</strong> and learn the basics of Python, like working with data types, dictionaries, lists, and Python functions:</p>
+        <img class="img-fluid mb-3 w-100 px-3" src="/static/cheatsheet-stacked-sm.c9ac81c58bcc.png" alt="Python Cheat Sheet" width="400" height="257">
+        <div class="row">
+            <form class="col-12" action="/optins/process/" method="post">
+              <input type="hidden" name="slug" value="static-cheat-sheet">
+              <input type="hidden" name="source_path" value="/">
+              <div class="form-group">
+                <input name="email" type="email" class="form-control form-control-lg" placeholder="Email Address" autocomplete="email" required autofocus>
+              </div>
+              <button name="submit" type="submit" class="btn btn-primary btn-lg btn-block">Send My Python Cheat&nbsp;Sheet »</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+</exit-prompt>
+
+
+
+
+      
+    
+
+    <script src="/static/frontend/podcasts/components/podcast-player.ca54586fe379.js" defer></script>
+<script src="/static/frontend/components/exit-prompt.bd193e2a65ef.js" defer></script>
+<link rel="stylesheet" href="/static/shikwasa.f84318141c77.css">
+
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+    
+  
+<script>window.rp_prop_id = '58946116052';</script>
+<script src="https://srv.realpython.net/tag.js" async></script>
+
+
+  <script src="/static/frontend/vendor/htmx.b97267d6d08f.js" defer></script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://realpython.com/#organization",
+      "name": "Real Python",
+      "url": "https://realpython.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://realpython.com/static/real-python-logo-square-512.157ae6bf64ed.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "Real Python is a leading provider of online Python education and one of the largest language-specific online communities for software developers. It publishes high-quality learning resources, such as tutorials, books, and courses to an audience of millions of developers, data scientists, and machine learning engineers each month.",
+      "slogan": "Become a Python Expert",
+      "email": "info@realpython.com",
+      "sameAs": [
+        "https://github.com/realpython",
+        "https://www.youtube.com/realpython",
+        "https://twitter.com/realpython",
+        "https://x.com/realpython",
+        "https://www.linkedin.com/company/realpython-com/",
+        "https://www.facebook.com/learnrealpython",
+        "https://www.instagram.com/realpython",
+        "https://www.tiktok.com/@realpython.com"
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://realpython.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://realpython.com/search?q={query}"
+        },
+        "query-input": "required name=query"
+      }
+    }
+  ]
+}</script>
+
+
+    <script src="/static/frontend/optins/optins.e9c27522d541.js" async></script>
+    <script src="/static/frontend/search/autocomplete.bbebb98e5d18.js" async></script>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+
+    
+
+    
+
+    
+
+
+  
+  <div id="g_id_onload"
+    data-client_id="912944204353-gv43om9f7qmj4eprm0esc45r12etunvp.apps.googleusercontent.com"
+    data-login_uri="https://realpython.com/account/google/login/token/?next=/"
+    data-itp_support="false">
+  </div>
+  <script src="//accounts.google.com/gsi/client" async></script>
+
+
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a04d3d718ecbb6f',t:'MTc2MzQ0MTIyMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

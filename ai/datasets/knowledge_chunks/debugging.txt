@@ -1,0 +1,8 @@
+تصحيح الأخطاء (Debugging) هو عملية اكتشاف الأخطاء في الكود وإصلاحها.
+من الأخطاء الشائعة في بايثون:
+- SyntaxError
+- NameError
+- TypeError
+- IndexError
+
+قراءة traceback من أهم مهارات المبرمج الجيد.

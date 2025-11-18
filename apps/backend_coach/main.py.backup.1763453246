@@ -1,0 +1,633 @@
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, List
+import logging
+from pathlib import Path
+from datetime import datetime
+import subprocess
+
+# ===== الإعدادات الأساسية =====
+BASE_DIR = Path("/root/hyper-factory")
+KNOWLEDGE_DIR = BASE_DIR / "ai" / "datasets" / "knowledge_chunks"
+LOGS_DIR = BASE_DIR / "logs"
+ORCHESTRATOR_LOG = LOGS_DIR / "orchestrator" / "decisions.log"
+PDF_DIR = BASE_DIR / "ai" / "pdfs"
+PDF_INGEST_SCRIPT = BASE_DIR / "scripts" / "ai" / "pdf_processor" / "pdf_ingest.sh"
+
+# إعداد السجل
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("backend_coach")
+
+app = FastAPI(
+    title="🏭 مصنع العمال الأذكياء - Backend Coach",
+    description="API لتدريب المبرمجين على مسار Backend Junior وربط المصنع بالمعرفة",
+    version="2.0.0"
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ===== نماذج البيانات =====
+class DebugRequest(BaseModel):
+    code: str
+    error: Optional[str] = None
+    language: str = "python"
+
+
+# ===== دوال مساعدة =====
+def count_knowledge_chunks() -> int:
+    if not KNOWLEDGE_DIR.exists():
+        return 0
+    return len([p for p in KNOWLEDGE_DIR.glob("*") if p.is_file()])
+
+
+def knowledge_quality(total: int) -> str:
+    if total == 0:
+        return "لا توجد معرفة بعد ❌"
+    if total < 10:
+        return "تحتاج تحسين ⚠️"
+    return "جيدة ✅"
+
+
+def read_decisions(limit: int) -> List[str]:
+    if not ORCHESTRATOR_LOG.exists():
+        return []
+    with ORCHESTRATOR_LOG.open("r", encoding="utf-8", errors="ignore") as f:
+        lines = f.readlines()
+    return [line.rstrip("\n") for line in lines[-limit:]]
+
+
+# ===== Endpoints أساسية =====
+@app.get("/")
+def root():
+    return {
+        "message": "🏭 مصنع العمال الأذكياء - Backend Coach API",
+        "version": "2.0.0",
+        "status": "يعمل 🚀",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@app.get("/api/health")
+def health():
+    return {
+        "status": "healthy ✅",
+        "service": "backend_coach",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@app.get("/api/factory/status")
+def factory_status():
+    chunks = count_knowledge_chunks()
+    return {
+        "factory": {
+            "name": "مصنع العمال الأذكياء",
+            "status": "operational 🏭",
+            "version": "1.0.0",
+            "agents_count": 4,
+            "knowledge_chunks": chunks,
+            "last_updated": datetime.now().isoformat(),
+        }
+    }
+
+
+@app.get("/api/knowledge/stats")
+def knowledge_stats():
+    total = count_knowledge_chunks()
+    return {
+        "total_chunks": total,
+        "last_updated": datetime.now().isoformat(),
+        "quality": knowledge_quality(total),
+    }
+
+
+@app.get("/api/orchestrator/decisions")
+def orchestrator_decisions(limit: int = Query(10, ge=1, le=100)):
+    items = read_decisions(limit)
+    return {
+        "limit": limit,
+        "count": len(items),
+        "items": items,
+    }
+
+
+@app.get("/api/agents")
+def list_agents():
+    chunks = count_knowledge_chunks()
+    return {
+        "agents": [
+            {
+                "id": "debug_expert",
+                "name": "خبير تصحيح الأخطاء",
+                "status": "active 🟢",
+                "description": "متخصص في تحليل وتصحيح أخطاء البرمجة",
+            },
+            {
+                "id": "system_architect",
+                "name": "مهندس النظام",
+                "status": "active 🟢",
+                "description": "متخصص في تصميم وهندسة الأنظمة",
+            },
+            {
+                "id": "technical_coach",
+                "name": "المدرب التقني",
+                "status": "active 🟢",
+                "description": "متخصص في تدريب المبرمجين وتحسين مهاراتهم",
+            },
+            {
+                "id": "knowledge_spider",
+                "name": "عنكبوت المعرفة",
+                "status": "active 🟢",
+                "description": "متخصص في جمع وتنظيم المعرفة التقنية",
+            },
+        ],
+        "knowledge": {
+            "chunks": chunks,
+        },
+    }
+
+
+@app.post("/api/debug")
+def debug_code(payload: DebugRequest):
+    logger.info(f"طلب تصحيح كود: {payload.language}")
+
+    analysis = f"🔍 تحليل كود {payload.language}"
+    if payload.error:
+        analysis += f": {payload.error}"
+
+    suggestions = [
+        "✅ تحقق من أسماء المتغيرات والأساليب",
+        "✅ تأكد من الأقواس وعلامات التنصيص",
+        "✅ جرب تشغيل الكود جزء جزء لاكتشاف الخطأ",
+        "✅ استخدم print للمتغيرات للتتبع",
+    ]
+
+    return {
+        "success": True,
+        "analysis": analysis,
+        "suggestions": suggestions,
+        "fixed_code": "# الكود المصحح سيظهر هنا\n" + payload.code,
+    }
+
+
+@app.post("/api/knowledge/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    """رفع ملف PDF ومعالجته في معالج PDF الخارجي"""
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="يجب أن يكون الملف بصيغة PDF")
+
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
+    pdf_path = PDF_DIR / file.filename
+
+    try:
+        content = await file.read()
+        with pdf_path.open("wb") as f:
+            f.write(content)
+    finally:
+        await file.close()
+
+    # تشغيل معالج PDF إن وجد
+    if PDF_INGEST_SCRIPT.exists():
+        try:
+            subprocess.run([str(PDF_INGEST_SCRIPT)], check=True)
+        except Exception as e:
+            logger.exception("خطأ في معالج PDF")
+            raise HTTPException(
+                status_code=500,
+                detail=f"تم حفظ الملف لكن فشل معالج PDF: {e}",
+            )
+    else:
+        logger.warning("لم يتم العثور على سكربت pdf_ingest.sh")
+
+    total = count_knowledge_chunks()
+    return {
+        "message": "تم رفع ومعالجة الملف (إن أمكن)",
+        "filename": file.filename,
+        "total_chunks": total,
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=9090, reload=False)
+
+# ===== التحليل الذكي لرسائل المستخدمين باستخدام LLMOrchestrator =====
+@app.get("/api/orchestrator/analyze")
+async def analyze_message(
+    message: str = Query(..., description="نص رسالة المستخدم"),
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    تحليل الرسالة وتحديد العامل المناسب (Debug / Architect / Coach / Spider)
+    مع سبب الاختيار.
+    """
+    try:
+        import sys
+        sys.path.append("/root/hyper-factory/scripts/ai/llm")
+        from llm_orchestrator import LLMOrchestrator
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"فشل في تحميل LLMOrchestrator: {str(e)}",
+        )
+
+    try:
+        orchestrator = LLMOrchestrator()
+        analysis = orchestrator.analyze_message(message, user_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"فشل في تحليل الرسالة: {str(e)}",
+        )
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "message": message,
+        "target_agent": analysis.get("target_agent"),
+        "confidence": analysis.get("confidence"),
+        "reason": analysis.get("reason"),
+    }
+
+# ===== Endpoint جواب ذكي مع RAG-MVP =====
+from fastapi import Query, HTTPException
+
+@app.get("/api/orchestrator/answer")
+async def orchestrator_answer(
+    message: str = Query(..., description="نص رسالة المستخدم"),
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    Endpoint أعلى مستوى:
+    - يحلل الرسالة لتحديد العامل المناسب.
+    - لو العامل knowledge_spider يستخدم طبقة RAG لاسترجاع سياقات من المعرفة.
+    - النسخة الحالية MVP لا تستدعي LLM فعلياً للجواب، فقط تعيد السياقات.
+    """
+    try:
+        import sys
+        sys.path.append("/root/hyper-factory/scripts/ai/llm")
+        from llm_orchestrator import LLMOrchestrator
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"فشل في تحميل LLMOrchestrator: {str(e)}",
+        )
+
+    orchestrator = LLMOrchestrator()
+    analysis = orchestrator.analyze_message(message, user_id)
+
+    if analysis.get("target_agent") == "knowledge_spider":
+        result = orchestrator.answer_with_knowledge(message, user_id)
+    else:
+        # حالياً لا يوجد استدعاء LLM فعلي لباقي العمال في هذا الـ MVP
+        result = {
+            "mode": "analysis_only",
+            "answer": None,
+            "note": "تم تحليل الرسالة وتحديد العامل فقط. RAG مخصص حالياً لـ knowledge_spider.",
+        }
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "message": message,
+        "routing": analysis,
+        "result": result,
+    }
+
+# ===================== Skills System =====================
+import os as _os_sk
+import sys as _sys_sk
+from fastapi import Query, HTTPException
+
+# ضمان قدرة Python على رؤية جذر المشروع
+_ROOT_DIR_SK = _os_sk.path.abspath(_os_sk.path.join(_os_sk.path.dirname(__file__), "..", ".."))
+if _ROOT_DIR_SK not in _sys_sk.path:
+    _sys_sk.path.append(_ROOT_DIR_SK)
+
+from scripts.ai.skills_manager import SkillsManager  # type: ignore
+
+skills_manager = SkillsManager()
+
+
+@app.get("/api/skills/state")
+async def get_skills_state(
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    إرجاع حالة مهارات المستخدم:
+    - المرحلة الحالية
+    - التقدم العام
+    - عدد الجلسات
+    - بعض المهارات الضعيفة
+    """
+    try:
+        profile = skills_manager.get_user_skills(user_id)
+        weak_skills = skills_manager.get_weak_skills(user_id)
+
+        return {
+            "success": True,
+            "user_id": user_id,
+            "profile": {
+                "track": profile["track_id"],
+                "current_phase": profile["current_phase"],
+                "overall_progress": profile["overall_progress"],
+                "sessions_count": profile["sessions_count"],
+                "weak_skills_count": len(weak_skills),
+            },
+            "weak_skills": weak_skills[:3],
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"خطأ في نظام المهارات: {e}")
+
+
+@app.post("/api/skills/update")
+async def update_skill_score(
+    user_id: str = Query(..., description="معرّف المستخدم"),
+    skill_id: str = Query(..., description="معرّف المهارة من skills YAML"),
+    new_score: int = Query(..., ge=0, le=100, description="الدرجة الجديدة (0-100)"),
+):
+    """
+    تحديث درجة مهارة واحدة للمستخدم
+    """
+    try:
+        profile = skills_manager.update_skill_score(user_id, skill_id, new_score)
+
+        return {
+            "success": True,
+            "user_id": user_id,
+            "skill_id": skill_id,
+            "new_score": new_score,
+            "updated_profile": {
+                "overall_progress": profile["overall_progress"],
+                "current_phase": profile["current_phase"],
+            },
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"خطأ في تحديث المهارة: {e}")
+
+# ===== تكامل المصنع المتقدم: Orchestrator + Skills =====
+from scripts.ai.llm.llm_orchestrator import LLMOrchestrator
+from scripts.ai.skills_manager import SkillsManager
+from fastapi import Query, HTTPException
+
+orchestrator = LLMOrchestrator()
+skills_manager = SkillsManager()
+
+# خريطة: أي Agent → مهارات يتم تحسينها مع كل Session
+AGENT_SKILL_MAP = {
+    "technical_coach": ["python_control_flow", "python_functions_basics"],
+    "debug_expert": ["python_errors_handling"],
+    "system_architect": ["backend_framework_intro", "db_modeling_basic"],
+    "knowledge_spider": ["web_http_fundamentals"],
+}
+
+
+def _auto_update_skills(user_id: str, target_agent: str) -> None:
+    """
+    تحديث أوتوماتيك لمجموعة مهارات بناء على الـ agent.
+
+    سياسة بسيطة:
+    - لو score < 40 → +15
+    - لو 40 <= score < 70 → +10
+    - لو score >= 70 → +5
+    """
+    skills_ids = AGENT_SKILL_MAP.get(target_agent, [])
+    if not skills_ids:
+        return
+
+    profile = skills_manager.get_user_skills(user_id)
+
+    for skill_id in skills_ids:
+        current = profile["skills"].get(skill_id, {}).get("score", 0)
+
+        if current < 40:
+            delta = 15
+        elif current < 70:
+            delta = 10
+        else:
+            delta = 5
+
+        new_score = min(current + delta, 100)
+        skills_manager.update_skill_score(
+            user_id,
+            skill_id,
+            new_score,
+            practice_context={"source": "auto_session", "agent": target_agent},
+        )
+
+
+@app.post("/api/orchestrator/answer")
+async def orchestrator_answer(payload: dict):
+    """
+    واجهة المصنع الموحدة:
+    - input: { "message": "...", "user_id": "..." }
+    - output: routing + RAG contexts + metadata
+    - يقوم بتحديث المهارات أوتوماتيكياً حسب الـ agent
+    """
+    message = (payload or {}).get("message", "")
+    user_id = (payload or {}).get("user_id", "anonymous")
+
+    if not message:
+        raise HTTPException(status_code=400, detail="message مطلوب")
+
+    orchestration = orchestrator.answer_with_rag(message, user_id=user_id)
+    target_agent = orchestration.get("routing", {}).get("target_agent")
+
+    if target_agent:
+        _auto_update_skills(user_id, target_agent)
+
+    return orchestration
+
+
+@app.get("/api/skills/state")
+async def get_skills_state(
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    الحصول على حالة مهارات المستخدم + أهم المهارات الضعيفة
+    """
+    profile = skills_manager.get_user_skills(user_id)
+    weak_skills = skills_manager.get_weak_skills(user_id)
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "profile": {
+            "track": profile["track_id"],
+            "current_phase": profile["current_phase"],
+            "overall_progress": profile["overall_progress"],
+            "sessions_count": profile["sessions_count"],
+            "weak_skills_count": len(weak_skills),
+        },
+        "weak_skills": weak_skills[:3],
+    }
+
+
+@app.post("/api/skills/update")
+async def manual_update_skill(
+    user_id: str = Query(..., description="معرّف المستخدم"),
+    skill_id: str = Query(..., description="معرّف المهارة (كما في YAML)"),
+    new_score: int = Query(..., ge=0, le=100, description="الدرجة الجديدة (0-100)"),
+):
+    """
+    تحديث يدوي لدرجة مهارة معينة (للاستخدام الإداري أو من واجهة خارجية)
+    """
+    profile = skills_manager.update_skill_score(
+        user_id,
+        skill_id,
+        new_score,
+        practice_context={"source": "manual_update"},
+    )
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "skill_id": skill_id,
+        "new_score": new_score,
+        "overall_progress": profile["overall_progress"],
+        "current_phase": profile["current_phase"],
+    }
+
+# ===== Orchestrator + Skills Integration =====
+import os as _os_int
+import sys as _sys_int
+from fastapi import Query, HTTPException
+
+# ضمان رؤية جذر المشروع في sys.path
+_ROOT_DIR_INT = _os_int.path.abspath(_os_int.path.join(_os_int.path.dirname(__file__), "..", ".."))
+if _ROOT_DIR_INT not in _sys_int.path:
+    _sys_int.path.append(_ROOT_DIR_INT)
+
+from scripts.ai.llm.llm_orchestrator import LLMOrchestrator
+from scripts.ai.skills_manager import SkillsManager
+
+orchestrator = LLMOrchestrator()
+skills_manager = SkillsManager()
+
+# خريطة: أي Agent → مهارات يتم تحسينها مع كل Session
+AGENT_SKILL_MAP = {
+    "technical_coach": ["python_control_flow", "python_functions_basics"],
+    "debug_expert": ["python_errors_handling"],
+    "system_architect": ["backend_framework_intro", "db_modeling_basic"],
+    "knowledge_spider": ["web_http_fundamentals"],
+}
+
+
+def _auto_update_skills(user_id: str, target_agent: str) -> None:
+    """
+    تحديث أوتوماتيك لمجموعة مهارات بناء على الـ agent.
+
+    سياسة بسيطة:
+    - لو score < 40 → +15
+    - لو 40 <= score < 70 → +10
+    - لو score >= 70 → +5
+    """
+    skills_ids = AGENT_SKILL_MAP.get(target_agent, [])
+    if not skills_ids:
+        return
+
+    profile = skills_manager.get_user_skills(user_id)
+
+    for skill_id in skills_ids:
+        current = profile["skills"].get(skill_id, {}).get("score", 0)
+
+        if current < 40:
+            delta = 15
+        elif current < 70:
+            delta = 10
+        else:
+            delta = 5
+
+        new_score = min(current + delta, 100)
+        skills_manager.update_skill_score(
+            user_id,
+            skill_id,
+            new_score,
+            practice_context={"source": "auto_session", "agent": target_agent},
+        )
+
+
+@app.post("/api/orchestrator/answer")
+async def orchestrator_answer(payload: dict):
+    """
+    واجهة المصنع الموحدة:
+    - input: { "message": "...", "user_id": "..." }
+    - output: routing + RAG contexts + metadata
+    - يقوم بتحديث المهارات أوتوماتيكياً حسب الـ agent
+    """
+    message = (payload or {}).get("message", "")
+    user_id = (payload or {}).get("user_id", "anonymous")
+
+    if not message:
+        raise HTTPException(status_code=400, detail="message مطلوب")
+
+    orchestration = orchestrator.answer_with_rag(message, user_id=user_id)
+    target_agent = orchestration.get("routing", {}).get("target_agent")
+
+    if target_agent:
+        _auto_update_skills(user_id, target_agent)
+
+    return orchestration
+
+
+@app.get("/api/skills/state")
+async def get_skills_state(
+    user_id: str = Query("anonymous", description="معرّف المستخدم"),
+):
+    """
+    الحصول على حالة مهارات المستخدم + أهم المهارات الضعيفة
+    """
+    profile = skills_manager.get_user_skills(user_id)
+    weak_skills = skills_manager.get_weak_skills(user_id)
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "profile": {
+            "track": profile["track_id"],
+            "current_phase": profile["current_phase"],
+            "overall_progress": profile["overall_progress"],
+            "sessions_count": profile["sessions_count"],
+            "weak_skills_count": len(weak_skills),
+        },
+        "weak_skills": weak_skills[:3],
+    }
+
+
+@app.post("/api/skills/update")
+async def manual_update_skill(
+    user_id: str = Query(..., description="معرّف المستخدم"),
+    skill_id: str = Query(..., description="معرّف المهارة (كما في YAML)"),
+    new_score: int = Query(..., ge=0, le=100, description="الدرجة الجديدة (0-100)"),
+):
+    """
+    تحديث يدوي لدرجة مهارة معينة للمستخدم
+    """
+    profile = skills_manager.update_skill_score(
+        user_id,
+        skill_id,
+        new_score,
+        practice_context={"source": "manual_update"},
+    )
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "skill_id": skill_id,
+        "new_score": new_score,
+        "overall_progress": profile["overall_progress"],
+        "current_phase": profile["current_phase"],
+    }
+
+# Auto-wired skills & orchestrator router
+from skills_api import router as skills_router  # noqa: E402
+app.include_router(skills_router, prefix="/api")

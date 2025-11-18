@@ -1,0 +1,7 @@
+{"id": "4d787bac-b8bc-470b-973c-4643dc3543c3", "ts": "2025-11-18T22:58:30.282257Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}
+{"id": "3371e888-79fd-49fe-afb4-9a6ef7fa04ac", "ts": "2025-11-18T23:00:58.341427Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}
+{"id": "5acb89a8-6eea-4067-bcb1-01cac719b8d9", "ts": "2025-11-18T23:02:52.742213Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}
+{"id": "78f8c8cf-0d6e-47cf-a7f5-610b4a5360d6", "ts": "2025-11-18T23:07:12.670253Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}
+{"id": "b7eca516-8525-4275-ae87-9ee0d06efac8", "ts": "2025-11-18T23:07:45.495039Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}
+{"id": "91efc93e-f681-4a93-bb30-876f3f86bc05", "ts": "2025-11-18T23:08:19.031645Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}
+{"id": "0fe6cff2-3a94-46a9-8033-e4cc5f96d33f", "ts": "2025-11-18T23:09:56.447031Z", "agent": "router", "event_type": "route_decision", "user_id": "test_user", "meta": {"selected_agent": "technical_coach", "rag_hits": 2}}

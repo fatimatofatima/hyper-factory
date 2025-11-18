@@ -1,0 +1,436 @@
+#!/bin/bash
+# ffactory.sh - السكريبت الرئيسي للمصنع (النسخة المحسنة)
+
+set -e
+
+# المسار الثابت بدل $HOME للتأكد من الدقة
+BASE_DIR="/root/hyper-factory"
+SCRIPTS_DIR="$BASE_DIR/scripts/core"
+AI_SCRIPTS_DIR="$BASE_DIR/scripts/ai"
+LOGS_DIR="$BASE_DIR/logs"
+
+# الألوان للواجهة الجميلة
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# دالة للطباعة الملونة
+log_info() { echo -e "${BLUE}ℹ️  $1${NC}"; }
+log_success() { echo -e "${GREEN}✅ $1${NC}"; }
+log_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
+log_error() { echo -e "${RED}❌ $1${NC}"; }
+log_debug() { echo -e "${CYAN}🐛 $1${NC}"; }
+
+# التحقق من وجود المصنع
+check_factory_exists() {
+    if [ ! -d "$BASE_DIR" ]; then
+        log_error "المصنع غير موجود في: $BASE_DIR"
+        exit 1
+    fi
+}
+
+# عرض الاستخدام
+usage() {
+    echo -e "${CYAN}🏭 مصنع العمال الأذكياء - وحدة التحكم الرئيسية${NC}"
+    echo ""
+    echo -e "${BLUE}الاستخدام:${NC}"
+    echo "  $0 init                              # تهيئة المصنع"
+    echo "  $0 start <app_id>                   # تشغيل تطبيق"
+    echo "  $0 stop <app_id>                    # إيقاف تطبيق"
+    echo "  $0 decide \"رسالة\" [user_id]       # استشارة المدير"
+    echo "  $0 spider [--seeds ملف] [--test]    # تشغيل العنكبوت"
+    echo "  $0 status [--detailed]              # حالة المصنع"
+    echo "  $0 logs [type] [--follow]           # عرض السجلات"
+    echo "  $0 agents                           # قائمة العمال"
+    echo "  $0 knowledge                        # إحصائيات المعرفة"
+    echo "  $0 clean [--days عدد]               # تنظيف السجلات القديمة"
+    echo ""
+    echo -e "${YELLOW}أمثلة:${NC}"
+    echo "  $0 decide \"عندي خطأ في الكود\" user_123"
+    echo "  $0 spider --seeds custom_urls.txt --test"
+    echo "  $0 status --detailed"
+    echo "  $0 logs orchestrator --follow"
+    echo "  $0 clean --days 7"
+}
+
+# تهيئة المصنع
+init_factory() {
+    log_info "بدء تهيئة المصنع..."
+    "$SCRIPTS_DIR/init_factory.sh"
+}
+
+# تشغيل التطبيقات
+start_app() {
+    local app_id="$1"
+    if [ -z "$app_id" ]; then
+        log_error "يجب تحديد معرف التطبيق"
+        echo -e "${YELLOW}التطبيقات المتاحة:${NC}"
+        find "$BASE_DIR/apps" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | while read app; do
+            echo "  - $app"
+        done
+        exit 1
+    fi
+    
+    log_info "تشغيل التطبيق: $app_id"
+    "$SCRIPTS_DIR/start_app.sh" "$app_id"
+}
+
+# إيقاف التطبيقات
+stop_app() {
+    local app_id="$1"
+    if [ -z "$app_id" ]; then
+        log_error "يجب تحديد معرف التطبيق"
+        exit 1
+    fi
+    
+    log_info "إيقاف التطبيق: $app_id"
+    
+    # البحث عن PID وإيقافه
+    local pid_file="$LOGS_DIR/apps/$app_id.pid"
+    if [ -f "$pid_file" ]; then
+        local pid=$(cat "$pid_file")
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid"
+            log_success "تم إيقاف التطبيق $app_id (PID: $pid)"
+            rm -f "$pid_file"
+        else
+            log_warning "التطبيق $app_id غير شغال"
+            rm -f "$pid_file"
+        fi
+    else
+        log_error "لم يتم العثور على ملف PID للتطبيق $app_id"
+    fi
+}
+
+# استشارة المدير
+decide_agent() {
+    local message="$1"
+    local user_id="${2:-anonymous}"
+    
+    if [ -z "$message" ]; then
+        log_error "يجب تقديم رسالة"
+        usage
+        exit 1
+    fi
+    
+    log_info "استشارة المدير (المستخدم: $user_id)"
+    log_debug "الرسالة: $message"
+    
+    "$SCRIPTS_DIR/orchestrator_decision_engine.sh" decide "$message" "$user_id"
+}
+
+# تشغيل العنكبوت
+run_spider() {
+    local seeds_file=""
+    local test_mode=false
+    
+    # معالجة الخيارات
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --seeds)
+                seeds_file="$2"
+                shift 2
+                ;;
+            --test)
+                test_mode=true
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    
+    log_info "تشغيل عنكبوت المعرفة..."
+    
+    if [ -n "$seeds_file" ]; then
+        if [ -f "$seeds_file" ]; then
+            log_info "استخدام ملف البذور المخصص: $seeds_file"
+            cp "$seeds_file" "$BASE_DIR/ai/datasets/spider_seeds/urls.txt"
+        else
+            log_error "ملف البذور غير موجود: $seeds_file"
+            exit 1
+        fi
+    fi
+    
+    if [ "$test_mode" = true ]; then
+        log_info "وضع الاختبار مفعل - سيتم جمع عدد محدود من الصفحات"
+        # يمكن إضافة متغير بيئة للوضع الاختباري
+        TEST_MODE=true "$AI_SCRIPTS_DIR/knowledge_spider.sh"
+    else
+        "$AI_SCRIPTS_DIR/knowledge_spider.sh"
+    fi
+}
+
+# حالة المصنع
+show_status() {
+    local detailed=false
+    
+    # معالجة الخيارات
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --detailed)
+                detailed=true
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    
+    echo -e "${CYAN}📊 حالة مصنع العمال الأذكياء${NC}"
+    echo "=========================================="
+    
+    # المعلومات الأساسية
+    echo -e "${BLUE}🏗️  الهيكل:${NC}"
+    echo "  - المسار: $BASE_DIR"
+    
+    # التطبيقات (بدقة أكبر)
+    local app_count=$(find "$BASE_DIR/apps" -mindepth 1 -maxdepth 1 -type d | wc -l)
+    echo -e "${BLUE}📦 التطبيقات:${NC}"
+    echo "  - العدد: $app_count"
+    
+    # التطبيقات النشطة
+    local active_apps=0
+    for app_dir in "$BASE_DIR/apps"/*/; do
+        if [ -d "$app_dir" ]; then
+            local app_name=$(basename "$app_dir")
+            local pid_file="$LOGS_DIR/apps/${app_name}.pid"
+            if [ -f "$pid_file" ] && kill -0 $(cat "$pid_file") 2>/dev/null; then
+                ((active_apps++))
+                if [ "$detailed" = true ]; then
+                    echo "    ✅ $app_name (نشط)"
+                fi
+            elif [ "$detailed" = true ]; then
+                echo "    ❌ $app_name (متوقف)"
+            fi
+        fi
+    done
+    echo "  - النشطة: $active_apps"
+    
+    # المعرفة
+    local knowledge_chunks=$(find "$BASE_DIR/ai/datasets/knowledge_chunks" -name "*chunk*" -type f 2>/dev/null | wc -l)
+    local knowledge_sources=$(find "$BASE_DIR/ai/datasets/raw_content" -type d 2>/dev/null | tail -n +2 | wc -l)
+    echo -e "${BLUE}🧠 المعرفة:${NC}"
+    echo "  - القطع المعرفية: $knowledge_chunks"
+    echo "  - المصادر: $knowledge_sources"
+    
+    # السجلات
+    local log_files=$(find "$LOGS_DIR" -name "*.log" -type f 2>/dev/null | wc -l)
+    local log_size=$(du -sh "$LOGS_DIR" 2>/dev/null | cut -f1)
+    echo -e "${BLUE}📝 السجلات:${NC}"
+    echo "  - الملفات: $log_files"
+    echo "  - الحجم: $log_size"
+    
+    if [ "$detailed" = true ]; then
+        echo ""
+        echo -e "${YELLOW}📈 إحصائيات مفصلة:${NC}"
+        
+        # قرارات المدير
+        if [ -f "$LOGS_DIR/orchestrator/decisions.log" ]; then
+            local decisions_count=$(wc -l < "$LOGS_DIR/orchestrator/decisions.log")
+            echo "  - قرارات المدير: $decisions_count"
+        fi
+        
+        # جودة الردود
+        if [ -f "$LOGS_DIR/quality_feedback.csv" ]; then
+            local feedback_count=$(wc -l < "$LOGS_DIR/quality_feedback.csv")
+            echo "  - تقييمات الجودة: $feedback_count"
+        fi
+    fi
+    
+    echo "=========================================="
+}
+
+# عرض السجلات
+show_logs() {
+    local log_type="$1"
+    local follow=false
+    
+    # معالجة الخيارات
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --follow)
+                follow=true
+                shift
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+    
+    if [ -z "$log_type" ]; then
+        echo -e "${CYAN}📁 السجلات المتاحة:${NC}"
+        find "$LOGS_DIR" -name "*.log" -type f | while read log_file; do
+            local relative_path=${log_file#$LOGS_DIR/}
+            local size=$(du -h "$log_file" | cut -f1)
+            local lines=$(wc -l < "$log_file" 2>/dev/null || echo "0")
+            echo "  📄 $relative_path ($size, $lines سطر)"
+        done
+        return 0
+    fi
+    
+    local log_file="$LOGS_DIR/${log_type}.log"
+    if [ ! -f "$log_file" ]; then
+        log_error "السجل غير موجود: $log_type"
+        echo -e "${YELLOW}جرب: $0 logs لعرض السجلات المتاحة${NC}"
+        return 1
+    fi
+    
+    if [ "$follow" = true ]; then
+        log_info "متابعة السجل: $log_type"
+        tail -f "$log_file"
+    else
+        echo -e "${CYAN}آخر 20 سطر من $log_type:${NC}"
+        tail -n 20 "$log_file"
+    fi
+}
+
+# قائمة العمال
+list_agents() {
+    echo -e "${CYAN}👥 العمال المتاحين:${NC}"
+    echo "=========================================="
+    
+    # من قرارات المدير المسجلة
+    if [ -f "$LOGS_DIR/orchestrator/decisions.log" ]; then
+        echo -e "${BLUE}📊 الإحصائيات من السجلات:${NC}"
+        for agent in "debug_expert" "system_architect" "technical_coach" "knowledge_spider"; do
+            local count=$(grep -c "$agent" "$LOGS_DIR/orchestrator/decisions.log" 2>/dev/null || echo "0")
+            echo "  - $agent: $count مهمة"
+        done
+    fi
+    
+    echo ""
+    echo -e "${YELLOW}🎯 أنواع المهام:${NC}"
+    echo "  - 🔍 debug_expert: الأخطاء والتصحيح"
+    echo "  - 🏗️  system_architect: التصميم والهندسة"
+    echo "  - 👨‍🏫 technical_coach: التدريب والتعلم"
+    echo "  - 🕸️  knowledge_spider: جمع المعرفة"
+}
+
+# إحصائيات المعرفة
+show_knowledge() {
+    echo -e "${CYAN}🧠 إحصائيات المعرفة:${NC}"
+    echo "=========================================="
+    
+    local total_chunks=0
+    local total_sources=0
+    
+    # القطع المعرفية
+    if [ -d "$BASE_DIR/ai/datasets/knowledge_chunks" ]; then
+        total_chunks=$(find "$BASE_DIR/ai/datasets/knowledge_chunks" -name "*chunk*" -type f | wc -l)
+        echo -e "${BLUE}📚 القطع المعرفية:${NC}"
+        echo "  - الإجمالي: $total_chunks"
+        
+        # التوزيع حسب النوع
+        echo "  - التوزيع:"
+        find "$BASE_DIR/ai/datasets/knowledge_chunks" -name "*chunk*" -type f | sed 's/.*_chunk_[0-9]*//' | sort | uniq -c | while read count type; do
+            echo "    • $count: ${type:-عام}"
+        done
+    fi
+    
+    # المصادر
+    if [ -d "$BASE_DIR/ai/datasets/raw_content" ]; then
+        total_sources=$(find "$BASE_DIR/ai/datasets/raw_content" -type d | tail -n +2 | wc -l)
+        echo -e "${BLUE}🌐 المصادر:${NC}"
+        echo "  - الإجمالي: $total_sources"
+        
+        # المصادر الفردية
+        echo "  - القائمة:"
+        find "$BASE_DIR/ai/datasets/raw_content" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | while read source; do
+            local source_count=$(find "$BASE_DIR/ai/datasets/raw_content/$source" -name "*.html" -type f | wc -l)
+            echo "    • $source: $source_count صفحة"
+        done
+    fi
+    
+    # الجودة
+    if [ -f "$LOGS_DIR/spider/spider.log" ]; then
+        echo -e "${BLUE}📊 الجودة:${NC}"
+        local last_quality=$(grep "جودة المعرفة:" "$LOGS_DIR/spider/spider.log" | tail -1)
+        if [ -n "$last_quality" ]; then
+            echo "  - آخر تقييم: $last_quality"
+        fi
+    fi
+}
+
+# تنظيف السجلات
+clean_logs() {
+    local days=7
+    
+    # معالجة الخيارات
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --days)
+                days="$2"
+                shift 2
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+    
+    log_info "تنظيف السجلات الأقدم من $days أيام..."
+    
+    local deleted_count=0
+    find "$LOGS_DIR" -name "*.log" -type f -mtime "+$days" | while read old_log; do
+        log_debug "حذف: $old_log"
+        rm -f "$old_log"
+        ((deleted_count++))
+    done
+    
+    log_success "تم حذف $deleted_count ملف سجل قديم"
+}
+
+# التنفيذ الرئيسي
+main() {
+    check_factory_exists
+    
+    case "${1:-}" in
+        init)
+            init_factory
+            ;;
+        start)
+            start_app "$2"
+            ;;
+        stop)
+            stop_app "$2"
+            ;;
+        decide)
+            decide_agent "$2" "$3"
+            ;;
+        spider)
+            shift
+            run_spider "$@"
+            ;;
+        status)
+            shift
+            show_status "$@"
+            ;;
+        logs)
+            shift
+            show_logs "$@"
+            ;;
+        agents)
+            list_agents
+            ;;
+        knowledge)
+            show_knowledge
+            ;;
+        clean)
+            shift
+            clean_logs "$@"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+}
+
+main "$@"
+

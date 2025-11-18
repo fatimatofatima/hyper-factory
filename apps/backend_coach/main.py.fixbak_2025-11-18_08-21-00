@@ -1,0 +1,273 @@
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
+import logging
+from pathlib import Path
+from datetime import datetime
+import os
+
+# ===== الإعدادات الأساسية =====
+BASE_DIR = Path("/root/hyper-factory")
+KNOWLEDGE_DIR = BASE_DIR / "ai" / "datasets" / "knowledge_chunks"
+LOGS_DIR = BASE_DIR / "logs"
+ORCHESTRATOR_LOG = LOGS_DIR / "orchestrator" / "decisions.log"
+
+# إعداد السجل
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("backend_coach")
+
+app = FastAPI(
+    title="🏭 مصنع العمال الأذكياء - Backend Coach",
+    description="API لتدريب المبرمجين على مسار Backend Junior",
+    version="2.0.0"
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ===== نماذج البيانات =====
+class DebugRequest(BaseModel):
+    code: str
+    error: Optional[str] = None
+    language: str = "python"
+
+class DebugResponse(BaseModel):
+    success: bool
+    analysis: str
+    suggestions: List[str]
+    fixed_code: str = ""
+
+# ===== دوال مساعدة =====
+def count_knowledge_chunks() -> int:
+    """عد القطع المعرفية"""
+    try:
+        if not KNOWLEDGE_DIR.exists():
+            return 0
+        return len(list(KNOWLEDGE_DIR.glob("*chunk*")))
+    except Exception as e:
+        logger.error(f"خطأ في عد القطع المعرفية: {e}")
+        return 0
+
+def get_recent_decisions(limit: int = 10) -> List[str]:
+    """الحصول على آخر القرارات"""
+    try:
+        if not ORCHESTRATOR_LOG.exists():
+            return ["⚠️ لا توجد قرارات مسجلة بعد"]
+        
+        with open(ORCHESTRATOR_LOG, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        
+        return [line.strip() for line in lines[-limit:]]
+    except Exception as e:
+        return [f"❌ خطأ في قراءة القرارات: {str(e)}"]
+
+# ===== Endpoints الأساسية =====
+@app.get("/")
+async def root():
+    return {
+        "message": "🏭 مصنع العمال الأذكياء - Backend Coach API",
+        "version": "2.0.0",
+        "status": "يعمل 🚀",
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/api/health")
+async def health():
+    return {
+        "status": "healthy ✅",
+        "service": "backend_coach",
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/api/factory/status")
+async def factory_status():
+    chunks = count_knowledge_chunks()
+    return {
+        "factory": {
+            "name": "مصنع العمال الأذكياء",
+            "status": "operational 🏭",
+            "version": "2.0.0",
+            "agents_count": 4,
+            "knowledge_chunks": chunks,
+            "last_updated": datetime.now().isoformat()
+        }
+    }
+
+@app.get("/api/agents")
+async def list_agents():
+    agents = [
+        {
+            "id": "debug_expert",
+            "name": "خبير تصحيح الأخطاء",
+            "status": "active 🟢",
+            "description": "متخصص في تحليل وتصحيح أخطاء البرمجة"
+        },
+        {
+            "id": "system_architect",
+            "name": "مهندس النظام",
+            "status": "active 🟢", 
+            "description": "متخصص في تصميم وهندسة الأنظمة"
+        },
+        {
+            "id": "technical_coach",
+            "name": "المدرب التقني",
+            "status": "active 🟢",
+            "description": "متخصص في تدريب المبرمجين وتحسين مهاراتهم"
+        },
+        {
+            "id": "knowledge_spider", 
+            "name": "عنكبوت المعرفة",
+            "status": "active 🟢",
+            "description": "متخصص في جمع وتنظيم المعرفة التقنية"
+        }
+    ]
+    
+    return {"agents": agents}
+
+@app.get("/api/knowledge/stats")
+async def knowledge_stats():
+    chunks = count_knowledge_chunks()
+    return {
+        "total_chunks": chunks,
+        "last_updated": datetime.now().isoformat(),
+        "quality": "جيدة ✅" if chunks > 0 else "تحتاج تحسين ⚠️"
+    }
+
+@app.get("/api/orchestrator/decisions")
+async def orchestrator_decisions(limit: int = Query(10, ge=1, le=100)):
+    decisions = get_recent_decisions(limit)
+    return {
+        "limit": limit,
+        "count": len(decisions),
+        "items": decisions
+    }
+
+@app.post("/api/debug", response_model=DebugResponse)
+async def debug_code(request: DebugRequest):
+    try:
+        logger.info(f"طلب تصحيح كود: {request.language}")
+        
+        analysis = f"🔍 تحليل كود {request.language}"
+        if request.error:
+            analysis += f": {request.error}"
+
+        suggestions = [
+            "✅ تحقق من أسماء المتغيرات والأساليب",
+            "✅ تأكد من الأقواس وعلامات التنصيص",
+            "✅ جرب تشغيل الكود جزء جزء لاكتشاف الخطأ", 
+            "✅ استخدم print للمتغيرات للتتبع"
+        ]
+
+        return DebugResponse(
+            success=True,
+            analysis=analysis,
+            suggestions=suggestions,
+            fixed_code=f"# الكود المصحح سيظهر هنا\n{request.code}"
+        )
+        
+    except Exception as e:
+        logger.error(f"خطأ في معالجة طلب التصحيح: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في الخادم")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=9090, reload=False)
+
+# إضافة في قسم imports
+from typing import Dict, Any
+
+# إضافة endpoint جديد للتحليل الذكي
+@app.get("/api/orchestrator/analyze")
+async def analyze_message(message: str = Query(..., description="الرسالة لتحليلها"), 
+                         user_id: str = Query("anonymous", description="معرف المستخدم")):
+    """تحليل الرسالة باستخدام الـ LLM"""
+    try:
+        # استيراد ديناميكي لمدير الـ LLM
+        import sys
+        sys.path.append('/root/hyper-factory/scripts/ai/llm')
+        from llm_orchestrator import LLMOrchestrator
+        
+        orchestrator = LLMOrchestrator()
+        analysis = orchestrator.analyze_message(message, user_id)
+        
+        return {
+            "success": True,
+            "analysis": analysis,
+            "message": message,
+            "user_id": user_id,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"خطأ في التحليل الذكي: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في التحليل الذكي")
+
+# إضافة نموذج للتحليل
+class AnalysisResponse(BaseModel):
+    success: bool
+    analysis: Dict[str, Any]
+    message: str
+    user_id: str
+    timestamp: str
+
+# إضافة endpoint لتحميل PDF
+from fastapi import UploadFile, File
+import shutil
+
+@app.post("/api/knowledge/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    """رفع ملف PDF وإضافته للمعرفة"""
+    try:
+        # التحقق من نوع الملف
+        if not file.filename.lower().endswith('.pdf'):
+            raise HTTPException(status_code=400, detail="يجب أن يكون الملف بصيغة PDF")
+        
+        # حفظ الملف في مجلد PDFs
+        pdf_path = f"/root/hyper-factory/ai/pdfs/{file.filename}"
+        with open(pdf_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # معالجة الملف
+        import subprocess
+        result = subprocess.run(
+            ["/root/hyper-factory/scripts/ai/pdf_processor/pdf_ingest.sh"],
+            capture_output=True, text=True
+        )
+        
+        if result.returncode == 0:
+            return {
+                "success": True,
+                "message": f"تم معالجة PDF بنجاح: {file.filename}",
+                "filename": file.filename,
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            raise HTTPException(status_code=500, detail=f"خطأ في معالجة PDF: {result.stderr}")
+            
+    except Exception as e:
+        logger.error(f"خطأ في تحميل PDF: {e}")
+        raise HTTPException(status_code=500, detail=f"خطأ في تحميل الملف: {str(e)}")
+
+@app.get("/api/knowledge/pdf-stats")
+async def pdf_stats():
+    """إحصائيات ملفات PDF"""
+    pdf_dir = "/root/hyper-factory/ai/pdfs"
+    pdf_chunks_dir = "/root/hyper-factory/ai/datasets/knowledge_chunks"
+    
+    try:
+        pdf_count = len([f for f in os.listdir(pdf_dir) if f.endswith('.pdf')]) if os.path.exists(pdf_dir) else 0
+        pdf_chunks_count = len([f for f in os.listdir(pdf_chunks_dir) if 'pdf_chunk' in f]) if os.path.exists(pdf_chunks_dir) else 0
+        
+        return {
+            "pdf_files": pdf_count,
+            "pdf_chunks": pdf_chunks_count,
+            "last_updated": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"خطأ في إحصائيات PDF: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في جلب إحصائيات PDF")
