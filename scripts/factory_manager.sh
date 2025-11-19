@@ -20,6 +20,6 @@ route_to_agent() {
 }
 
 # الاستخدام
-AGENT=$(route_to_agent "$1")
+if [ -z "${1:-}" ]; then
 echo "🔀 توجيه إلى: $AGENT"
 ./hf_run_${AGENT}.sh "$1"
