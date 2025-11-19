@@ -1,51 +1,36 @@
 #!/usr/bin/env python3
 # reporter_basic.py
 # عامل تقارير بسيط:
-# - يقرأ data/semantic/semantic_index.jsonl
-# - ينتج:
-#   - data/serving/semantic_summary.json
-#   - reports/semantic_report.txt
+# - يقرأ ملفات semantic من data/semantic
+# - يكتب ملخص JSON في data/serving
+# - يكتب تقرير نصي في reports/
 
 import os
 import sys
+import glob
 import json
-from pathlib import Path
 from datetime import datetime
 
 try:
     import yaml
 except ImportError:
-    print("❌ مكتبة PyYAML غير مثبتة.")
-    print("   استخدم: pip3 install pyyaml")
+    print("❌ مكتبة PyYAML غير مثبتة. نفّذ: pip3 install pyyaml")
     sys.exit(1)
 
-ROOT = Path(__file__).resolve().parents[1]
-CONFIG_DIR = ROOT / "config"
-AGENTS_PATH = CONFIG_DIR / "agents.yaml"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(ROOT, "config")
+FACTORY_PATH = os.path.join(CONFIG_DIR, "factory.yaml")
+AGENTS_PATH = os.path.join(CONFIG_DIR, "agents.yaml")
 
 
-def load_agents():
-    if not AGENTS_PATH.exists():
-        print(f"❌ ملف agents.yaml غير موجود: {AGENTS_PATH}")
+def load_yaml(path, label):
+    if not os.path.exists(path):
+        print(f"❌ ملف {label} غير موجود: {path}")
         sys.exit(1)
-    with AGENTS_PATH.open("r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
-
-
-def resolve_path_from_cfg(cfg, key, default):
-    if cfg is None:
-        return default
-
-    if isinstance(cfg, dict):
-        return cfg.get(key, default)
-
-    if isinstance(cfg, list):
-        for item in cfg:
-            if isinstance(item, dict) and key in item:
-                return item[key]
-        return default
-
-    return default
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    print(f"✅ تم تحميل {label}: {path}")
+    return data
 
 
 def main():
@@ -53,120 +38,86 @@ def main():
     print("📂 CONFIG_DIR :", CONFIG_DIR)
     print("----------------------------------------")
 
-    agents_cfg = load_agents()
-    agents_block = agents_cfg.get("agents", {})
-    reporter_cfg = agents_block.get("reporter_basic")
+    factory_cfg = load_yaml(FACTORY_PATH, "factory.yaml")
+    agents_cfg = load_yaml(AGENTS_PATH, "agents.yaml")
 
-    if not reporter_cfg:
-        print("❌ لم يتم العثور على تكوين reporter_basic في agents.yaml")
-        sys.exit(1)
+    agents_block = agents_cfg.get("agents", agents_cfg)
+    agent = agents_block.get("reporter_basic", {})
 
-    input_cfg = reporter_cfg.get("input")
-    output_cfg = reporter_cfg.get("output")
+    input_path = agent.get("input", {}).get("path", "./data/semantic")
+    output_serving = agent.get("output", {}).get("serving_path", "./data/serving")
+    output_reports = agent.get("output", {}).get("reports_path", "./reports")
 
-    input_path_str = resolve_path_from_cfg(input_cfg, "path", "./data/semantic")
-    serving_path_str = resolve_path_from_cfg(output_cfg, "serving_path", "./data/serving")
-    reports_path_str = resolve_path_from_cfg(output_cfg, "reports_path", "./reports")
+    input_path = os.path.join(ROOT, os.path.relpath(input_path, "."))
+    output_serving = os.path.join(ROOT, os.path.relpath(output_serving, "."))
+    output_reports = os.path.join(ROOT, os.path.relpath(output_reports, "."))
 
-    input_dir = (ROOT / input_path_str).resolve()
-    serving_dir = (ROOT / serving_path_str).resolve()
-    reports_dir = (ROOT / reports_path_str).resolve()
+    os.makedirs(output_serving, exist_ok=True)
+    os.makedirs(output_reports, exist_ok=True)
 
-    print("================= 📑 Reporter Basic =================")
-    print(f"- INPUT   : {input_dir}")
-    print(f"- SERVING : {serving_dir}")
-    print(f"- REPORTS : {reports_dir}")
+    print("\n================= 📣 Reporter Basic =================")
+    print(f"- INPUT         : {os.path.relpath(input_path, ROOT)}")
+    print(f"- SERVING OUT   : {os.path.relpath(output_serving, ROOT)}")
+    print(f"- REPORTS OUT   : {os.path.relpath(output_reports, ROOT)}")
 
-    index_path = input_dir / "semantic_index.jsonl"
+    pattern = os.path.join(input_path, "*.semantic.json")
+    sem_files = sorted(glob.glob(pattern))
 
-    if not index_path.exists():
-        print(f"ℹ️ ملف semantic_index.jsonl غير موجود بعد: {index_path}")
-        print("ℹ️ شغّل analyzer_basic أولاً لتهيئة البيانات.")
-        serving_dir.mkdir(parents=True, exist_ok=True)
-        reports_dir.mkdir(parents=True, exist_ok=True)
-        # نكتب تقارير فارغة
-        (serving_dir / "semantic_summary.json").write_text(
-            json.dumps(
-                {
-                    "generated_at": datetime.utcnow().isoformat() + "Z",
-                    "records": 0,
-                    "note": "no semantic_index.jsonl yet",
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
-        )
-        (reports_dir / "semantic_report.txt").write_text(
-            "No semantic_index.jsonl exists yet.\n",
-            encoding="utf-8",
-        )
-        sys.exit(0)
+    if not sem_files:
+        print("ℹ️ لا توجد ملفات semantic لكتابة تقرير عنها.")
+        return
 
-    serving_dir.mkdir(parents=True, exist_ok=True)
-    reports_dir.mkdir(parents=True, exist_ok=True)
+    items = []
+    for path in sem_files:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            items.append({
+                "file": data.get("file"),
+                "meta_path": data.get("meta_path"),
+                "created_at": data.get("created_at"),
+            })
+        except Exception as e:
+            print(f"❌ خطأ في قراءة semantic: {path} ({e})")
 
-    records = []
-    per_type = {}
-
-    with index_path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            records.append(rec)
-            fields = rec.get("fields", {})
-            rec_type = fields.get("type") or fields.get("category") or "unknown"
-            per_type[rec_type] = per_type.get(rec_type, 0) + 1
-
-    total = len(records)
-    last_id = records[-1].get("id") if records else None
-
+    now = datetime.now()
     summary = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-        "index_path": str(index_path),
-        "total_records": total,
-        "per_type": per_type,
-        "last_record_id": last_id,
+        "generated_at": now.isoformat(timespec="seconds"),
+        "semantic_dir": input_path,
+        "total_items": len(items),
+        "items": items,
+        "agent": "reporter_basic",
     }
 
-    summary_json_path = serving_dir / "semantic_summary.json"
-    summary_txt_path = reports_dir / "semantic_report.txt"
+    serving_path = os.path.join(output_serving, "semantic_serving_summary.json")
+    report_txt = os.path.join(output_reports, "semantic_overview.txt")
 
-    summary_json_path.write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    try:
+        with open(serving_path, "w", encoding="utf-8") as f:
+            json.dump(summary, f, ensure_ascii=False, indent=2)
+        print(f"✅ تم إنشاء ملف serving: {os.path.relpath(serving_path, ROOT)}")
+    except Exception as e:
+        print(f"❌ خطأ في كتابة ملف serving: {serving_path} ({e})")
 
-    lines = []
-    lines.append("===== Hyper Factory Semantic Report =====")
-    lines.append(f"Generated at   : {summary['generated_at']}")
-    lines.append(f"Index file     : {summary['index_path']}")
-    lines.append("")
-    lines.append(f"Total records  : {total}")
-    lines.append("")
-    lines.append("Per type breakdown:")
-    if per_type:
-        for t, c in per_type.items():
-            lines.append(f"  - {t}: {c}")
-    else:
-        lines.append("  (no type information available)")
-    lines.append("")
-    lines.append(f"Last record id : {last_id}")
-    lines.append("")
+    try:
+        lines = []
+        lines.append("===== Hyper Factory Semantic Overview =====")
+        lines.append(f"Generated at  : {now.strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append(f"Semantic dir  : {os.path.relpath(input_path, ROOT)}")
+        lines.append(f"Total items   : {len(items)}")
+        lines.append("")
+        for item in items:
+            lines.append(f"- {item.get('file')} | created_at={item.get('created_at')}")
+        content = "\n".join(lines)
 
-    summary_txt_path.write_text("\n".join(lines), encoding="utf-8")
+        with open(report_txt, "w", encoding="utf-8") as f:
+            f.write(content)
 
-    print("----------------- 📊 ملخص Reporter -----------------")
-    print(f"- عدد السجلات       : {total}")
-    print(f"- ملف JSON (serving): {summary_json_path}")
-    print(f"- ملف TXT (report)  : {summary_txt_path}")
-    print("✅ انتهى تشغيل reporter_basic.")
-    sys.exit(0)
+        print(f"✅ تم إنشاء تقرير نصي: {os.path.relpath(report_txt, ROOT)}")
+    except Exception as e:
+        print(f"❌ خطأ في كتابة التقرير النصي: {report_txt} ({e})")
+
+    print("\n✅ انتهى تشغيل reporter_basic.")
 
 
 if __name__ == "__main__":

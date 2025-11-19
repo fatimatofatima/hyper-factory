@@ -2,79 +2,33 @@
 # analyzer_basic.py
 # عامل تحليل بسيط:
 # - يقرأ ملفات meta من data/processed
-# - يبني تمثيل دلالي مبسّط في data/semantic/semantic_index.jsonl
+# - يحوّلها إلى JSON في data/semantic
 
 import os
 import sys
+import glob
 import json
-from pathlib import Path
 from datetime import datetime
 
 try:
     import yaml
 except ImportError:
-    print("❌ مكتبة PyYAML غير مثبتة.")
-    print("   استخدم: pip3 install pyyaml")
+    print("❌ مكتبة PyYAML غير مثبتة. نفّذ: pip3 install pyyaml")
     sys.exit(1)
 
-ROOT = Path(__file__).resolve().parents[1]
-CONFIG_DIR = ROOT / "config"
-AGENTS_PATH = CONFIG_DIR / "agents.yaml"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(ROOT, "config")
+FACTORY_PATH = os.path.join(CONFIG_DIR, "factory.yaml")
+AGENTS_PATH = os.path.join(CONFIG_DIR, "agents.yaml")
 
 
-def load_agents():
-    if not AGENTS_PATH.exists():
-        print(f"❌ ملف agents.yaml غير موجود: {AGENTS_PATH}")
+def load_yaml(path, label):
+    if not os.path.exists(path):
+        print(f"❌ ملف {label} غير موجود: {path}")
         sys.exit(1)
-    with AGENTS_PATH.open("r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
-
-
-def resolve_path_from_cfg(cfg, key, default):
-    """
-    يدعم الشكلين:
-    input:
-      path: ...
-    أو:
-    input:
-      - path: ...
-    """
-    if cfg is None:
-        return default
-
-    if isinstance(cfg, dict):
-        return cfg.get(key, default)
-
-    if isinstance(cfg, list):
-        for item in cfg:
-            if isinstance(item, dict) and key in item:
-                return item[key]
-        return default
-
-    return default
-
-
-def parse_meta_file(path: Path):
-    data = {}
-    try:
-        with path.open("r", encoding="utf-8", errors="ignore") as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                if ":" in line:
-                    k, v = line.split(":", 1)
-                    data[k.strip()] = v.strip()
-    except Exception as e:
-        print(f"⚠️ تعذّر قراءة meta: {path} -> {e}")
-
-    if not data:
-        try:
-            text = path.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
-            text = ""
-        data = {"raw_text": text}
-
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    print(f"✅ تم تحميل {label}: {path}")
     return data
 
 
@@ -83,60 +37,77 @@ def main():
     print("📂 CONFIG_DIR :", CONFIG_DIR)
     print("----------------------------------------")
 
-    agents_cfg = load_agents()
-    agents_block = agents_cfg.get("agents", {})
-    analyzer_cfg = agents_block.get("analyzer_basic")
+    factory_cfg = load_yaml(FACTORY_PATH, "factory.yaml")
+    agents_cfg = load_yaml(AGENTS_PATH, "agents.yaml")
 
-    if not analyzer_cfg:
-        print("❌ لم يتم العثور على تكوين analyzer_basic في agents.yaml")
-        sys.exit(1)
+    agents_block = agents_cfg.get("agents", agents_cfg)
+    agent = agents_block.get("analyzer_basic", {})
 
-    input_cfg = analyzer_cfg.get("input")
-    output_cfg = analyzer_cfg.get("output")
+    input_path = agent.get("input", {}).get("path", "./data/processed")
+    output_path = agent.get("output", {}).get("path", "./data/semantic")
 
-    input_path_str = resolve_path_from_cfg(input_cfg, "path", "./data/processed")
-    output_path_str = resolve_path_from_cfg(output_cfg, "path", "./data/semantic")
+    input_path = os.path.join(ROOT, os.path.relpath(input_path, "."))
+    output_path = os.path.join(ROOT, os.path.relpath(output_path, "."))
 
-    input_dir = (ROOT / input_path_str).resolve()
-    output_dir = (ROOT / output_path_str).resolve()
+    os.makedirs(output_path, exist_ok=True)
 
-    print("================= 🧩 Analyzer Basic =================")
-    print(f"- INPUT   : {input_dir}")
-    print(f"- OUTPUT  : {output_dir}")
+    print("\n================= 🔍 Analyzer Basic =================")
+    print(f"- INPUT   : {os.path.relpath(input_path, ROOT)}")
+    print(f"- OUTPUT  : {os.path.relpath(output_path, ROOT)}")
 
-    if not input_dir.exists():
-        print(f"⚠️ مجلد الإدخال غير موجود: {input_dir}")
-        sys.exit(0)
+    pattern = os.path.join(input_path, "*.meta.txt")
+    meta_files = sorted(glob.glob(pattern))
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    index_path = output_dir / "semantic_index.jsonl"
-
-    meta_files = sorted(input_dir.glob("*.meta.txt"))
     if not meta_files:
-        print("ℹ️ لا توجد ملفات *.meta.txt في مجلد الإدخال.")
-        # نكتب ملف فارغ (لضمان وجوده)
-        index_path.write_text("", encoding="utf-8")
-        sys.exit(0)
+        print("ℹ️ لا توجد ملفات meta لمعالجتها.")
+        return
 
-    records = 0
-    with index_path.open("w", encoding="utf-8") as out_f:
-        for meta_file in meta_files:
-            meta_data = parse_meta_file(meta_file)
-            record = {
-                "id": meta_file.stem.replace(".meta", ""),
-                "meta_path": str(meta_file),
-                "created_at": datetime.utcnow().isoformat() + "Z",
-                "fields": meta_data,
-            }
-            out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
-            records += 1
+    total = 0
+    created = 0
+    skipped = 0
 
-    print("----------------- 📊 ملخص Analyzer -----------------")
-    print(f"- عدد ملفات meta المعالجة : {records}")
-    print(f"- ملف الفهرس              : {index_path}")
-    print("✅ انتهى تشغيل analyzer_basic.")
-    sys.exit(0)
+    for meta_path in meta_files:
+        total += 1
+        base = os.path.basename(meta_path)
+        stem = base.replace(".meta.txt", "")
+        out_path = os.path.join(output_path, f"{stem}.semantic.json")
+
+        if os.path.exists(out_path):
+            print(f"↩️ SKIP (semantic موجود مسبقاً): {os.path.basename(out_path)}")
+            skipped += 1
+            continue
+
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                meta_text = f.read().strip()
+        except Exception as e:
+            print(f"❌ خطأ في قراءة meta: {meta_path} ({e})")
+            skipped += 1
+            continue
+
+        record = {
+            "file": stem,
+            "meta_path": meta_path,
+            "meta_text": meta_text,
+            "agent": "analyzer_basic",
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+        }
+
+        try:
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(record, f, ensure_ascii=False, indent=2)
+            print(f"✅ SEMANTIC: {os.path.basename(out_path)}")
+            created += 1
+        except Exception as e:
+            print(f"❌ خطأ في كتابة semantic: {out_path} ({e})")
+            skipped += 1
+
+    print("\n================= 📊 ملخص Analyzer =================")
+    print(f"- العدد الكلي        : {total}")
+    print(f"- تم إنشاء semantic : {created}")
+    print(f"- تم تخطيه           : {skipped}")
+    print(f"- الوقت              : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("\n✅ انتهى تشغيل analyzer_basic.")
 
 
 if __name__ == "__main__":
