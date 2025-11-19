@@ -1,0 +1,13 @@
+[Unit]
+Description=Hyper Factory Core Services
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/root/hyper-factory
+ExecStart=/bin/bash -c "./run_basic_with_memory.sh"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
