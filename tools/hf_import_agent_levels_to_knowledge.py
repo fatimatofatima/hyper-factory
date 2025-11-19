@@ -13,9 +13,8 @@ hf_import_agent_levels_to_knowledge.py
   data/knowledge/knowledge.db
   جدول: knowledge_items
 
-مصمم ليكون متوافق مع سكيمة الجدول الموجودة فعليًا:
 - يعتمد على introspection عبر PRAGMA table_info
-- يستخدم الأعمدة المتاحة فقط.
+- يستخدم الأعمدة المتاحة فقط (بدون افتراض وجود عمود key).
 """
 
 import json
@@ -31,34 +30,38 @@ TABLE_NAME = "knowledge_items"
 
 def load_agents():
     if not AGENTS_FILE.exists():
-        print(f"⚠️ ملف Agents غير موجود: {AGENTS_FILE}")
+        print(f"⚠️ ملف agents_levels غير موجود: {AGENTS_FILE}")
         return []
 
     try:
         data = json.loads(AGENTS_FILE.read_text(encoding="utf-8"))
     except Exception as e:
-        print(f"⚠️ فشل قراءة JSON من {AGENTS_FILE}: {e}")
+        print(f"⚠️ تعذّر قراءة agents_levels.json: {e}")
         return []
 
-    # نتوقع list[dict]
-    if isinstance(data, dict):
-        # fallback قديم (لو كان الشكل map)
-        items = []
-        for k, v in data.items():
-            if isinstance(v, dict):
-                v.setdefault("agent", k)
-                items.append(v)
-        return items
-    elif isinstance(data, list):
-        return [x for x in data if isinstance(x, dict)]
-    else:
-        print("⚠️ شكل agents_levels.json غير مدعوم (ليس dict أو list).")
+    if not isinstance(data, list):
+        print("⚠️ شكل agents_levels.json غير مدعوم (ليس list).")
         return []
 
+    agents = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        agent_id = item.get("agent") or item.get("id")
+        if not agent_id:
+            continue
+        agents.append(item)
+    return agents
 
-def get_columns(conn):
-    cur = conn.execute(f"PRAGMA table_info({TABLE_NAME})")
-    cols = [row[1] for row in cur.fetchall()]
+
+def get_table_columns(cur):
+    cur.execute(f"PRAGMA table_info({TABLE_NAME})")
+    rows = cur.fetchall()
+    if not rows:
+        print(f"⚠️ تعذّر قراءة أعمدة الجدول {TABLE_NAME} (ربما غير موجود).")
+        return []
+    cols = [r[1] for r in rows]
+    print(f"📊 أعمدة {TABLE_NAME}: {cols}")
     return cols
 
 
@@ -73,98 +76,100 @@ def main():
         return
 
     conn = sqlite3.connect(DB_PATH)
-    try:
-        cols = get_columns(conn)
-        if not cols:
-            print(f"⚠️ تعذّر قراءة أعمدة الجدول {TABLE_NAME}.")
-            return
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
 
-        required = ["item_type", "key", "payload_json"]
-        for c in required:
-            if c not in cols:
-                print(f"⚠️ العمود '{c}' غير موجود في {TABLE_NAME}، لن يتم الإدخال.")
-                return
-
-        # أعمدة اختيارية
-        optional = []
-        if "title" in cols:
-            optional.append("title")
-        if "tags" in cols:
-            optional.append("tags")
-        if "created_at" in cols:
-            optional.append("created_at")
-
-        insert_cols = required + optional
-        placeholders = ",".join([f":{c}" for c in insert_cols])
-        cols_sql = ",".join(insert_cols)
-        sql = f"INSERT OR REPLACE INTO {TABLE_NAME} ({cols_sql}) VALUES ({placeholders})"
-
-        now = datetime.utcnow().isoformat() + "Z"
-
-        cursor = conn.cursor()
-        inserted = 0
-
-        for ag in agents:
-            agent_id = ag.get("agent") or ag.get("name")
-            if not agent_id:
-                continue
-
-            level = ag.get("level", "unknown")
-            family = ag.get("family", "unknown")
-            display_name = ag.get("display_name", agent_id)
-            success_rate = ag.get("success_rate")
-            salary_index = ag.get("salary_index")
-            total_runs = ag.get("total_runs")
-            success_runs = ag.get("success_runs")
-            failed_runs = ag.get("failed_runs")
-
-            payload = {
-                "agent": agent_id,
-                "display_name": display_name,
-                "family": family,
-                "role": ag.get("role"),
-                "level": level,
-                "success_rate": success_rate,
-                "salary_index": salary_index,
-                "total_runs": total_runs,
-                "success_runs": success_runs,
-                "failed_runs": failed_runs,
-            }
-
-            # بناء الحقول حسب الأعمدة المتاحة
-            row = {
-                "item_type": "agent_level",
-                "key": agent_id,
-                "payload_json": json.dumps(payload, ensure_ascii=False),
-            }
-
-            if "title" in insert_cols:
-                row["title"] = f"{display_name} ({agent_id})"
-
-            if "tags" in insert_cols:
-                tags = [
-                    "agent",
-                    f"family={family}",
-                    f"level={level}",
-                ]
-                if success_rate is not None:
-                    try:
-                        tags.append(f"success_rate={float(success_rate):.2f}")
-                    except Exception:
-                        pass
-                row["tags"] = ",".join(tags)
-
-            if "created_at" in insert_cols:
-                row["created_at"] = now
-
-            cursor.execute(sql, row)
-            inserted += 1
-
-        conn.commit()
-        print(f"✅ تم استيراد/تحديث {inserted} عنصر معرفة من نوع 'agent_level' في جدول {TABLE_NAME}.")
-    finally:
+    cols = get_table_columns(cur)
+    if "item_type" not in cols:
+        print(f"⚠️ العمود 'item_type' غير موجود في {TABLE_NAME}، لا يمكن الإدخال.")
         conn.close()
-        print(f"📄 قاعدة المعرفة المستخدمة: {DB_PATH}")
+        return
+
+    # حذف أي عناصر قديمة من نوع agent_level (لو أمكن)
+    try:
+        cur.execute(
+            f"DELETE FROM {TABLE_NAME} WHERE item_type = ?",
+            ("agent_level",),
+        )
+        deleted = cur.rowcount
+        print(f"🧹 حذف {deleted} عنصر سابق من نوع agent_level (إن وجد).")
+    except Exception as e:
+        print(f"⚠️ تعذر حذف العناصر السابقة من {TABLE_NAME}: {e}")
+
+    now = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    inserted = 0
+
+    for item in agents:
+        agent_id = item.get("agent") or item.get("id")
+        family = item.get("family", "")
+        role = item.get("role", "")
+        display_name = item.get("display_name") or agent_id
+        level = item.get("level", "")
+        salary_index = item.get("salary_index")
+        success_rate = item.get("success_rate")
+        total_runs = item.get("total_runs")
+        success_runs = item.get("success_runs")
+        failed_runs = item.get("failed_runs")
+
+        # payload الأساسي داخل content / extra_json
+        details = {
+            "agent": agent_id,
+            "family": family,
+            "role": role,
+            "display_name": display_name,
+            "level": level,
+            "salary_index": salary_index,
+            "success_rate": success_rate,
+            "total_runs": total_runs,
+            "success_runs": success_runs,
+            "failed_runs": failed_runs,
+        }
+
+        row = {}
+        # أعمدة قياسية إن وجدت
+        if "item_type" in cols:
+            row["item_type"] = "agent_level"
+        if "title" in cols:
+            row["title"] = f"مستوى العامل {display_name} ({agent_id})"
+        if "content" in cols:
+            row["content"] = json.dumps(
+                details, ensure_ascii=False, separators=(",", ":")
+            )
+        if "source" in cols:
+            row["source"] = "hf_roles_engine"
+        if "created_at" in cols:
+            row["created_at"] = now
+        if "tags" in cols:
+            row["tags"] = "agent,level,pipeline"
+        if "key" in cols:
+            # نستخدم agent_id كمفتاح لو العمود موجود
+            row["key"] = str(agent_id)
+        if "extra_json" in cols:
+            row["extra_json"] = json.dumps(
+                {"kind": "agent_level", "agent": agent_id}, ensure_ascii=False
+            )
+
+        if len(row) <= 1:  # فقط item_type تقريبًا
+            print(f"⚠️ تخطي agent={agent_id}: لا توجد أعمدة كافية للإدخال.")
+            continue
+
+        columns = ",".join(row.keys())
+        placeholders = ",".join(["?"] * len(row))
+        values = list(row.values())
+
+        try:
+            cur.execute(
+                f"INSERT INTO {TABLE_NAME} ({columns}) VALUES ({placeholders})",
+                values,
+            )
+            inserted += 1
+        except Exception as e:
+            print(f"⚠️ فشل إدخال agent={agent_id}: {e}")
+
+    conn.commit()
+    conn.close()
+
+    print(f"✅ تم استيراد {inserted} عنصر agent_level إلى {DB_PATH}")
 
 
 if __name__ == "__main__":
