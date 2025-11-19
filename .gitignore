@@ -33,7 +33,7 @@ ai/datasets/messages.jsonl
 ai/datasets/train_backend.jsonl
 ai/datasets/quality.json
 
-# --- Logs & Generated Reports ---
+# --- Logs & Generated Reports (تشغيلية) ---
 logs/
 reports/ai/
 reports/management/

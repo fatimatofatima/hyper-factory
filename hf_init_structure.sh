@@ -26,6 +26,7 @@ EOR
 done
 
 # 2) data_models / feedback / evaluation / crawler / knowledge / requirements
+
 mkdir -p data_models feedback evaluation crawler knowledge
 
 if [[ ! -f "data_models/user_state.py" ]]; then
