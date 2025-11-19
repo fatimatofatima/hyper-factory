@@ -17,130 +17,101 @@ for AGENT in debug_expert system_architect technical_coach knowledge_spider; do
 
 هذا المجلد مخصص لتعريف العامل المتقدم "${AGENT}" داخل Hyper Factory.
 
-- تعريف الدور Role & Responsibilities
+- تعريف الدور (Role & Responsibilities)
 - تعريف الـ pipelines المرتبطة
 - خرائط التكامل مع data_lakehouse و knowledge و feedback
 EOR
-    echo "[+] created $README_PATH"
+    echo "[+] created ${README_PATH}"
   fi
 done
 
-# 2) data_models / user_state
-mkdir -p data_models
+# 2) data_models / feedback / evaluation / crawler / knowledge / requirements
+mkdir -p data_models feedback evaluation crawler knowledge
 
 if [[ ! -f "data_models/user_state.py" ]]; then
-  cat > data_models/user_state.py <<'EOP'
+  cat > data_models/user_state.py <<'EOPY'
 """
-user_state.py
-
-نموذج حالة المستخدم (Skill/Level/History) لـ Hyper Factory.
-هذا ملف مبدئي (stub) لتوثيق واجهة النموذج فقط.
+نموذج حالة المستخدم - Hyper Factory
 """
+from pydantic import BaseModel
+from typing import Dict, List
+from datetime import datetime
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional
-
-
-@dataclass
-class UserSkillState:
+class UserSkillState(BaseModel):
     user_id: str
-    skills: Dict[str, float] = field(default_factory=dict)
-    tracks: List[str] = field(default_factory=list)
-    last_update: Optional[str] = None  # ISO 8601
+    current_level: str
+    skills: Dict[str, float]           # مهارة -> مستوى
+    learning_path: List[str]
+    last_activity: datetime
+    performance_metrics: Dict[str, float]
 
-    def to_dict(self) -> Dict:
-        return {
-            "user_id": self.user_id,
-            "skills": self.skills,
-            "tracks": self.tracks,
-            "last_update": self.last_update,
-        }
-EOP
+    def update_skill(self, skill: str, level: float):
+        self.skills[skill] = level
+        self.last_activity = datetime.now()
+EOPY
   echo "[+] created data_models/user_state.py"
 fi
 
-# 3) feedback system
-mkdir -p feedback/good feedback/bad feedback/rules
-
 if [[ ! -f "feedback/README.md" ]]; then
-  cat > feedback/README.md <<'EOR'
-# Feedback System
+  mkdir -p feedback/good feedback/bad feedback/rules
+  cat > feedback/README.md <<'EOFB'
+# Feedback System - Hyper Factory
 
-نظام feedback لتقييم أداء العوامل والمصنع:
-
-- feedback/good/ : مخرجات ناجحة أو حالات نجاح واضحة.
-- feedback/bad/  : مخرجات فاشلة أو حالات تحتاج تحسين.
-- feedback/rules/: قواعد التقييم (scoring / heuristics / templates).
-EOR
-  echo "[+] created feedback/README.md"
+- good/  : تعليقات إيجابية
+- bad/   : تعليقات سلبية
+- rules/ : قواعد تقييم الجودة
+EOFB
+  echo "[+] created feedback/ structure"
 fi
-
-# 4) evaluation system
-mkdir -p evaluation/tests evaluation/reports
 
 if [[ ! -f "evaluation/README.md" ]]; then
-  cat > evaluation/README.md <<'EOR'
-# Evaluation System
+  mkdir -p evaluation/tests evaluation/reports
+  cat > evaluation/README.md <<'EOFE'
+# Evaluation System - Hyper Factory
 
-نظام التقييم (Evaluation):
-
-- evaluation/tests/   : تعريف حالات الاختبار والسيناريوهات.
-- evaluation/reports/ : تقارير التقييم والجودة على مستوى العوامل والمصنع.
-EOR
-  echo "[+] created evaluation/README.md"
+- tests/   : حزم الاختبار
+- reports/ : تقارير التقييم
+EOFE
+  echo "[+] created evaluation/ structure"
 fi
-
-# 5) crawler system
-mkdir -p crawler/spiders crawler/pipelines
 
 if [[ ! -f "crawler/README.md" ]]; then
-  cat > crawler/README.md <<'EOR'
-# Knowledge Crawler
+  mkdir -p crawler/pipelines crawler/spiders
+  cat > crawler/README.md <<'EOFC'
+# Knowledge Crawler - Hyper Factory
 
-طبقة زحف المعرفة (Knowledge Crawler):
-
-- crawler/spiders/   : تعريف الزواحف لكل مصدر معرفة.
-- crawler/pipelines/ : خطوط المعالجة من الزحف إلى التخزين في knowledge/.
-EOR
-  echo "[+] created crawler/README.md"
+- pipelines/ : بايبلاين الزحف
+- spiders/   : العناكب (مصادر المعرفة)
+EOFC
+  echo "[+] created crawler/ structure"
 fi
-
-# 6) knowledge base folders (files تبنى لاحقًا من الأنظمة)
-mkdir -p knowledge/snippets knowledge/patterns
 
 if [[ ! -f "knowledge/README.md" ]]; then
-  cat > knowledge/README.md <<'EOR'
-# Knowledge Base
+  mkdir -p knowledge/patterns knowledge/snippets
+  cat > knowledge/README.md <<'EOFK'
+# Knowledge Base - Hyper Factory
 
-قاعدة المعرفة لـ Hyper Factory:
-
-- knowledge/snippets/ : مقاطع معرفة قصيرة (rules, hints, examples).
-- knowledge/patterns/ : أنماط متقدمة وتحليلات مهيكلة.
-EOR
-  echo "[+] created knowledge/README.md"
+- patterns/ : أنماط معرفية
+- snippets/ : مقتطفات وخلاصات
+EOFK
+  echo "[+] created knowledge/ structure"
 fi
 
-# 7) requirements.txt (للمشروع نفسه فقط إن لم يكن موجودًا)
 if [[ ! -f "requirements.txt" ]]; then
-  cat > requirements.txt <<'EOR'
-# Hyper Factory – Python dependencies (project-level)
-# ملاحظة: هذا الملف لا يلمس أي venv خارجية، الهدف توثيق الحزم المطلوبة للمشروع.
-
-# Core
-pydantic>=2.0
+  cat > requirements.txt <<'EOFR'
+# Hyper Factory - المتطلبات الأساسية
 pyyaml>=6.0
+requests>=2.28.0
+python-dotenv>=0.19.0
 
-# Data / AI (adjust لاحقًا حسب الاحتياج الفعلي)
-numpy
-pandas
+# معالجة البيانات
+pandas>=1.3.0
+numpy>=1.21.0
 
-# Database / SQLite tools
-sqlalchemy
-
-# Optional: logging / cli enhancements
-rich
-typer
-EOR
+# الأدوات المساعدة
+tqdm>=4.62.0
+colorama>=0.4.4
+EOFR
   echo "[+] created requirements.txt"
 fi
 

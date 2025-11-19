@@ -25,7 +25,6 @@ data/processed/
 data/semantic/
 data/serving/
 data/tmp/
-
 data_lakehouse/
 
 # --- AI runtime data ---
@@ -41,9 +40,10 @@ reports/management/
 reports/diagnostics/
 reports/tmp/
 
-# --- Config backups & secrets ---
+# --- Config backups & potential secrets ---
 config/backup/
 config/*secret*.yaml
 config/*secrets*.yaml
 config/secure.env
-config/local_*.*
+config/local_*.yml
+config/local_*.yaml
