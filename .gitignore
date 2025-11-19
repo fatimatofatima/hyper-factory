@@ -34,3 +34,11 @@ docker-compose.override.yml
 Thumbs.db
 .idea/
 .vscode/
+ai/memory/
+data/
+config_changes/
+reports/
+data_lakehouse/
+factories/
+stack/
+integrations/
