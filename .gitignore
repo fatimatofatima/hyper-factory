@@ -47,3 +47,7 @@ config/*secrets*.yaml
 config/secure.env
 config/local_*.yml
 config/local_*.yaml
+
+# SQLite journal files
+data/knowledge/*.db-shm
+data/knowledge/*.db-wal
