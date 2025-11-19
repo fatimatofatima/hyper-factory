@@ -1,64 +1,61 @@
 #!/usr/bin/env python3
 # orchestrator_basic.py
 # عامل تنسيق بسيط:
-# - يشغّل ingestor_basic ثم processor_basic
-# - يكتب سطر تقرير في reports/basic_runs.log
+# - يشغّل بالترتيب:
+#   1) ingestor_basic.sh
+#   2) processor_basic.sh
+#   3) analyzer_basic.sh
+#   4) reporter_basic.sh
+# - يسجّل نتيجة الدورة في reports/basic_runs.log
 
 import os
 import sys
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-AGENTS_DIR = os.path.join(ROOT, "agents")
-REPORTS_DIR = os.path.join(ROOT, "reports")
-LOG_PATH = os.path.join(REPORTS_DIR, "basic_runs.log")
+ROOT = Path(__file__).resolve().parents[1]
+AGENTS_DIR = ROOT / "agents"
+REPORTS_DIR = ROOT / "reports"
+LOG_PATH = REPORTS_DIR / "basic_runs.log"
 
-INGESTOR_SH = os.path.join(AGENTS_DIR, "ingestor_basic.sh")
-PROCESSOR_SH = os.path.join(AGENTS_DIR, "processor_basic.sh")
+STEPS = [
+    ("ingestor_basic", AGENTS_DIR / "ingestor_basic.sh"),
+    ("processor_basic", AGENTS_DIR / "processor_basic.sh"),
+    ("analyzer_basic", AGENTS_DIR / "analyzer_basic.sh"),
+    ("reporter_basic", AGENTS_DIR / "reporter_basic.sh"),
+]
 
 
-def run_step(name, script_path):
+def run_step(name: str, script_path: Path):
     print(f"\n================= 🚀 تشغيل {name} =================")
-    if not os.path.exists(script_path):
+    print(f"📄 SCRIPT : {script_path}")
+
+    if not script_path.exists():
         print(f"❌ الملف غير موجود: {script_path}")
-        return False
+        return "MISSING", 1
+
+    if not os.access(str(script_path), os.X_OK):
+        print(f"⚠️ الملف غير قابل للتنفيذ، سيتم التصحيح: {script_path}")
+        try:
+            os.chmod(script_path, 0o755)
+        except Exception as e:
+            print(f"❌ فشل chmod: {e}")
+            return "NOT_EXECUTABLE", 1
 
     try:
-        result = subprocess.run(
-            [script_path],
-            cwd=ROOT,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            check=False,
+        subprocess.run(
+            [str(script_path)],
+            check=True,
         )
-        if result.returncode == 0:
-            print(f"✅ {name} انتهى بنجاح (code=0)")
-            return True
-        else:
-            print(f"❌ {name} انتهى بخطأ (code={result.returncode})")
-            return False
+        print(f"✅ {name} انتهى بنجاح.")
+        return "OK", 0
+    except subprocess.CalledProcessError as e:
+        print(f"❌ فشل تشغيل {name} (exit code={e.returncode})")
+        return "ERROR", e.returncode
     except Exception as e:
         print(f"❌ استثناء أثناء تشغيل {name}: {e}")
-        return False
-
-
-def append_report(status_ingestor, status_processor):
-    os.makedirs(REPORTS_DIR, exist_ok=True)
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    line = (
-        f"{now} | "
-        f"ingestor_basic={'OK' if status_ingestor else 'FAIL'} | "
-        f"processor_basic={'OK' if status_processor else 'FAIL'}\n"
-    )
-
-    try:
-        with open(LOG_PATH, "a", encoding="utf-8") as f:
-            f.write(line)
-        print(f"\n📝 تم تسجيل الدورة في: {LOG_PATH}")
-    except Exception as e:
-        print(f"⚠️ تعذر كتابة تقرير في {LOG_PATH}: {e}")
+        return "ERROR", 1
 
 
 def main():
@@ -67,13 +64,30 @@ def main():
     print("📝 REPORTS_DIR  :", REPORTS_DIR)
     print("----------------------------------------")
 
-    ok_ingestor = run_step("ingestor_basic", INGESTOR_SH)
-    ok_processor = run_step("processor_basic", PROCESSOR_SH)
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    append_report(ok_ingestor, ok_processor)
+    statuses = {}
+    overall_ok = True
 
-    if ok_ingestor and ok_processor:
-        print("\n✅ الدورة الأساسية (ingestor + processor) انتهت بنجاح.")
+    for name, script_path in STEPS:
+        status, code = run_step(name, script_path)
+        statuses[name] = status
+        if status != "OK":
+            overall_ok = False
+
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    status_parts = [f"{k}={v}" for k, v in statuses.items()]
+    line = f"{now} | " + " | ".join(status_parts)
+
+    try:
+        with LOG_PATH.open("a", encoding="utf-8") as log_f:
+            log_f.write(line + "\n")
+        print(f"\n📝 تم تسجيل الدورة في: {LOG_PATH}")
+    except Exception as e:
+        print(f"⚠️ تعذّر الكتابة في basic_runs.log: {e}")
+
+    if overall_ok:
+        print("\n✅ الدورة الأساسية (ingestor + processor + analyzer + reporter) انتهت بنجاح.")
         sys.exit(0)
     else:
         print("\n⚠️ الدورة انتهت مع أخطاء في واحد أو أكثر من الخطوات.")
