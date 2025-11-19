@@ -1,149 +1,266 @@
 #!/usr/bin/env python3
-"""
-tools/hf_apply_lessons.py
-
-Apply Lessons (Dry-Run Config Advisor):
-- يقرأ كل ملفات ai/memory/lessons/*.json
-- يجمع الـ Actions المسجّلة (id/title/priority/description)
-- ينتج:
-  - reports/config_changes/{timestamp}_lessons_summary.txt
-  - reports/config_changes/{timestamp}_agents.diff   (قالب يدوي)
-  - reports/config_changes/{timestamp}_factory.diff  (قالب يدوي)
-لا يقوم بأي تعديل على config/ تلقائيًا؛ فقط يجهّز ملفات للمراجعة اليدوية.
-"""
-
-import os
+import sqlite3
 import json
-from datetime import datetime
-from typing import List, Dict, Any
-
+import sys
+import shutil
+import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+try:
+    import yaml
+except ImportError:
+    print("ERROR: مكتبة PyYAML غير مثبتة. نفّذ:", file=sys.stderr)
+    print("  pip install pyyaml", file=sys.stderr)
+    sys.exit(1)
 
-MEMORY_DIR = ROOT / "ai" / "memory"
-LESSONS_DIR = MEMORY_DIR / "lessons"
+ROOT = Path(__file__).resolve().parent.parent
+DB_PATH = ROOT / "data" / "knowledge" / "knowledge.db"
+CONFIG_DIR = ROOT / "config"
+REPORTS_CONFIG_DIR = ROOT / "reports" / "config_changes"
+BACKUP_DIR = CONFIG_DIR / "backup"
 
-REPORTS_DIR = ROOT / "reports"
-CONFIG_CHANGES_DIR = REPORTS_DIR / "config_changes"
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+REPORTS_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+
+TS = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
 
 
-def load_lessons() -> List[Dict[str, Any]]:
-    lessons_files = sorted(LESSONS_DIR.glob("*.json"))
-    if not lessons_files:
-        print("ℹ️ لا توجد ملفات lessons في ai/memory/lessons/*.json حتى الآن.")
-        return []
+def load_yaml(path: Path):
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data or {}
 
-    all_actions: List[Dict[str, Any]] = []
 
-    for path in lessons_files:
+def save_yaml(data, path: Path):
+    with path.open("w", encoding="utf-8") as f:
+        yaml.safe_dump(
+            data,
+            f,
+            sort_keys=False,
+            allow_unicode=True,
+            default_flow_style=False,
+        )
+
+
+def apply_path(config: dict, dot_path: str, value, operation: str):
+    """
+    تطبيق تعديل على config وفق dot_path:
+    operation: set | increment
+    """
+    keys = dot_path.split(".")
+    cur = config
+    for k in keys[:-1]:
+        if k not in cur or not isinstance(cur[k], dict):
+            cur[k] = {}
+        cur = cur[k]
+    last = keys[-1]
+    old_value = cur.get(last, None)
+
+    if operation == "set":
+        cur[last] = value
+    elif operation == "increment":
         try:
-            with path.open("r", encoding="utf-8") as f:
-                data = json.load(f)
-        except Exception as e:
-            print(f"⚠️ تعذّر قراءة ملف lessons: {path} ({e})")
-            continue
+            base = old_value if isinstance(old_value, (int, float)) else 0
+            add = value if isinstance(value, (int, float)) else 0
+            cur[last] = base + add
+        except Exception:
+            # fallback: set
+            cur[last] = value
+    else:
+        raise ValueError(f"Unsupported operation: {operation}")
 
-        date = data.get("date")
-        actions = data.get("actions", [])
-        for act in actions:
-            all_actions.append(
-                {
-                    "source_file": str(path.name),
-                    "date": date,
-                    "id": act.get("id"),
-                    "title": act.get("title"),
-                    "priority": act.get("priority"),
-                    "description": act.get("description"),
-                }
-            )
-
-    return all_actions
+    return old_value, cur[last]
 
 
-def main() -> None:
-    print(f"📁 ROOT        : {ROOT}")
-    print(f"📂 LESSONS_DIR : {LESSONS_DIR}")
-    print(f"📂 REPORTS_DIR : {REPORTS_DIR}")
-    print("----------------------------------------")
+def main():
+    print("=== Hyper Factory – Apply Lessons ===")
+    print(f"ROOT: {ROOT}")
+    if not DB_PATH.exists():
+        print(f"ERROR: knowledge DB غير موجود: {DB_PATH}")
+        sys.exit(1)
 
-    CONFIG_CHANGES_DIR.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
 
-    actions = load_lessons()
-    if not actions:
-        print("ℹ️ لا توجد Actions لاستخلاصها من lessons. لا شيء للكتابة.")
+    cur.execute(
+        """
+        SELECT id, item_key, title, body, importance, tags, meta_json
+        FROM knowledge_items
+        WHERE item_type = 'lesson'
+        ORDER BY id
+        """
+    )
+    rows = cur.fetchall()
+    conn.close()
+
+    if not rows:
+        print("INFO: لا توجد عناصر lesson في knowledge_items – لا شيء لتطبيقه.")
         return
 
-    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    summary_path = CONFIG_CHANGES_DIR / f"{ts}_lessons_summary.txt"
-    agents_diff_path = CONFIG_CHANGES_DIR / f"{ts}_agents.diff"
-    factory_diff_path = CONFIG_CHANGES_DIR / f"{ts}_factory.diff"
+    print(f"INFO: عدد الدروس المستخرجة من DB: {len(rows)}")
 
-    # كتابة ملف الملخص النصي
-    lines: List[str] = []
-    lines.append("===== Hyper Factory Lessons Summary =====")
-    lines.append(f"Generated at : {datetime.utcnow().isoformat()}Z")
-    lines.append(f"Total actions: {len(actions)}")
-    lines.append("")
-    lines.append("== Actions ==")
+    agents_cfg_path = CONFIG_DIR / "agents.yaml"
+    factory_cfg_path = CONFIG_DIR / "factory.yaml"
 
-    for idx, act in enumerate(actions, start=1):
-        lines.append(f"[{idx}] id={act.get('id')}")
-        lines.append(f"    title      : {act.get('title')}")
-        lines.append(f"    priority   : {act.get('priority')}")
-        lines.append(f"    date       : {act.get('date')}")
-        lines.append(f"    source     : {act.get('source_file')}")
-        lines.append("    description:")
-        desc = act.get("description") or ""
-        for dline in str(desc).splitlines():
-            lines.append(f"      - {dline}")
-        lines.append("")
+    agents_cfg = load_yaml(agents_cfg_path)
+    factory_cfg = load_yaml(factory_cfg_path)
 
-    summary_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # نسخ احتياطية (مرة واحدة لكل ملف عند أول تعديل)
+    agents_backup_path = None
+    factory_backup_path = None
 
-    # قوالب diff مبدئية (تعليقات فقط) للمراجعة اليدوية
-    header = []
-    header.append("# Hyper Factory Config Changes (DRAFT / MANUAL)")
-    header.append(f"# Generated at : {datetime.utcnow().isoformat()}Z")
-    header.append(f"# Total actions: {len(actions)}")
-    header.append("# NOTE: هذا الملف لا يُطبّق تلقائيًا؛ استخدمه كقالب لتعديل config/ بعد مراجعة بشرية.")
-    header.append("#")
-    header.append("# لكل Action أدناه، قرّر يدويًا هل التأثير على agents.yaml أو factory.yaml أو الإعدادات التشغيلية.")
-    header.append("")
+    changes = []
+    skipped = []
 
-    agents_lines = list(header)
-    agents_lines.append("# === Candidate changes for config/agents.yaml ===")
-    agents_lines.append("#")
+    for row in rows:
+        lesson_id = row["id"]
+        item_key = row["item_key"]
+        title = row["title"] or ""
+        importance = row["importance"] if row["importance"] is not None else 0.0
+        tags = (row["tags"] or "").strip()
+        meta_json = row["meta_json"] or ""
 
-    factory_lines = list(header)
-    factory_lines.append("# === Candidate changes for config/factory.yaml ===")
-    factory_lines.append("#")
+        # محاولة قراءة meta_json
+        try:
+            meta = json.loads(meta_json) if meta_json else {}
+        except Exception as exc:
+            skipped.append(
+                {
+                    "lesson_id": lesson_id,
+                    "item_key": item_key,
+                    "reason": f"meta_json غير صالح: {exc}",
+                }
+            )
+            continue
 
-    for idx, act in enumerate(actions, start=1):
-        base = [
-            f"# [{idx}] id={act.get('id')} | priority={act.get('priority')}",
-            f"# title   : {act.get('title')}",
-            f"# date    : {act.get('date')} | source: {act.get('source_file')}",
-            "# description:",
-        ]
-        desc = act.get("description") or ""
-        for dline in str(desc).splitlines():
-            base.append(f"#   {dline}")
-        base.append("# TODO: حدّد إذا كان هذا الدرس يتطلّب تعديل عامل (agent) معيّن أو إعدادات المصنع (factory).")
-        base.append("# TODO: استبدل هذا التعليق ببلوك diff فعلي بعد اتخاذ القرار.")
-        base.append("#")
+        enabled = meta.get("enabled", True)
+        if not enabled:
+            skipped.append(
+                {
+                    "lesson_id": lesson_id,
+                    "item_key": item_key,
+                    "reason": "الدرس معطّل enabled=false",
+                }
+            )
+            continue
 
-        # حالياً نكرّر نفس البلوك في الملفين، والقرار النهائي يكون يدوي
-        agents_lines.extend(base)
-        factory_lines.extend(base)
+        target = meta.get("target") or meta.get("config_target")
+        dot_path = meta.get("path") or meta.get("config_path")
+        value = meta.get("value")
+        operation = meta.get("operation", "set")
 
-    agents_diff_path.write_text("\n".join(agents_lines) + "\n", encoding="utf-8")
-    factory_diff_path.write_text("\n".join(factory_lines) + "\n", encoding="utf-8")
+        if not target or not dot_path:
+            skipped.append(
+                {
+                    "lesson_id": lesson_id,
+                    "item_key": item_key,
+                    "reason": "meta_json بدون target/path",
+                }
+            )
+            continue
 
-    print("✅ تم توليد ملفات Apply Lessons (Draft):")
-    print(f"   - {summary_path}")
-    print(f"   - {agents_diff_path}")
-    print(f"   - {factory_diff_path}")
+        target = str(target).lower().strip()
+        if target in ["agents", "agent", "agents.yaml"]:
+            cfg_name = "agents"
+            cfg_path = agents_cfg_path
+            cfg_obj = agents_cfg
+        elif target in ["factory", "factory.yaml"]:
+            cfg_name = "factory"
+            cfg_path = factory_cfg_path
+            cfg_obj = factory_cfg
+        else:
+            skipped.append(
+                {
+                    "lesson_id": lesson_id,
+                    "item_key": item_key,
+                    "reason": f"target غير مدعوم: {target}",
+                }
+            )
+            continue
+
+        # حفظ نسخة احتياطية مرة واحدة لكل ملف
+        if cfg_name == "agents" and agents_backup_path is None and cfg_path.exists():
+            agents_backup_path = BACKUP_DIR / f"agents.yaml.{TS}"
+            shutil.copy2(cfg_path, agents_backup_path)
+        if cfg_name == "factory" and factory_backup_path is None and cfg_path.exists():
+            factory_backup_path = BACKUP_DIR / f"factory.yaml.{TS}"
+            shutil.copy2(cfg_path, factory_backup_path)
+
+        try:
+            old_value, new_value = apply_path(cfg_obj, dot_path, value, operation)
+        except Exception as exc:
+            skipped.append(
+                {
+                    "lesson_id": lesson_id,
+                    "item_key": item_key,
+                    "reason": f"فشل تطبيق المسار {dot_path}: {exc}",
+                }
+            )
+            continue
+
+        changes.append(
+            {
+                "lesson_id": lesson_id,
+                "item_key": item_key,
+                "title": title,
+                "importance": importance,
+                "target": cfg_name,
+                "path": dot_path,
+                "operation": operation,
+                "old_value": old_value,
+                "new_value": new_value,
+                "config_file": str(cfg_path.relative_to(ROOT)),
+                "tags": tags,
+            }
+        )
+
+    # حفظ التعديلات على ملفات YAML
+    if changes:
+        if agents_backup_path:
+            print(f"INFO: تم حفظ نسخة احتياطية لـ agents.yaml: {agents_backup_path}")
+        if factory_backup_path:
+            print(f"INFO: تم حفظ نسخة احتياطية لـ factory.yaml: {factory_backup_path}")
+
+        save_yaml(agents_cfg, agents_cfg_path)
+        save_yaml(factory_cfg, factory_cfg_path)
+
+    # إنشاء تقرير config_changes
+    report = {
+        "created_at_utc": TS,
+        "root": str(ROOT),
+        "db_path": str(DB_PATH),
+        "lessons_total": len(rows),
+        "changes_applied": len(changes),
+        "skipped": skipped,
+        "changes": changes,
+    }
+    report_path = REPORTS_CONFIG_DIR / f"apply_lessons_{TS}.json"
+    with report_path.open("w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
+    print(f"=== ملخص تطبيق الدروس ===")
+    print(f"- عدد الدروس في DB        : {len(rows)}")
+    print(f"- عدد التغييرات المطبقة   : {len(changes)}")
+    print(f"- عدد الدروس المتخطاة     : {len(skipped)}")
+    print(f"- تقرير التغييرات         : {report_path}")
+
+    if changes:
+        print("\nأهم التغييرات:")
+        for ch in changes:
+            print(
+                f"* [lesson_id={ch['lesson_id']}] target={ch['target']} "
+                f"path={ch['path']} old={ch['old_value']!r} -> new={ch['new_value']!r}"
+            )
+
+    if skipped:
+        print("\nملاحظات حول الدروس المتخطاة:")
+        for sk in skipped:
+            print(
+                f"- [lesson_id={sk['lesson_id']}] item_key={sk['item_key']}: {sk['reason']}"
+            )
 
 
 if __name__ == "__main__":
