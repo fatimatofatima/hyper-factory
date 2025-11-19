@@ -1,0 +1,170 @@
+# Hyper Factory - Agents Configuration
+# Matches ACTUAL scripts in repository
+# Generated: 2025-11-19
+
+version: "2.1"
+description: "Hyper Factory agents configuration - matches actual repository structure"
+
+# === BASIC PIPELINE AGENTS ===
+basic_agents:
+  ingestor_basic:
+    id: "ingestor_basic"
+    name: "Basic Data Ingestor"
+    type: "data_ingestion"
+    enabled: true
+    script: "run_basic_cycle.sh"
+    output_dir: "data/raw/"
+    
+  processor_basic:
+    id: "processor_basic" 
+    name: "Basic Data Processor"
+    type: "data_processing"
+    enabled: true
+    script: "run_basic_cycle.sh"
+    output_dir: "data/processed/"
+    
+  analyzer_basic:
+    id: "analyzer_basic"
+    name: "Basic Data Analyzer"
+    type: "data_analysis"
+    enabled: true  
+    script: "run_basic_cycle.sh"
+    output_dir: "data/semantic/"
+    
+  reporter_basic:
+    id: "reporter_basic"
+    name: "Basic Reporter"
+    type: "reporting"
+    enabled: true
+    script: "run_basic_with_report.sh"
+    output_dir: "reports/"
+
+# === ADVANCED AGENTS (Scripts EXIST in repo) ===
+advanced_agents:
+  debug_expert:
+    id: "debug_expert"
+    name: "Debug Expert"
+    type: "debugging"
+    enabled: true
+    script: "hf_run_debug_expert.sh"
+    python_tool: "tools/hf_debug_expert.py"
+    description: "Error analysis and pattern detection"
+    
+  system_architect:
+    id: "system_architect"
+    name: "System Architect"
+    type: "architecture"
+    enabled: true
+    script: "hf_run_system_architect.sh"
+    python_tool: "tools/hf_system_architect.py"
+    description: "System design and architecture planning"
+    
+  technical_coach:
+    id: "technical_coach"
+    name: "Technical Coach"
+    type: "coaching"
+    enabled: true
+    script: "hf_run_technical_coach.sh"
+    python_tool: "tools/hf_technical_coach.py"
+    description: "Skills development and training"
+    
+  knowledge_spider:
+    id: "knowledge_spider"
+    name: "Knowledge Spider"
+    type: "knowledge_management"
+    enabled: true
+    script: "hf_run_knowledge_spider.sh"
+    description: "Knowledge gathering and organization"
+
+# === MANAGEMENT AGENTS ===
+management_agents:
+  manager_dashboard:
+    id: "manager_dashboard"
+    name: "Manager Dashboard"
+    type: "monitoring"
+    enabled: true
+    script: "hf_run_manager_dashboard.sh"
+    description: "System monitoring and reporting"
+    
+  quality_worker:
+    id: "quality_worker"
+    name: "Quality Worker"
+    type: "quality_assurance"
+    enabled: true
+    script: "hf_run_quality_worker.sh"
+    description: "Quality assurance and validation"
+    
+  roles_engine:
+    id: "roles_engine"
+    name: "Roles Engine"
+    type: "coordination"
+    enabled: true
+    script: "hf_run_roles_engine.sh"
+    description: "Role management and coordination"
+
+# === LEARNING AGENTS ===
+learning_agents:
+  offline_learner:
+    id: "offline_learner"
+    name: "Offline Learner"
+    type: "machine_learning"
+    enabled: true
+    script: "hf_run_offline_learner.sh"
+    description: "Machine learning and pattern recognition"
+    
+  smart_worker:
+    id: "smart_worker"
+    name: "Smart Worker"
+    type: "ai_processing"
+    enabled: true
+    script: "hf_run_smart_worker.sh"
+    description: "AI-powered task processing"
+
+# === OPERATIONAL AGENTS ===
+operational_agents:
+  apply_lessons:
+    id: "apply_lessons"
+    name: "Lessons Applier"
+    type: "knowledge_application"
+    enabled: true
+    script: "hf_run_apply_lessons.sh"
+    description: "Apply learned lessons to system"
+    
+  export_lessons:
+    id: "export_lessons"
+    name: "Lessons Exporter"
+    type: "knowledge_export"
+    enabled: true
+    script: "hf_run_export_lessons.sh"
+    description: "Export system lessons and insights"
+
+# === EXECUTION SETTINGS ===
+execution:
+  max_concurrent_agents: 3
+  default_timeout_seconds: 300
+  health_check_interval: 60
+  log_level: "INFO"
+
+# === WORKFLOW DEPENDENCIES ===
+workflow_dependencies:
+  data_processing:
+    - "ingestor_basic"
+    - "processor_basic"
+    - "analyzer_basic"
+    - "reporter_basic"
+    
+  system_analysis:
+    - "debug_expert"
+    - "system_architect"
+    - "quality_worker"
+    
+  learning_cycle:
+    - "offline_learner"
+    - "technical_coach"
+    - "knowledge_spider"
+    
+  management_cycle:
+    - "manager_dashboard"
+    - "roles_engine"
+    - "smart_worker"
+

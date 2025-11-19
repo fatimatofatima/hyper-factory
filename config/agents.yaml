@@ -1,52 +1,212 @@
-# agents.yaml - تعريف أولي لأنواع العمال (بدون تنفيذ فعلي)
+# Hyper Factory - Complete Agents Configuration
+# الإصدار: 3.0 - متوافق مع الريبو الفعلي
+# Generated: 2025-11-19
 
-agents:
+version: "3.0"
+description: "تكوين كامل لجميع عمال Hyper Factory - متوافق مع السكريبتات الموجودة"
 
+# === العوامل الأساسية (الموجودة في الريبو) ===
+basic_agents:
   ingestor_basic:
-    role: "ingestor"
-    description: "عامل إدخال أولي - يسحب البيانات الخام إلى data/raw."
+    id: "ingestor_basic"
+    name: "جامع البيانات الأساسي"
+    type: "data_ingestion"
     enabled: true
-    input:
-      source_type: "filesystem"
-      paths:
-        - "./data/raw"
-    output:
-      path: "./data/raw"
-    notes: "يتم دمجه لاحقًا مع سكربتات ingestion الحقيقية."
-
+    script: "run_basic_cycle.sh"
+    description: "جمع البيانات الخام من المصادر المختلفة"
+    output_dir: "data/raw/"
+    
   processor_basic:
-    role: "processor"
-    description: "عامل معالجة - ينقل البيانات من raw إلى processed."
+    id: "processor_basic"
+    name: "معالج البيانات الأساسي"
+    type: "data_processing" 
     enabled: true
-    input:
-      path: "./data/raw"
-    output:
-      path: "./data/processed"
-    notes: "مسؤول عن التنظيف/التحويل التدريجي."
-
+    script: "run_basic_cycle.sh"
+    description: "معالجة البيانات الخام وتحويلها"
+    output_dir: "data/processed/"
+    
   analyzer_basic:
-    role: "analyzer"
-    description: "عامل تحليل - يبني تمثيل دلالي في data/semantic."
+    id: "analyzer_basic"
+    name: "محلل البيانات الأساسي"
+    type: "data_analysis"
     enabled: true
-    input:
-      path: "./data/processed"
-    output:
-      path: "./data/semantic"
-    notes: "يرتبط لاحقًا بوحدات الذكاء الاصطناعي."
-
+    script: "run_basic_cycle.sh"
+    description: "تحليل البيانات واستخراج الرؤى"
+    output_dir: "data/semantic/"
+    
   reporter_basic:
-    role: "reporter"
-    description: "عامل تقارير - يكتب مخرجات نهائية إلى data/serving و reports."
+    id: "reporter_basic"
+    name: "مولد التقارير الأساسي"
+    type: "reporting"
     enabled: true
-    input:
-      path: "./data/semantic"
-    output:
-      serving_path: "./data/serving"
-      reports_path: "./reports"
-    notes: "واجهة بين المصنع ولوحات العرض/الـ APIs."
+    script: "run_basic_with_report.sh"
+    description: "إنشاء التقارير الشاملة"
+    output_dir: "reports/"
 
-orchestrator:
-  enabled: false
-  description: "يتم تفعيله لاحقًا لجدولة العمال بناءً على factory.yaml + agents.yaml."
-  strategy: "sequential"
-  notes: "هذه مجرد placeholder الآن."
+# === العوامل المتقدمة (سكريبتات موجودة في الريبو) ===
+advanced_agents:
+  debug_expert:
+    id: "debug_expert"
+    name: "خبير تصحيح الأخطاء"
+    type: "debugging"
+    enabled: true
+    script: "hf_run_debug_expert.sh"
+    python_tool: "tools/hf_debug_expert.py"
+    description: "تحليل الأخطاء واكتشاف الأنماط المتكررة"
+    
+  system_architect:
+    id: "system_architect"
+    name: "المهندس المعماري للنظام"
+    type: "architecture"
+    enabled: true
+    script: "hf_run_system_architect.sh"
+    python_tool: "tools/hf_system_architect.py"
+    description: "تصميم وتحسين البنية التحتية للنظام"
+    
+  technical_coach:
+    id: "technical_coach"
+    name: "المدرب التقني"
+    type: "coaching"
+    enabled: true
+    script: "hf_run_technical_coach.sh"
+    python_tool: "tools/hf_technical_coach.py"
+    description: "تطوير مهارات المبرمجين عبر مسارات تعلم مخصصة"
+    
+  knowledge_spider:
+    id: "knowledge_spider"
+    name: "عنكبوت المعرفة"
+    type: "knowledge_management"
+    enabled: true
+    script: "hf_run_knowledge_spider.sh"
+    description: "جمع وتنظيم المعرفة من مصادر متعددة"
+
+# === عمال الإدارة (موجودة في الريبو) ===
+management_agents:
+  manager_dashboard:
+    id: "manager_dashboard"
+    name: "لوحة تحكم المدير"
+    type: "monitoring"
+    enabled: true
+    script: "hf_run_manager_dashboard.sh"
+    description: "مراقبة أداء النظام وعرض التقارير"
+    
+  quality_worker:
+    id: "quality_worker"
+    name: "عامل الجودة"
+    type: "quality_assurance"
+    enabled: true
+    script: "hf_run_quality_worker.sh"
+    description: "ضمان جودة العمليات والمخرجات"
+    
+  roles_engine:
+    id: "roles_engine"
+    name: "محرك الأدوار"
+    type: "coordination"
+    enabled: true
+    script: "hf_run_roles_engine.sh"
+    description: "تنسيق التفاعل بين العوامل المختلفة"
+
+# === عمال التعلم (موجودة في الريبو) ===
+learning_agents:
+  offline_learner:
+    id: "offline_learner"
+    name: "المتعلم الآلي"
+    type: "machine_learning"
+    enabled: true
+    script: "hf_run_offline_learner.sh"
+    description: "التعلم من البيانات والخبرات السابقة"
+    
+  smart_worker:
+    id: "smart_worker"
+    name: "العامل الذكي"
+    type: "ai_processing"
+    enabled: true
+    script: "hf_run_smart_worker.sh"
+    description: "معالجة المهام المعقدة باستخدام الذكاء الاصطناعي"
+
+# === عمال التشغيل (موجودة في الريبو) ===
+operational_agents:
+  apply_lessons:
+    id: "apply_lessons"
+    name: "مطبق الدروس"
+    type: "knowledge_application"
+    enabled: true
+    script: "hf_run_apply_lessons.sh"
+    description: "تطبيق الدروس المستفادة على النظام"
+    
+  export_lessons:
+    id: "export_lessons"
+    name: "مصدر الدروس"
+    type: "knowledge_export"
+    enabled: true
+    script: "hf_run_export_lessons.sh"
+    description: "تصدير الدروس والرؤى من النظام"
+    
+  daily_ops:
+    id: "daily_ops"
+    name: "عمليات اليومية"
+    type: "operations"
+    enabled: true
+    script: "hf_run_daily_ops.sh"
+    description: "إدارة العمليات اليومية للنظام"
+    
+  learning_cycle:
+    id: "learning_cycle"
+    name: "دورة التعلم"
+    type: "learning"
+    enabled: true
+    script: "hf_run_learning_cycle.sh"
+    description: "إدارة دورات التعلم الآلي"
+    
+  set_phase:
+    id: "set_phase"
+    name: "معالج المراحل"
+    type: "phase_management"
+    enabled: true
+    script: "hf_run_set_phase.sh"
+    description: "إدارة مراحل تطور النظام"
+
+# === إعدادات التنفيذ ===
+execution_settings:
+  max_concurrent_agents: 3
+  default_timeout_seconds: 300
+  health_check_interval: 60
+  log_level: "INFO"
+  log_directory: "logs/"
+
+# === تبعيات سير العمل ===
+workflow_dependencies:
+  data_processing_pipeline:
+    - "ingestor_basic"
+    - "processor_basic"
+    - "analyzer_basic"
+    - "reporter_basic"
+    
+  system_analysis_pipeline:
+    - "debug_expert"
+    - "system_architect"
+    - "quality_worker"
+    
+  learning_development_pipeline:
+    - "offline_learner"
+    - "technical_coach"
+    - "knowledge_spider"
+    
+  management_monitoring_pipeline:
+    - "manager_dashboard"
+    - "roles_engine"
+    - "smart_worker"
+    
+  operational_pipeline:
+    - "daily_ops"
+    - "learning_cycle"
+    - "set_phase"
+
+# === جداول التشغيل ===
+scheduling:
+  data_processing: "06:00"
+  system_analysis: "12:00"
+  learning_development: "18:00"
+  management_reports: "22:00"
+  daily_operations: "02:00"
+
