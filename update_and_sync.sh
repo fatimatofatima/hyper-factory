@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # update_and_sync.sh
 # 1) يضيف sync_repo.sh للـ Git لو متغير
-# 2) يعمل commit
-# 3) يشغّل ./sync_repo.sh اللي بيعمل add + push لباقي الملفات الآمنة
+# 2) يعمل commit برسالة فيها التوقيت
+# 3) يشغّل ./sync_repo.sh
 
 set -euo pipefail
 
@@ -17,9 +17,9 @@ if git diff --quiet sync_repo.sh 2>/dev/null; then
 else
   echo "✅ إضافة sync_repo.sh إلى الـ staging..."
   git add sync_repo.sh
-  COMMIT_MSG="Update sync_repo.sh: \$(date +'%Y-%m-%d %H:%M:%S')"
-  echo "📝 إنشاء commit: \$COMMIT_MSG"
-  git commit -m "\$COMMIT_MSG"
+  COMMIT_MSG="Update sync_repo.sh: $(date +'%Y-%m-%d %H:%M:%S')"
+  echo "📝 إنشاء commit: $COMMIT_MSG"
+  git commit -m "$COMMIT_MSG"
 fi
 
 echo "🔄 تشغيل sync_repo.sh لمزامنة الريبو..."
