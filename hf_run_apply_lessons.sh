@@ -1,27 +1,28 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -e
 
-ROOT="/root/hyper-factory"
-cd "$ROOT"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-LOG_DIR="$ROOT/logs"
-mkdir -p "$LOG_DIR"
-LOG_FILE="$LOG_DIR/hf_run_apply_lessons.log"
+echo "=================================================="
+echo "🧩 Hyper Factory – بناء خطة تطبيق الدروس وملفات diff"
+echo "ROOT : $ROOT"
+echo "=================================================="
 
-ts="$(date -Is)"
-{
-  echo "[$ts] === hf_run_apply_lessons – start ==="
-  echo "ROOT: $ROOT"
-} >> "$LOG_FILE"
-
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "[$ts] ERROR: python3 غير موجود في PATH." >> "$LOG_FILE"
+if [ ! -x "$ROOT/tools/hf_apply_lessons_to_config.py" ]; then
+  echo "[ERROR] سكربت Python غير موجود أو غير قابل للتنفيذ: tools/hf_apply_lessons_to_config.py"
   exit 1
 fi
 
-python3 "$ROOT/tools/hf_apply_lessons.py" >> "$LOG_FILE" 2>&1 || {
-  echo "[$ts] ERROR: فشل تنفيذ hf_apply_lessons.py" >> "$LOG_FILE"
-  exit 0
-}
+mkdir -p "$ROOT/ai/memory/lessons"
+mkdir -p "$ROOT/config_changes"
+mkdir -p "$ROOT/reports/management"
 
-echo "[$ts] === hf_run_apply_lessons – done ===" >> "$LOG_FILE"
+python3 "$ROOT/tools/hf_apply_lessons_to_config.py"
+
+echo "=================================================="
+echo "✅ اكتمل تنفيذ hf_run_apply_lessons.sh"
+echo "راجع:"
+echo "  - reports/management/lessons_apply_plan.md"
+echo "  - config_changes/agents.diff"
+echo "  - config_changes/factory.diff"
+echo "=================================================="
