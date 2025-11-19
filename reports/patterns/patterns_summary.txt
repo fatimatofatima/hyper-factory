@@ -1,0 +1,19 @@
+📊 Patterns Engine – Summary
+⏰ 2025-11-19T17:44:45.536842Z
+DB: /root/hyper-factory/data/knowledge/knowledge.db
+
+الجداول:
+- sources: count=9, ratio=0.008
+- knowledge_items: count=14, ratio=0.0124
+- debug_knowledge: count=5, ratio=0.0044
+- web_knowledge: count=1083, ratio=0.9601
+- programming_patterns: count=4, ratio=0.0035
+- knowledge_index: count=7, ratio=0.0062
+- system_patterns: count=0, ratio=0.0
+- agent_memory: count=0, ratio=0.0
+- debug_solutions: count=6, ratio=0.0053
+
+استنتاجات:
+- هناك اعتماد قوي على web_knowledge بعدد 1083 سجل.
+- مكتبة الأنماط البرمجية تحتوي على 4 نمط.
+- جدول system_patterns فارغ → لم يتم تخزين أنماط تشغيلية بعد.

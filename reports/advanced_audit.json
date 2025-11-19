@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "timestamp": "2025-11-19T20:44:44",
+    "base_dir": "/root/hyper-factory"
+  },
+  "data_lakehouse": {
+    "exists": true,
+    "zones": {
+      "raw": {
+        "exists": true,
+        "files": 0
+      },
+      "cleansed": {
+        "exists": true,
+        "files": 0
+      },
+      "semantic": {
+        "exists": true,
+        "files": 0
+      },
+      "serving": {
+        "exists": true,
+        "files": 0
+      },
+      "catalog": {
+        "exists": true,
+        "files": 2
+      }
+    }
+  },
+  "factories_stack": {
+    "factories_dir": {
+      "exists": true
+    },
+    "stack_dir": {
+      "exists": true
+    },
+    "factory_config": {
+      "factory_yaml": true,
+      "factory_manifest": true
+    }
+  },
+  "agents": {
+    "agents_root_exists": true,
+    "agents": {
+      "debug_expert": {
+        "status": "OK",
+        "exists": true
+      },
+      "system_architect": {
+        "status": "OK",
+        "exists": true
+      },
+      "technical_coach": {
+        "status": "OK",
+        "exists": true
+      },
+      "knowledge_spider": {
+        "status": "OK",
+        "exists": true
+      },
+      "security_auditor": {
+        "status": "OK",
+        "exists": true
+      },
+      "document_generator": {
+        "status": "OK",
+        "exists": true
+      },
+      "patterns_engine": {
+        "status": "OK",
+        "exists": true
+      },
+      "quality_engine": {
+        "status": "OK",
+        "exists": true
+      },
+      "temporal_memory": {
+        "status": "OK",
+        "exists": true
+      },
+      "integration_hub": {
+        "status": "OK",
+        "exists": true
+      }
+    }
+  },
+  "integrations": {
+    "root_exists": true,
+    "files": [
+      "github_api.py",
+      "notifications.py"
+    ],
+    "has_github_api": true,
+    "has_notifications": true
+  },
+  "knowledge_db": {
+    "db_exists": true,
+    "tables": {
+      "sources": 9,
+      "sqlite_sequence": 7,
+      "knowledge_items": 14,
+      "debug_knowledge": 5,
+      "web_knowledge": 1083,
+      "programming_patterns": 4,
+      "knowledge_index": 7,
+      "system_patterns": 0,
+      "agent_memory": 0,
+      "debug_solutions": 6
+    },
+    "error": null
+  }
+}
