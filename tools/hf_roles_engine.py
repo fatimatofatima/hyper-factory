@@ -1,249 +1,158 @@
 #!/usr/bin/env python3
-"""
-tools/hf_roles_engine.py
+# -*- coding: utf-8 -*-
 
-Roles & Compensation Engine:
-- يقرأ:
-  - ai/memory/offline/sessions/*.json   (إحصائيات step_stats لكل Agent)
-  - config/roles.json                   (تعريف الأدوار والمستويات)
-- يحسب:
-  - عدد مرات التشغيل/النجاح/الفشل لكل Agent
-  - نسبة النجاح الكلية
-  - مستوى العامل (Junior/Mid/Senior/Expert) حسب thresholds
-  - مؤشر راتب salary_index = base_salary_index * level_multiplier
-- يكتب:
-  - ai/memory/people/agents_levels.json
-  - ai/memory/people/agents_levels.txt
+"""
+hf_roles_engine.py
+
+محرك الأدوار ومستويات الـ Agents لـ Hyper Factory.
+
+المصادر:
+  - config/roles.json
+  - data/report/summary_basic.json
+
+النواتج:
+  - ai/memory/people/agents_levels.json   (قابل للاستهلاك من Manager Dashboard + Knowledge Spider)
+  - ai/memory/people/agents_levels.txt    (ملخص نصي للقراءة السريعة)
 """
 
-import os
 import json
+from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List, Tuple
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = Path(__file__).resolve().parent.parent
 
-MEMORY_DIR = os.path.join(ROOT, "ai", "memory")
-SESSIONS_DIR = os.path.join(MEMORY_DIR, "offline", "sessions")
-PEOPLE_DIR = os.path.join(MEMORY_DIR, "people")
-
-CONFIG_ROLES = os.path.join(ROOT, "config", "roles.json")
-REPORTS_PEOPLE_DIR = os.path.join(ROOT, "reports", "people")
-
-os.makedirs(PEOPLE_DIR, exist_ok=True)
-os.makedirs(REPORTS_PEOPLE_DIR, exist_ok=True)
+ROLES_CONFIG_PATH = ROOT / "config" / "roles.json"
+SUMMARY_BASIC_PATH = ROOT / "data" / "report" / "summary_basic.json"
+PEOPLE_DIR = ROOT / "ai" / "memory" / "people"
+AGENTS_LEVELS_JSON = PEOPLE_DIR / "agents_levels.json"
+AGENTS_LEVELS_TXT = PEOPLE_DIR / "agents_levels.txt"
 
 
-def load_json_safe(path: str) -> Any:
-    if not os.path.isfile(path):
-        return None
+def load_json(path, default=None):
+    if default is None:
+        default = {}
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
+    except FileNotFoundError:
+        print(f"⚠️ لم يتم العثور على الملف: {path}")
     except Exception as e:
-        print(f"⚠️ فشل تحميل JSON من {path}: {e}")
-        return None
+        print(f"⚠️ خطأ أثناء قراءة JSON من {path}: {e}")
+    return default
 
 
-def load_roles_config() -> Dict[str, Any]:
-    cfg = load_json_safe(CONFIG_ROLES)
-    if not isinstance(cfg, dict):
-        # إعداد افتراضي بسيط في حال غياب الملف
-        print("⚠️ لم يتم العثور على config/roles.json أو الملف غير صالح، استخدام إعداد افتراضي.")
-        cfg = {
-            "levels": {
-                "junior": {"label": "مبتدئ", "min_success_rate": 0.70, "multiplier": 0.8},
-                "mid": {"label": "متوسط", "min_success_rate": 0.85, "multiplier": 1.0},
-                "senior": {"label": "متقدم", "min_success_rate": 0.95, "multiplier": 1.2},
-                "expert": {"label": "خبير", "min_success_rate": 0.99, "multiplier": 1.5},
-            },
-            "roles": {},
-            "agents": {},
-        }
-    return cfg
-
-
-def discover_sessions() -> List[str]:
-    if not os.path.isdir(SESSIONS_DIR):
-        return []
-    files = []
-    for name in os.listdir(SESSIONS_DIR):
-        if name.endswith(".json"):
-            files.append(os.path.join(SESSIONS_DIR, name))
-    return sorted(files)
-
-
-def aggregate_agent_stats() -> Dict[str, Dict[str, Any]]:
+def pick_level(success_rate, levels_cfg):
     """
-    يقرأ كل ملفات sessions ويجمع step_stats لكل Agent.
+    اختيار المستوى الأنسب بناءً على success_rate
+    يستخدم thresholds من config/roles.json["levels"].
     """
-    files = discover_sessions()
-    if not files:
-        print(f"ℹ️ لا توجد ملفات sessions في {SESSIONS_DIR}. لن يتم احتساب إحصائيات.")
-        return {}
+    if not levels_cfg:
+        return "junior"
 
-    agg: Dict[str, Dict[str, Any]] = {}
-    total_days = 0
+    # نبني قائمة (level_name, min_success_rate, multiplier)
+    entries = []
+    for name, cfg in levels_cfg.items():
+        min_sr = float(cfg.get("min_success_rate", 0.0))
+        entries.append((name, min_sr))
 
-    for path in files:
-        data = load_json_safe(path)
-        if not isinstance(data, dict):
-            continue
-        stats = data.get("stats") or {}
-        step_stats = stats.get("step_stats") or {}
-        if not isinstance(step_stats, dict):
-            continue
+    # ترتيب حسب min_success_rate تصاعديًا
+    entries.sort(key=lambda x: x[1])
 
-        total_days += 1
-        for agent_name, s in step_stats.items():
-            if not isinstance(s, dict):
-                continue
-            count = int(s.get("count", 0) or 0)
-            ok = int(s.get("ok", 0) or 0)
-            fail = int(s.get("fail", 0) or 0)
-
-            rec = agg.setdefault(agent_name, {
-                "agent": agent_name,
-                "total_runs": 0,
-                "ok_runs": 0,
-                "fail_runs": 0,
-                "days_seen": 0,
-            })
-            rec["total_runs"] += count
-            rec["ok_runs"] += ok
-            rec["fail_runs"] += fail
-            rec["days_seen"] += 1
-
-    # حساب success_rate
-    for agent_name, rec in agg.items():
-        total = rec.get("total_runs", 0)
-        ok = rec.get("ok_runs", 0)
-        rec["success_rate"] = (ok / total) if total > 0 else 0.0
-
-    print(f"ℹ️ تم جمع إحصائيات {len(agg)} Agent من {len(files)} ملف sessions (أيام={total_days}).")
-    return agg
+    chosen = entries[0][0]
+    for name, min_sr in entries:
+        if success_rate >= min_sr:
+            chosen = name
+    return chosen
 
 
-def determine_level(levels_cfg: Dict[str, Any], success_rate: float) -> Tuple[str, Dict[str, Any]]:
-    """
-    يختار المستوى المناسب بناءً على success_rate، أعلى threshold مناسبة.
-    """
-    chosen_id = "junior"
-    chosen = {"label": "مبتدئ", "min_success_rate": 0.0, "multiplier": 0.8}
+def main():
+    print("📂 ROOT            :", ROOT)
+    print("📄 roles.json      :", ROLES_CONFIG_PATH)
+    print("📄 summary_basic   :", SUMMARY_BASIC_PATH)
+    print("📄 agents_levels   :", AGENTS_LEVELS_JSON)
+    print("--------------------------------------------------")
 
-    # ترتيب المستويات حسب min_success_rate تصاعدياً
-    items = []
-    for lvl_id, info in levels_cfg.items():
-        try:
-            thr = float(info.get("min_success_rate", 0.0) or 0.0)
-        except Exception:
-            thr = 0.0
-        items.append((thr, lvl_id, info))
-    items.sort(key=lambda x: x[0])
+    roles_cfg = load_json(ROLES_CONFIG_PATH, {})
+    summary = load_json(SUMMARY_BASIC_PATH, {})
 
-    for thr, lvl_id, info in items:
-        if success_rate >= thr:
-            chosen_id = lvl_id
-            chosen = info
-
-    return chosen_id, chosen
-
-
-def build_agents_levels_report() -> None:
-    roles_cfg = load_roles_config()
     levels_cfg = roles_cfg.get("levels", {})
-    roles = roles_cfg.get("roles", {})
-    agents_cfg = roles_cfg.get("agents", {})
+    roles_map = roles_cfg.get("roles", {})
+    agents_map = roles_cfg.get("agents", {})
 
-    agg_stats = aggregate_agent_stats()
+    if not agents_map:
+        print("⚠️ لا توجد agents معرفة في config/roles.json → القسم 'agents'. لن يتم توليد شيء.")
+        return
 
-    agents_output: List[Dict[str, Any]] = []
+    total_runs = int(summary.get("total_runs") or 0)
+    success_runs = int(summary.get("success_runs") or 0)
+    failed_runs = int(summary.get("failed_runs") or 0)
 
-    for agent_name, stats in sorted(agg_stats.items(), key=lambda x: x[0]):
-        meta = agents_cfg.get(agent_name, {})
-        role_id = meta.get("role")
-        role_info = roles.get(role_id, {})
-        base_salary_index = float(role_info.get("base_salary_index", 1.0))
+    if total_runs > 0:
+        success_rate = success_runs / total_runs
+    else:
+        success_rate = 0.0
 
-        success_rate = float(stats.get("success_rate", 0.0))
-        level_id, level_info = determine_level(levels_cfg, success_rate)
-        level_label = level_info.get("label", level_id)
-        multiplier = float(level_info.get("multiplier", 1.0))
+    print(f"📊 إجمالي الدورات   : {total_runs}")
+    print(f"✅ الناجحة           : {success_runs}")
+    print(f"❌ الفاشلة           : {failed_runs}")
+    print(f"📈 نسبة النجاح      : {success_rate:.2%}")
+    print("--------------------------------------------------")
 
-        salary_index = base_salary_index * multiplier
+    PEOPLE_DIR.mkdir(parents=True, exist_ok=True)
 
-        agent_record = {
+    agents_levels = []
+    lines_txt = []
+    lines_txt.append(f"# Agents Levels generated at {datetime.utcnow().isoformat()}Z")
+    lines_txt.append("# agent_id | display_name | family | level | success_rate | salary_index | total_runs | success_runs | failed_runs")
+    lines_txt.append("")
+
+    for agent_name, agent_meta in agents_map.items():
+        role_key = agent_meta.get("role")
+        role_cfg = roles_map.get(role_key, {})
+
+        family = role_cfg.get("family", "pipeline")
+        display_name = role_cfg.get("title", agent_name)
+
+        level_name = pick_level(success_rate, levels_cfg)
+        level_cfg = levels_cfg.get(level_name, {})
+        multiplier = float(level_cfg.get("multiplier", 1.0))
+        base_salary = float(role_cfg.get("base_salary_index", 1.0))
+        salary_index = round(base_salary * multiplier, 2)
+
+        item = {
             "agent": agent_name,
-            "role_id": role_id,
-            "role_title": role_info.get("title"),
-            "family": role_info.get("family"),
-            "total_runs": stats.get("total_runs", 0),
-            "ok_runs": stats.get("ok_runs", 0),
-            "fail_runs": stats.get("fail_runs", 0),
-            "days_seen": stats.get("days_seen", 0),
+            "family": family,
+            "role": role_key,
+            "display_name": display_name,
+            "level": level_name,
+            "salary_index": salary_index,
             "success_rate": round(success_rate, 4),
-            "level_id": level_id,
-            "level_label": level_label,
-            "base_salary_index": base_salary_index,
-            "multiplier": multiplier,
-            "salary_index": round(salary_index, 4),
+            "total_runs": total_runs,
+            "success_runs": success_runs,
+            "failed_runs": failed_runs,
         }
-        agents_output.append(agent_record)
+        agents_levels.append(item)
 
-    result = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-        "root": ROOT,
-        "sessions_dir": SESSIONS_DIR,
-        "roles_config": CONFIG_ROLES,
-        "agents_count": len(agents_output),
-        "agents": agents_output,
-    }
+        lines_txt.append(
+            f"{agent_name} | {display_name} | {family} | {level_name} | "
+            f"{success_rate:.2%} | {salary_index} | {total_runs} | {success_runs} | {failed_runs}"
+        )
 
-    out_json = os.path.join(PEOPLE_DIR, "agents_levels.json")
-    out_txt = os.path.join(PEOPLE_DIR, "agents_levels.txt")
+    # حفظ JSON
+    try:
+        with open(AGENTS_LEVELS_JSON, "w", encoding="utf-8") as f:
+            json.dump(agents_levels, f, ensure_ascii=False, indent=2)
+        print(f"✅ تم حفظ agents_levels.json إلى: {AGENTS_LEVELS_JSON}")
+    except Exception as e:
+        print(f"⚠️ فشل حفظ agents_levels.json: {e}")
 
-    with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
-
-    lines: List[str] = []
-    lines.append("===== Hyper Factory Agents Levels & Compensation =====")
-    lines.append(f"Generated at : {result['generated_at']}")
-    lines.append("")
-    lines.append(f"Agents count : {len(agents_output)}")
-    lines.append("")
-
-    for rec in agents_output:
-        sr = rec["success_rate"] * 100.0
-        lines.append(f"[{rec['agent']}] ({rec.get('role_title') or rec.get('role_id')})")
-        lines.append(f"  - الأسرة        : {rec.get('family')}")
-        lines.append(f"  - الأيام المرصودة: {rec['days_seen']}")
-        lines.append(f"  - مرات التشغيل  : {rec['total_runs']} (نجاح={rec['ok_runs']}, فشل={rec['fail_runs']})")
-        lines.append(f"  - نسبة النجاح   : {sr:.2f}%")
-        lines.append(f"  - المستوى       : {rec['level_label']} ({rec['level_id']})")
-        lines.append(f"  - مؤشر الراتب   : base={rec['base_salary_index']}, x{rec['multiplier']} => {rec['salary_index']}")
-        lines.append("")
-
-    with open(out_txt, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
-
-    # كما يمكن إنشاء تقرير للأشخاص تحت reports/people
-    rep_path = os.path.join(REPORTS_PEOPLE_DIR, "agents_levels_overview.txt")
-    with open(rep_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
-
-    print("✅ تم توليد تقارير مستويات ورواتب الـ Agents:")
-    print(f"   - {out_json}")
-    print(f"   - {out_txt}")
-    print(f"   - {rep_path}")
-
-
-def main() -> None:
-    print(f"📁 ROOT        : {ROOT}")
-    print(f"📂 SESSIONS_DIR: {SESSIONS_DIR}")
-    print(f"📄 ROLES_CFG   : {CONFIG_ROLES}")
-    print(f"📂 PEOPLE_DIR  : {PEOPLE_DIR}")
-    print("----------------------------------------")
-    build_agents_levels_report()
+    # حفظ TXT
+    try:
+        with open(AGENTS_LEVELS_TXT, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines_txt) + "\n")
+        print(f"✅ تم حفظ agents_levels.txt إلى: {AGENTS_LEVELS_TXT}")
+    except Exception as e:
+        print(f"⚠️ فشل حفظ agents_levels.txt: {e}")
 
 
 if __name__ == "__main__":
