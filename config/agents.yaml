@@ -1,15 +1,52 @@
+# agents.yaml - تعريف أولي لأنواع العمال (بدون تنفيذ فعلي)
+
 agents:
-  - id: debug_expert
-    name: "Debug Expert"
-    prompt_file: "ai/prompts/agent_debug_expert.md"
-    skills_focus: ["python_errors_handling", "debug_skills"]
-    
-  - id: system_architect
-    name: "System Architect"
-    prompt_file: "ai/prompts/agent_system_architect.md"
-    skills_focus: ["rest_api_concepts", "db_modeling_basic"]
-    
-  - id: technical_coach
-    name: "Technical Coach"
-    prompt_file: "ai/prompts/agent_technical_coach.md"
-    skills_track_file: "ai/skills_tracks/backend_junior_skills.yaml"
+
+  ingestor_basic:
+    role: "ingestor"
+    description: "عامل إدخال أولي - يسحب البيانات الخام إلى data/raw."
+    enabled: true
+    input:
+      source_type: "filesystem"
+      paths:
+        - "./data/raw"
+    output:
+      path: "./data/raw"
+    notes: "يتم دمجه لاحقًا مع سكربتات ingestion الحقيقية."
+
+  processor_basic:
+    role: "processor"
+    description: "عامل معالجة - ينقل البيانات من raw إلى processed."
+    enabled: true
+    input:
+      path: "./data/raw"
+    output:
+      path: "./data/processed"
+    notes: "مسؤول عن التنظيف/التحويل التدريجي."
+
+  analyzer_basic:
+    role: "analyzer"
+    description: "عامل تحليل - يبني تمثيل دلالي في data/semantic."
+    enabled: true
+    input:
+      path: "./data/processed"
+    output:
+      path: "./data/semantic"
+    notes: "يرتبط لاحقًا بوحدات الذكاء الاصطناعي."
+
+  reporter_basic:
+    role: "reporter"
+    description: "عامل تقارير - يكتب مخرجات نهائية إلى data/serving و reports."
+    enabled: true
+    input:
+      path: "./data/semantic"
+    output:
+      serving_path: "./data/serving"
+      reports_path: "./reports"
+    notes: "واجهة بين المصنع ولوحات العرض/الـ APIs."
+
+orchestrator:
+  enabled: false
+  description: "يتم تفعيله لاحقًا لجدولة العمال بناءً على factory.yaml + agents.yaml."
+  strategy: "sequential"
+  notes: "هذه مجرد placeholder الآن."

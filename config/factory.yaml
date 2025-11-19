@@ -1,0 +1,35 @@
+# factory.yaml - تعريف DataHome وبنية المصنع على الحديد
+
+factory:
+  name: "Hyper Factory"
+  description: "مصنع العمال الأذكياء فوق بيانات اللعبة/الأنظمة."
+  version: "0.1.0"
+
+paths:
+  root: "./"
+  data_home: "./data"
+
+  raw_dir: "./data/raw"
+  processed_dir: "./data/processed"
+  semantic_dir: "./data/semantic"
+  serving_dir: "./data/serving"
+
+  agents_root: "./ai/agents"
+  pipelines_root: "./ai/pipelines"
+  models_root: "./ai/models"
+  experiments_root: "./ai/experiments"
+
+  logs_dir: "./logs"
+  reports_dir: "./reports"
+  audit_dir: "./audit"
+
+data_policies:
+  keep_raw_forever: true
+  delete_nothing: true
+  versioned_processing: true
+
+logging:
+  level: "INFO"
+  format: "json"
+  rotation: "daily"
+
