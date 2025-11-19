@@ -1,63 +1,49 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-
-# Envs
+# --- Python / Env ---
+venv/
 .env
 .env.*
-venv/
-apps/*/venv/
-
-# Logs & reports
-logs/
-reports/
-audit/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
 *.log
 
-# Datasets & PDFs (تحفظ محليًا)
-ai/pdfs/
-ai/datasets/
-ai/knowledge/
-ai/raw_knowledge/
-
-# Cache & tmp
-.tmp/
-.cache/
-*.swp
-
-# Docker & compose overrides
-docker-compose.override.yml
-
-# OS/Editor
-.DS_Store
-Thumbs.db
+# --- IDE / System ---
 .idea/
 .vscode/
-ai/memory/
-data/
-config_changes/
-reports/
-data_lakehouse/
-factories/
-stack/
-integrations/
+*.code-workspace
+.DS_Store
 
-# البيانات التشغيلية والذاكرة
-ai/memory/
-ai/patterns/  
-ai/quality/
-data/
-config_changes/
-reports/
+# --- Databases / Knowledge ---
+*.sqlite3
+*.db
+data/knowledge/knowledge.db
+
+# --- Runtime Data (Factory + Lakehouse) ---
+data/raw/
+data/processed/
+data/semantic/
+data/serving/
+data/tmp/
+
 data_lakehouse/
-factories/
-stack/
-integrations/
-priority_tasks.txt
+
+# --- AI runtime data ---
+ai/memory/
+ai/datasets/messages.jsonl
+ai/datasets/train_backend.jsonl
+ai/datasets/quality.json
+
+# --- Logs & Generated Reports ---
 logs/
+reports/ai/
+reports/management/
+reports/diagnostics/
+reports/tmp/
 
-# ملفات النظام
-*.backup.*
-*.tmp
-*.log
+# --- Config backups & secrets ---
+config/backup/
+config/*secret*.yaml
+config/*secrets*.yaml
+config/secure.env
+config/local_*.*

@@ -1,0 +1,25 @@
+# Hyper Factory Config Changes (DRAFT / MANUAL)
+# Generated at : 2025-11-19T02:10:02.996098Z
+# Total actions: 2
+# NOTE: هذا الملف لا يُطبّق تلقائيًا؛ استخدمه كقالب لتعديل config/ بعد مراجعة بشرية.
+#
+# لكل Action أدناه، قرّر يدويًا هل التأثير على agents.yaml أو factory.yaml أو الإعدادات التشغيلية.
+
+# === Candidate changes for config/factory.yaml ===
+#
+# [1] id=stable_day_reference | priority=MEDIUM
+# title   : يوم مستقر - مرجع جيد
+# date    : 2025-11-19 | source: 2025-11-19_lessons.json
+# description:
+#   جميع الدورات في هذا اليوم ناجحة. يمكن استخدام إعدادات هذا اليوم كمرجع للاستقرار وتوثيق البيئة (إصدارات الكود، إعدادات السيرفر).
+# TODO: حدّد إذا كان هذا الدرس يتطلّب تعديل عامل (agent) معيّن أو إعدادات المصنع (factory).
+# TODO: استبدل هذا التعليق ببلوك diff فعلي بعد اتخاذ القرار.
+#
+# [2] id=scale_confidently | priority=MEDIUM
+# title   : إمكانية زيادة الحمل بثقة
+# date    : 2025-11-19 | source: 2025-11-19_lessons.json
+# description:
+#   معدل النجاح مرتفع وعدد الدورات كافٍ. يمكن زيادة عدد الدورات أو إدخال مصادر بيانات إضافية، مع استمرار مراقبة الجودة.
+# TODO: حدّد إذا كان هذا الدرس يتطلّب تعديل عامل (agent) معيّن أو إعدادات المصنع (factory).
+# TODO: استبدل هذا التعليق ببلوك diff فعلي بعد اتخاذ القرار.
+#

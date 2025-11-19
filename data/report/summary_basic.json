@@ -1,0 +1,14 @@
+{
+  "generated_at": "2025-11-19 09:28:40",
+  "log_path": "/root/hyper-factory/reports/basic_runs.log",
+  "total_runs": 39,
+  "success_runs": 38,
+  "failed_runs": 1,
+  "last_run_at": "2025-11-19 09:28:40",
+  "last_statuses": {
+    "ingestor_basic": "OK",
+    "processor_basic": "OK",
+    "analyzer_basic": "OK",
+    "reporter_basic": "OK"
+  }
+}

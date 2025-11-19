@@ -1,0 +1,10 @@
+===== Hyper Factory Basic Summary =====
+Generated at   : 2025-11-19 09:28:40
+Log file       : /root/hyper-factory/reports/basic_runs.log
+
+Total runs     : 39
+Success runs   : 38
+Failed runs    : 1
+
+Last run at    : 2025-11-19 09:28:40
+Last statuses  : {'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}

@@ -1,0 +1,12 @@
+# Hyper Factory – Integrations Manifest (template)
+# هذا الملف لا يفعّل أي تكامل تلقائيًا؛ فقط هيكل جاهز للربط لاحقًا.
+
+external_systems:
+  smartfriend_suite:
+    enabled: false
+    notes: "اربط هنا بين Hyper Factory و SmartFriend Suite (health, memory, knowledge)."
+  ffactory:
+    enabled: false
+    notes: "تكامل اختياري مع ffactory / stack الخارجي."
+
+updated_at: "2025-11-19T09:46:39+03:00"
