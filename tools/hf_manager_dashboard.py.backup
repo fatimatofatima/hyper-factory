@@ -243,9 +243,9 @@ def build_text_report(kpis, lessons, phases, current_phase, agents):
     else:
         for idx, l in enumerate(lessons, start=1):
             lines.append(
-                f"[{idx}] file={l['file']} | priority={l.get('priority', 'medium')} | title={l.get('title', 'بدون عنوان')}"
+                f"[{idx}] id={l['id']} | priority={l['priority']} | date={l['date']}"
             )
-            lines.append(f"    title: {l.get('title', 'بدون عنوان')}")
+            lines.append(f"    title: {l['title']}")
             lines.append(f"    desc : {l['description']}")
     lines.append("")
 
