@@ -1,0 +1,24 @@
+skills:
+  python_basics:
+    name: "أساسيات بايثون"
+    category: "programming"
+    level_min: 0
+    level_max: 100
+    description: "المتغيرات، التحكم في التدفق، الدوال الأساسية"
+    
+  debug_skills:
+    name: "مهارات التصحيح"
+    category: "debugging" 
+    level_min: 0
+    level_max: 100
+    description: "فهم Traceback، تحليل الأخطاء، إصلاح الشيفرة"
+
+tracks:
+  backend_junior:
+    name: "مسار المطور الخلفي المبتدئ"
+    description: "مسار متكامل لتطوير مهارات Backend من الصفر"
+    phases:
+      - phase: "أساسيات البرمجة"
+        skills: ["python_basics", "debug_skills"]
+      - phase: "تطوير الويب"
+        skills: ["web_basics", "api_design"]

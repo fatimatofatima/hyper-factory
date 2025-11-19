@@ -4,190 +4,262 @@ set -euo pipefail
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$BASE_DIR"
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+TS="$(date +%Y%m%d_%H%M%S)"
+REPORT_DIR="$BASE_DIR/reports/diagnostics"
+REPORT_FILE="$REPORT_DIR/hf_missing_advanced_${TS}.txt"
 
-present=0
-partial=0
-missing=0
+mkdir -p "$REPORT_DIR"
 
-header() {
-  echo -e ""
-  echo -e "${BLUE}==================================================${NC}"
-  echo -e "${BLUE}$1${NC}"
-  echo -e "${BLUE}==================================================${NC}"
+green()  { printf "\033[0;32m%s\033[0m\n" "$*"; }
+yellow() { printf "\033[0;33m%s\033[0m\n" "$*"; }
+red()    { printf "\033[0;31m%s\033[0m\n" "$*"; }
+
+status_line() {
+  local label="$1" state="$2" details="${3:-}"
+  case "$state" in
+    OK)  printf "✅ %-40s : OK %s\n" "$label" "$details" ;;
+    PARTIAL) printf "⚠️  %-40s : PARTIAL %s\n" "$label" "$details" ;;
+    MISSING) printf "❌ %-40s : MISSING %s\n" "$label" "$details" ;;
+    *) printf "❓ %-40s : %s %s\n" "$label" "$state" "$details" ;;
+  esac
 }
 
-status_full() {
-  echo -e "   ${GREEN}✅ مكتمل${NC} - $1"
-  ((present++))
+check_dir() {
+  local path="$1"
+  [[ -d "$path" ]] && echo "OK" || echo "MISSING"
 }
 
-status_partial() {
-  echo -e "   ${YELLOW}🟡 جزئي${NC} - $1"
-  ((partial++))
+check_file() {
+  local path="$1"
+  [[ -f "$path" ]] && echo "OK" || echo "MISSING"
 }
 
-status_missing() {
-  echo -e "   ${RED}❌ مفقود${NC} - $1"
-  ((missing++))
-}
+echo "🔍 Hyper Factory – Advanced Checklist Audit" | tee "$REPORT_FILE"
+echo "⏰ $(date)" | tee -a "$REPORT_FILE"
+echo "📍 $BASE_DIR" | tee -a "$REPORT_FILE"
+echo "===============================================" | tee -a "$REPORT_FILE"
+echo >> "$REPORT_FILE"
 
-check_data_lakehouse() {
-  header "1) البنية التحتية المتقدمة (data_lakehouse / factories / stack)"
+##################################################
+# 1) البنية التحتية المتقدمة (Advanced Infra)
+##################################################
+echo "🏗️  البنية التحتية المتقدمة" | tee -a "$REPORT_FILE"
+echo "-----------------------------------------------" | tee -a "$REPORT_FILE"
 
-  # data_lakehouse
-  local root="data_lakehouse"
-  local ok_root=0
-  local layers=0
+# 1.1 data_lakehouse/ (Raw → Cleansed → Semantic → Serving)
+DL_ROOT="data_lakehouse"
+DL_RAW="$DL_ROOT/raw"
+DL_CLEANSED="$DL_ROOT/cleansed"
+DL_SEMANTIC="$DL_ROOT/semantic"
+DL_SERVING="$DL_ROOT/serving"
 
-  [ -d "$root" ] && ok_root=1 || true
+if [[ -d "$DL_ROOT" ]]; then
+  missing_sub=0
+  [[ -d "$DL_RAW"      ]] || missing_sub=$((missing_sub+1))
+  [[ -d "$DL_CLEANSED" ]] || missing_sub=$((missing_sub+1))
+  [[ -d "$DL_SEMANTIC" ]] || missing_sub=$((missing_sub+1))
+  [[ -d "$DL_SERVING"  ]] || missing_sub=$((missing_sub+1))
 
-  for d in raw cleansed semantic serving; do
-    [ -d "$root/$d" ] && ((layers++)) || true
-  done
-
-  if (( ok_root == 1 && layers == 4 )); then
-    status_full "data_lakehouse (Raw/Cleansed/Semantic/Serving)"
-  elif (( ok_root == 1 || layers > 0 )); then
-    status_partial "data_lakehouse (موجودة لكن بعض الطبقات ناقص)"
+  if (( missing_sub == 0 )); then
+    state="OK"
+    detail="(raw/cleansed/semantic/serving مكتملة)"
   else
-    status_missing "data_lakehouse (غير موجودة)"
+    state="PARTIAL"
+    detail="(مجلد رئيسي موجود، لكن $missing_sub من subdirs مفقودة)"
+  fi
+else
+  state="MISSING"
+  detail="(data_lakehouse/ غير موجودة)"
+fi
+
+status_line "data_lakehouse" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+# 1.2 factories/ (مصنع النماذج - مصنع المعرفة - مصنع الجودة)
+FACT_ROOT="factories"
+if [[ -d "$FACT_ROOT" ]]; then
+  # نفترض 3 مصانع: model_factory / knowledge_factory / quality_factory (اختيارية الآن)
+  sub_missing=0
+  [[ -d "$FACT_ROOT/model_factory"      ]] || sub_missing=$((sub_missing+1))
+  [[ -d "$FACT_ROOT/knowledge_factory"  ]] || sub_missing=$((sub_missing+1))
+  [[ -d "$FACT_ROOT/quality_factory"    ]] || sub_missing=$((sub_missing+1))
+
+  if (( sub_missing == 0 )); then
+    state="OK"
+    detail="(model/knowledge/quality factories موجودة)"
+  elif (( sub_missing == 3 )); then
+    state="PARTIAL"
+    detail="(factories/ موجودة لكن المصانع الفرعية غير معرفة بعد – تصميم placeholder)"
+  else
+    state="PARTIAL"
+    detail="(factories/ موجودة وبعض المصانع الفرعية مفقودة: $sub_missing)"
+  fi
+else
+  state="MISSING"
+  detail="(factories/ غير موجودة)"
+fi
+status_line "factories" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+# 1.3 stack/ (GPU cluster - Model serving - Vector DB)
+STACK_ROOT="stack"
+if [[ -d "$STACK_ROOT" ]]; then
+  st_missing=0
+  [[ -d "$STACK_ROOT/gpu_cluster"  ]] || st_missing=$((st_missing+1))
+  [[ -d "$STACK_ROOT/model_serving" ]] || st_missing=$((st_missing+1))
+  [[ -d "$STACK_ROOT/vector_db"    ]] || st_missing=$((st_missing+1))
+
+  if (( st_missing == 0 )); then
+    state="OK"
+    detail="(gpu_cluster/model_serving/vector_db جاهزة أو placeholders)"
+  elif (( st_missing == 3 )); then
+    state="PARTIAL"
+    detail="(stack/ موجودة بدون subdirs مخصصة – تصميم placeholder)"
+  else
+    state="PARTIAL"
+    detail="(stack/ موجودة وبعض المكونات الفرعية ناقصة: $st_missing)"
+  fi
+else
+  state="MISSING"
+  detail="(stack/ غير موجودة)"
+fi
+status_line "stack" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+echo >> "$REPORT_FILE"
+
+##################################################
+# 2) العوامل المتقدمة (Advanced Agents)
+##################################################
+echo "🤖 العوامل المتقدمة" | tee -a "$REPORT_FILE"
+echo "-----------------------------------------------" | tee -a "$REPORT_FILE"
+
+check_agent_dir() {
+  local name="$1"
+  local path="agents/$name"
+  local readme="$path/README.md"
+  local init_py="$path/__init__.py"
+
+  if [[ ! -d "$path" ]]; then
+    status_line "agent: $name" "MISSING" "(agents/$name غير موجودة)" | tee -a "$REPORT_FILE"
+    return
   fi
 
-  # factories
-  local froot="factories"
-  local f_sub=0
-  for d in model_factory knowledge_factory quality_factory; do
-    [ -d "$froot/$d" ] && ((f_sub++)) || true
-  done
+  local missing=0
+  [[ -f "$readme"  ]] || missing=$((missing+1))
+  [[ -f "$init_py" ]] || missing=$((missing+1))
 
-  if [ -d "$froot" ] && (( f_sub >= 3 )); then
-    status_full "factories (مصنع النماذج/المعرفة/الجودة مكتمل)"
-  elif [ -d "$froot" ] || (( f_sub > 0 )); then
-    status_partial "factories (مجلد موجود لكن بدون مصانع فرعية كاملة)"
+  if (( missing == 0 )); then
+    status_line "agent: $name" "OK" "(هيكل + README + __init__.py)" | tee -a "$REPORT_FILE"
   else
-    status_missing "factories (غير موجودة كبنية واضحة)"
-  fi
-
-  # stack
-  local sroot="stack"
-  local s_sub=0
-  for d in gpu_cluster model_serving vector_db; do
-    [ -d "$sroot/$d" ] && ((s_sub++)) || true
-  done
-
-  if [ -d "$sroot" ] && (( s_sub >= 3 )); then
-    status_full "stack (GPU / Model serving / Vector DB)"
-  elif [ -d "$sroot" ] || (( s_sub > 0 )); then
-    status_partial "stack (مجلد موجود بدون مكوّنات كاملة)"
-  else
-    status_missing "stack (غير موجودة كبنية واضحة)"
-  fi
-}
-
-check_agent() {
-  local id="$1"
-  local nice="$2"
-  local run_script="$3"
-  local tool="$4"
-  local dir="agents/$id"
-
-  echo -e ""
-  echo -e "${BLUE}🔹 عامل: $nice ($id)${NC}"
-
-  local have_script=0
-  local have_tool=0
-  local have_dir=0
-
-  [ -x "$run_script" ] && have_script=1 || true
-  [ -f "$tool" ] && have_tool=1 || true
-  [ -d "$dir" ] && have_dir=1 || true
-
-  if (( have_script == 1 && have_tool == 1 && have_dir == 1 )); then
-    status_full "$nice - سكربت + أداة + مجلد عامل"
-  elif (( have_script == 1 || have_tool == 1 )); then
-    status_partial "$nice - سكربت/أداة موجودة لكن مجلد agents/$id مفقود"
-  else
-    status_missing "$nice - لا سكربت ولا أداة ولا مجلد عامل"
-  fi
-}
-
-check_advanced_agents() {
-  header "2) العوامل المتقدمة (Advanced Agents)"
-
-  check_agent "debug_expert" "عامل تصحيح الأخطاء" \
-    "hf_run_debug_expert.sh" "tools/hf_debug_expert.py"
-
-  check_agent "system_architect" "عامل التصميم المعماري" \
-    "hf_run_system_architect.sh" "tools/hf_system_architect.py"
-
-  check_agent "technical_coach" "عامل التدريب التقني" \
-    "hf_run_technical_coach.sh" "tools/hf_technical_coach.py"
-
-  check_agent "knowledge_spider" "عامل جمع المعرفة" \
-    "hf_run_knowledge_spider.sh" "tools/hf_knowledge_spider.py"
-}
-
-check_advanced_systems() {
-  header "3) الأنظمة المتقدمة (Patterns / Quality / Temporal / Integration)"
-
-  # Patterns system
-  if [ -d "systems/patterns" ]; then
-    status_full "نظام الأنماط (systems/patterns/)"
-  elif ls ai/memory/offline/*patterns* >/dev/null 2>&1; then
-    status_partial "نظام الأنماط - موجود كملفات أنماط في ai/memory/offline/ لكن بدون نظام رسمي"
-  else
-    status_missing "نظام الأنماط - غير موجود كنظام واضح"
-  fi
-
-  # Quality system
-  if [ -d "systems/quality" ]; then
-    status_full "نظام الجودة (systems/quality/)"
-  elif [ -f "tools/hf_quality_worker.py" ]; then
-    status_partial "نظام الجودة - موجود عبر quality_worker لكن بدون نظام مستقل"
-  else
-    status_missing "نظام الجودة - غير موجود كنظام واضح"
-  fi
-
-  # Temporal memory system
-  if [ -d "systems/temporal_memory" ]; then
-    status_full "نظام الذاكرة الزمنية (systems/temporal_memory/)"
-  elif [ -d "ai/memory/temporal" ]; then
-    status_partial "نظام الذاكرة الزمنية - ai/memory/temporal موجود لكن بدون نظام متكامل"
-  else
-    status_missing "نظام الذاكرة الزمنية - غير موجود"
-  fi
-
-  # Integration system
-  if [ -d "systems/integration" ]; then
-    status_full "نظام التكامل (systems/integration/)"
-  elif grep -q "smartfriend" config/factory.yaml 2>/dev/null || \
-       grep -q "ffactory"   config/factory.yaml 2>/dev/null; then
-    status_partial "نظام التكامل - تكامل منطقي مع SmartFriend/ffactory لكن بدون systems/integration/"
-  else
-    status_missing "نظام التكامل - غير موجود كبنية مستقلة"
+    status_line "agent: $name" "PARTIAL" "(مجلد موجود لكن ملفات تعريف ناقصة: $missing)" | tee -a "$REPORT_FILE"
   fi
 }
 
-summary() {
-  header "4) الملخص النهائي"
-  echo -e "   ✅ مكتمل:  $present مكوّن"
-  echo -e "   🟡 جزئي:   $partial مكوّن"
-  echo -e "   ❌ مفقود:  $missing مكوّن"
-  echo ""
-  echo -e "📌 الأولوية القادمة: معالجة العناصر ❌ ثم 🟡."
-}
+for AG in debug_expert system_architect technical_coach knowledge_spider; do
+  check_agent_dir "$AG"
+done
 
-echo "🔍 Hyper Factory – فحص المفقودات الاستراتيجية"
-echo "ROOT: $BASE_DIR"
-echo "TIME: $(date +%Y-%m-%dT%H:%M:%S%z)"
-echo ""
+echo >> "$REPORT_FILE"
 
-check_data_lakehouse
-check_advanced_agents
-check_advanced_systems
-summary
+##################################################
+# 3) الأنظمة المتقدمة (Patterns / Quality / Temporal / Integration)
+##################################################
+echo "⚙️  الأنظمة المتقدمة" | tee -a "$REPORT_FILE"
+echo "-----------------------------------------------" | tee -a "$REPORT_FILE"
+
+# 3.1 نظام الأنماط (Patterns) - التعلم من الأخطاء
+PAT_ROOT="ai/patterns"
+PAT_INDEX="$PAT_ROOT/patterns_index.json"
+if [[ -d "$PAT_ROOT" ]]; then
+  if [[ -f "$PAT_INDEX" ]]; then
+    state="OK"
+    detail="(ai/patterns + patterns_index.json موجودة)"
+  else
+    state="PARTIAL"
+    detail="(مجلد ai/patterns موجود لكن patterns_index.json مفقود أو placeholder)"
+  fi
+else
+  state="MISSING"
+  detail="(ai/patterns غير موجودة)"
+fi
+status_line "نظام الأنماط (patterns)" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+# 3.2 نظام الجودة (Quality) - التقييم التلقائي
+Q_ROOT="ai/quality"
+Q_STATUS="ai/memory/quality_status.json"
+Q_SCRIPT="tools/hf_quality_worker.py"
+Q_RUN="hf_run_quality_worker.sh"
+
+if [[ -d "$Q_ROOT" ]]; then
+  missing=0
+  [[ -f "$Q_STATUS" ]] || missing=$((missing+1))
+  [[ -f "$Q_SCRIPT" ]] || missing=$((missing+1))
+  [[ -f "$Q_RUN"    ]] || missing=$((missing+1))
+
+  if (( missing == 0 )); then
+    state="OK"
+    detail="(ai/quality + worker script + memory status مكتملة)"
+  else
+    state="PARTIAL"
+    detail="(نظام الجودة موجود لكن $missing مكونات ناقصة)"
+  fi
+else
+  state="MISSING"
+  detail="(ai/quality غير موجودة)"
+fi
+status_line "نظام الجودة (quality)" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+# 3.3 نظام الذاكرة الزمنية - تطور المستخدمين
+T_ROOT="ai/memory/temporal"
+T_SEED="$T_ROOT/seed_state.json"
+
+if [[ -d "$T_ROOT" ]]; then
+  if [[ -f "$T_SEED" ]]; then
+    state="OK"
+    detail="(ذاكرة زمنية مبدئية seed_state.json موجودة)"
+  else
+    state="PARTIAL"
+    detail="(مجلد temporal موجود بدون seed_state.json)"
+  fi
+else
+  state="MISSING"
+  detail="(ai/memory/temporal غير موجودة)"
+fi
+status_line "نظام الذاكرة الزمنية" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+# 3.4 نظام التكامل - ربط مع أنظمة خارجية
+INT_ROOT="integrations"
+INT_MANIFEST="$INT_ROOT/integrations_manifest.yaml"
+
+if [[ -d "$INT_ROOT" ]]; then
+  if [[ -f "$INT_MANIFEST" ]]; then
+    state="OK"
+    detail="(integrations/ + integrations_manifest.yaml موجودة)"
+  else
+    state="PARTIAL"
+    detail="(integrations/ موجودة بدون manifest واضح)"
+  fi
+else
+  state="MISSING"
+  detail="(integrations/ غير موجودة)"
+fi
+status_line "نظام التكامل (integrations)" "$state" "$detail" | tee -a "$REPORT_FILE"
+
+echo >> "$REPORT_FILE"
+
+##################################################
+# ملخص نهائي
+##################################################
+echo "📊 الملخص النهائي" | tee -a "$REPORT_FILE"
+echo "-----------------------------------------------" | tee -a "$REPORT_FILE"
+
+# حساب سريع عبر التقرير نفسه
+TOTAL_OK=$(grep -c " : OK" "$REPORT_FILE" || true)
+TOTAL_PARTIAL=$(grep -c " : PARTIAL" "$REPORT_FILE" || true)
+TOTAL_MISSING=$(grep -c " : MISSING" "$REPORT_FILE" || true)
+
+echo "✅ عناصر مكتملة  : $TOTAL_OK"     | tee -a "$REPORT_FILE"
+echo "⚠️  عناصر جزئية  : $TOTAL_PARTIAL" | tee -a "$REPORT_FILE"
+echo "❌ عناصر مفقودة  : $TOTAL_MISSING" | tee -a "$REPORT_FILE"
+
+echo
+green "✅ تم إنشاء تقرير مفصل في:"
+echo "   $REPORT_FILE"
