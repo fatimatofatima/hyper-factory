@@ -2,17 +2,11 @@
 """
 tools/hf_build_insights.py
 
-يبني ملف ai/memory/insights.json من:
-- ai/memory/quality.json
-- ai/memory/messages.jsonl
-
-المخرجات تشمل:
-- success_rate
-- success_streak
-- failure_streak
-- last_failure_at
-- last_failure_steps
-- last_runs (آخر N رنات)
+يبني طبقة insights من ذاكرة Hyper Factory:
+- يقرأ ai/memory/messages.jsonl
+- يكتب:
+  - ai/memory/insights.json
+  - ai/memory/insights.txt
 """
 
 import os
@@ -23,147 +17,165 @@ from typing import List, Dict, Any
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEMORY_DIR = os.path.join(ROOT, "ai", "memory")
-QUALITY_PATH = os.path.join(MEMORY_DIR, "quality.json")
 MESSAGES_PATH = os.path.join(MEMORY_DIR, "messages.jsonl")
-INSIGHTS_PATH = os.path.join(MEMORY_DIR, "insights.json")
-
-LAST_N = 10  # عدد آخر الرنات في التقرير
-
-
-def load_json(path: str, default):
-    if not os.path.exists(path):
-        return default
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return default
+INSIGHTS_JSON = os.path.join(MEMORY_DIR, "insights.json")
+INSIGHTS_TXT = os.path.join(MEMORY_DIR, "insights.txt")
 
 
-def load_messages(path: str) -> List[Dict[str, Any]]:
-    if not os.path.exists(path):
+def load_events() -> List[Dict[str, Any]]:
+    if not os.path.exists(MESSAGES_PATH):
+        print(f"ℹ️ لا يوجد ملف events بعد: {MESSAGES_PATH}")
         return []
+
     events: List[Dict[str, Any]] = []
-    with open(path, "r", encoding="utf-8") as f:
+    with open(MESSAGES_PATH, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
             try:
-                ev = json.loads(line)
-                events.append(ev)
-            except Exception:
-                # نتجاهل الأسطر المعطوبة
-                continue
+                obj = json.loads(line)
+                events.append(obj)
+            except Exception as e:
+                print(f"⚠️ تعذّر قراءة سطر من messages.jsonl: {e}")
     return events
 
 
-def parse_timestamp(ts_str: str):
-    if not ts_str:
-        return None
-    # نحاول ISO أولاً
-    try:
-        return datetime.fromisoformat(ts_str.replace("Z", ""))
-    except Exception:
-        # fallback: نعيد None
-        return None
+def build_step_stats(events: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    stats: Dict[str, Dict[str, Any]] = {}
+
+    for ev in events:
+        steps = ev.get("steps", {}) or {}
+        for name, status in steps.items():
+            name = str(name)
+            status_up = str(status).upper()
+
+            if name not in stats:
+                stats[name] = {
+                    "count": 0,
+                    "ok": 0,
+                    "fail": 0,
+                }
+
+            stats[name]["count"] += 1
+            if status_up == "OK":
+                stats[name]["ok"] += 1
+            else:
+                stats[name]["fail"] += 1
+
+    # إضافة نسب النجاح/الفشل لكل عامل
+    for name, s in stats.items():
+        c = s["count"] or 1
+        ok_rate = s["ok"] / c
+        fail_rate = s["fail"] / c
+        s["ok_rate"] = ok_rate
+        s["fail_rate"] = fail_rate
+
+    return stats
 
 
-def build_insights():
-    quality = load_json(
-        QUALITY_PATH,
-        {
-            "total_runs": 0,
-            "success_runs": 0,
-            "failed_runs": 0,
-            "last_run_at": None,
-            "last_status": {},
-        },
-    )
-    events = load_messages(MESSAGES_PATH)
-
-    total_runs = int(quality.get("total_runs", 0))
-    success_runs = int(quality.get("success_runs", 0))
-    failed_runs = int(quality.get("failed_runs", 0))
-
-    success_rate = 0.0
-    if total_runs > 0:
-        success_rate = (success_runs / total_runs) * 100.0
-
-    # ترتيب الأحداث زمنيًا حسب timestamp (لو متاح)
-    def sort_key(ev: Dict[str, Any]):
-        dt = parse_timestamp(ev.get("timestamp") or "")
-        return dt or datetime.min
-
-    events_sorted = sorted(events, key=sort_key)
-
-    # حساب الستريك الحالي من آخر حدث إلى الخلف
-    success_streak = 0
-    failure_streak = 0
-    last_failure_at = None
-    last_failure_steps: Dict[str, Any] = {}
-
-    for ev in reversed(events_sorted):
-        if ev.get("success"):
-            if failure_streak > 0:
-                # كان فيه ستريك فشل وانتهى
-                break
-            success_streak += 1
-        else:
-            if success_streak > 0:
-                # كان فيه ستريك نجاح وانتهى
-                break
-            failure_streak += 1
-
-    # آخر فشل
-    for ev in reversed(events_sorted):
-        if not ev.get("success"):
-            last_failure_at = ev.get("timestamp")
-            last_failure_steps = ev.get("steps", {})
-            break
-
-    # آخر N رنات
-    last_runs = list(reversed(events_sorted))[:LAST_N]
-
-    insights = {
-        "total_runs": total_runs,
-        "success_runs": success_runs,
-        "failed_runs": failed_runs,
-        "success_rate": round(success_rate, 2),
-        "success_streak": success_streak,
-        "failure_streak": failure_streak,
-        "last_failure_at": last_failure_at,
-        "last_failure_steps": last_failure_steps,
-        "last_runs_count": len(last_runs),
-        "last_runs": last_runs,
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-    }
-
-    os.makedirs(MEMORY_DIR, exist_ok=True)
-    with open(INSIGHTS_PATH, "w", encoding="utf-8") as f:
-        json.dump(insights, f, ensure_ascii=False, indent=2)
-
-    return insights
+def build_recent_window(events: List[Dict[str, Any]], window: int = 20) -> List[Dict[str, Any]]:
+    sub = events[-window:] if len(events) > window else events[:]
+    # نعيد فقط حقول مختصرة
+    recent: List[Dict[str, Any]] = []
+    for ev in sub:
+        recent.append(
+            {
+                "timestamp": ev.get("timestamp"),
+                "success": ev.get("success"),
+                "steps": ev.get("steps", {}),
+            }
+        )
+    return recent
 
 
 def main():
-    print("📂 ROOT        :", ROOT)
-    print("📂 MEMORY_DIR  :", MEMORY_DIR)
-    print("📄 QUALITY     :", QUALITY_PATH)
-    print("📄 MESSAGES    :", MESSAGES_PATH)
-    print("📄 INSIGHTS    :", INSIGHTS_PATH)
+    print("📂 ROOT       :", ROOT)
+    print("📂 MEMORY_DIR :", MEMORY_DIR)
+    print("📄 MESSAGES   :", MESSAGES_PATH)
+    print("📄 INSIGHTS   :", INSIGHTS_JSON)
     print("----------------------------------------")
 
-    insights = build_insights()
+    os.makedirs(MEMORY_DIR, exist_ok=True)
 
-    print("✅ تم بناء insights:")
-    print(f"   - total_runs     : {insights['total_runs']}")
-    print(f"   - success_runs   : {insights['success_runs']}")
-    print(f"   - failed_runs    : {insights['failed_runs']}")
-    print(f"   - success_rate   : {insights['success_rate']}%")
-    print(f"   - success_streak : {insights['success_streak']}")
-    print(f"   - failure_streak : {insights['failure_streak']}")
-    print(f"   - last_failure_at: {insights['last_failure_at']}")
+    events = load_events()
+    total_runs = len(events)
+    success_runs = sum(1 for e in events if e.get("success"))
+    failed_runs = total_runs - success_runs
+
+    if total_runs == 0:
+        print("ℹ️ لا توجد أحداث في الذاكرة حتى الآن. سيتم إنشاء ملف insights فارغ.")
+        insights = {
+            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "total_runs": 0,
+            "success_runs": 0,
+            "failed_runs": 0,
+            "success_rate": 0.0,
+            "last_run_at": None,
+            "last_status": {},
+            "steps": {},
+            "recent_window_size": 0,
+            "recent_runs": [],
+        }
+    else:
+        success_rate = success_runs / total_runs
+        last_event = events[-1]
+        last_run_at = last_event.get("timestamp")
+        last_status = last_event.get("steps", {})
+
+        step_stats = build_step_stats(events)
+        recent = build_recent_window(events, window=20)
+
+        insights = {
+            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "total_runs": total_runs,
+            "success_runs": success_runs,
+            "failed_runs": failed_runs,
+            "success_rate": success_rate,
+            "last_run_at": last_run_at,
+            "last_status": last_status,
+            "steps": step_stats,
+            "recent_window_size": len(recent),
+            "recent_runs": recent,
+        }
+
+    # كتابة insights.json
+    with open(INSIGHTS_JSON, "w", encoding="utf-8") as f:
+        json.dump(insights, f, ensure_ascii=False, indent=2)
+
+    # كتابة insights.txt (نص مبسط)
+    lines: List[str] = []
+    lines.append("===== Hyper Factory Memory Insights =====")
+    lines.append(f"Generated at : {insights['generated_at']}")
+    lines.append("")
+    lines.append(f"Total runs   : {insights['total_runs']}")
+    lines.append(f"Success runs : {insights['success_runs']}")
+    lines.append(f"Failed runs  : {insights['failed_runs']}")
+    lines.append(f"Success rate : {insights['success_rate']:.2%}")
+    lines.append("")
+    lines.append(f"Last run at  : {insights['last_run_at']}")
+    lines.append(f"Last status  : {insights['last_status']}")
+    lines.append("")
+    lines.append("----- Per-step stats -----")
+    for name, s in insights["steps"].items():
+        lines.append(
+            f"- {name}: count={s['count']}, ok={s['ok']}, fail={s['fail']}, ok_rate={s['ok_rate']:.2%}"
+        )
+
+    lines.append("")
+    lines.append(f"----- Recent {insights['recent_window_size']} runs -----")
+    for ev in insights["recent_runs"]:
+        lines.append(
+            f"{ev.get('timestamp')} | success={ev.get('success')} | steps={ev.get('steps')}"
+        )
+
+    with open(INSIGHTS_TXT, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+
+    print("----------------------------------------")
+    print("✅ تم بناء insights من الذاكرة:")
+    print(f"   - {INSIGHTS_JSON}")
+    print(f"   - {INSIGHTS_TXT}")
 
 
 if __name__ == "__main__":
