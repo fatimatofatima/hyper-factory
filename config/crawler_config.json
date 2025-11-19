@@ -1,0 +1,14 @@
+{
+  "max_depth": 3,
+  "max_pages_per_session": 100,
+  "delay_between_requests": 1,
+  "allowed_domains": [
+    "docs.python.org",
+    "realpython.com",
+    "www.w3schools.com",
+    "stackoverflow.com"
+  ],
+  "banned_domains": [],
+  "auto_cleanup": true,
+  "learning_enabled": true
+}

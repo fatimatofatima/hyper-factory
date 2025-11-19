@@ -1,15 +1,38 @@
-sources:
-  - name: "Python Official Docs"
-    url: "https://docs.python.org/3/"
-    type: "documentation"
-    priority: "high"
-    
-  - name: "Django Documentation"
-    url: "https://docs.djangoproject.com/"
-    type: "documentation" 
-    priority: "medium"
-    
-  - name: "FastAPI Docs"
-    url: "https://fastapi.tiangolo.com/"
-    type: "documentation"
-    priority: "medium"
+# مصادر المعرفة لـ Knowledge Spider
+knowledge_sources:
+  # مصادر الويب
+  web_sources:
+    - url: "https://github.com/topics/python-programming"
+      type: "programming"
+      priority: "high"
+    - url: "https://stackoverflow.com/questions/tagged/python"
+      type: "qna" 
+      priority: "high"
+    - url: "https://docs.python.org/3/"
+      type: "documentation"
+      priority: "medium"
+    - url: "https://realpython.com/"
+      type: "tutorials"
+      priority: "medium"
+
+  # الملفات المحلية
+  local_sources:
+    - path: "docs/"
+      type: "documentation"
+    - path: "examples/"
+      type: "code_samples"
+    - path: "config/"
+      type: "configuration"
+
+  # قواعد البيانات
+  database_sources:
+    - path: "data/knowledge/knowledge.db"
+      type: "knowledge_base"
+
+  # الكلمات المفتاحية للبحث
+  search_keywords:
+    - "Python programming"
+    - "debugging techniques"
+    - "system architecture"
+    - "AI agents"
+    - "machine learning"

@@ -1,0 +1,18 @@
+{
+  "system_name": "Hyper-Factory AI System",
+  "version": "2.0.0",
+  "created_date": "2025-11-19T16:03:33.264720",
+  "modules": {
+    "crawler": true,
+    "debug_expert": true,
+    "knowledge_base": true,
+    "ai_agents": true,
+    "reporting": true
+  },
+  "settings": {
+    "max_crawler_depth": 3,
+    "max_pages_per_session": 100,
+    "auto_cleanup": true,
+    "learning_enabled": true
+  }
+}
