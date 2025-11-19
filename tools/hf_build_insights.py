@@ -2,11 +2,16 @@
 """
 tools/hf_build_insights.py
 
-يبني طبقة insights من ذاكرة Hyper Factory:
 - يقرأ ai/memory/messages.jsonl
+- يحسب:
+  - إجمالي عدد الدورات
+  - عدد الناجح/الفاشل ونسبة النجاح
+  - إحصائيات لكل عامل (ingestor_basic, ...)
+  - نافذة آخر N دورات
 - يكتب:
   - ai/memory/insights.json
   - ai/memory/insights.txt
+  - ai/memory/quality.json (ملخص جودة)
 """
 
 import os
@@ -20,6 +25,7 @@ MEMORY_DIR = os.path.join(ROOT, "ai", "memory")
 MESSAGES_PATH = os.path.join(MEMORY_DIR, "messages.jsonl")
 INSIGHTS_JSON = os.path.join(MEMORY_DIR, "insights.json")
 INSIGHTS_TXT = os.path.join(MEMORY_DIR, "insights.txt")
+QUALITY_JSON = os.path.join(MEMORY_DIR, "quality.json")
 
 
 def load_events() -> List[Dict[str, Any]]:
@@ -63,20 +69,16 @@ def build_step_stats(events: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
             else:
                 stats[name]["fail"] += 1
 
-    # إضافة نسب النجاح/الفشل لكل عامل
     for name, s in stats.items():
         c = s["count"] or 1
-        ok_rate = s["ok"] / c
-        fail_rate = s["fail"] / c
-        s["ok_rate"] = ok_rate
-        s["fail_rate"] = fail_rate
+        s["ok_rate"] = s["ok"] / c
+        s["fail_rate"] = s["fail"] / c
 
     return stats
 
 
 def build_recent_window(events: List[Dict[str, Any]], window: int = 20) -> List[Dict[str, Any]]:
     sub = events[-window:] if len(events) > window else events[:]
-    # نعيد فقط حقول مختصرة
     recent: List[Dict[str, Any]] = []
     for ev in sub:
         recent.append(
@@ -93,7 +95,6 @@ def main():
     print("📂 ROOT       :", ROOT)
     print("📂 MEMORY_DIR :", MEMORY_DIR)
     print("📄 MESSAGES   :", MESSAGES_PATH)
-    print("📄 INSIGHTS   :", INSIGHTS_JSON)
     print("----------------------------------------")
 
     os.makedirs(MEMORY_DIR, exist_ok=True)
@@ -104,46 +105,54 @@ def main():
     failed_runs = total_runs - success_runs
 
     if total_runs == 0:
-        print("ℹ️ لا توجد أحداث في الذاكرة حتى الآن. سيتم إنشاء ملف insights فارغ.")
-        insights = {
-            "generated_at": datetime.utcnow().isoformat() + "Z",
-            "total_runs": 0,
-            "success_runs": 0,
-            "failed_runs": 0,
-            "success_rate": 0.0,
-            "last_run_at": None,
-            "last_status": {},
-            "steps": {},
-            "recent_window_size": 0,
-            "recent_runs": [],
-        }
+        print("ℹ️ لا توجد أحداث في الذاكرة حتى الآن. سيتم إنشاء ملفات insights/quality فارغة.")
+
+        step_stats: Dict[str, Dict[str, Any]] = {}
+        recent: List[Dict[str, Any]] = []
+        success_rate = 0.0
+        last_run_at = None
+        last_status: Dict[str, Any] = {}
     else:
         success_rate = success_runs / total_runs
         last_event = events[-1]
         last_run_at = last_event.get("timestamp")
         last_status = last_event.get("steps", {})
-
         step_stats = build_step_stats(events)
         recent = build_recent_window(events, window=20)
 
-        insights = {
-            "generated_at": datetime.utcnow().isoformat() + "Z",
-            "total_runs": total_runs,
-            "success_runs": success_runs,
-            "failed_runs": failed_runs,
-            "success_rate": success_rate,
-            "last_run_at": last_run_at,
-            "last_status": last_status,
-            "steps": step_stats,
-            "recent_window_size": len(recent),
-            "recent_runs": recent,
-        }
+    now_iso = datetime.utcnow().isoformat() + "Z"
 
-    # كتابة insights.json
+    insights = {
+        "generated_at": now_iso,
+        "total_runs": total_runs,
+        "success_runs": success_runs,
+        "failed_runs": failed_runs,
+        "success_rate": success_rate,
+        "last_run_at": last_run_at,
+        "last_status": last_status,
+        "steps": step_stats,
+        "recent_window_size": len(recent),
+        "recent_runs": recent,
+    }
+
+    quality = {
+        "updated_at": now_iso,
+        "total_runs": total_runs,
+        "success_runs": success_runs,
+        "failed_runs": failed_runs,
+        "success_rate": success_rate,
+        "steps": step_stats,
+    }
+
+    # insights.json
     with open(INSIGHTS_JSON, "w", encoding="utf-8") as f:
         json.dump(insights, f, ensure_ascii=False, indent=2)
 
-    # كتابة insights.txt (نص مبسط)
+    # quality.json
+    with open(QUALITY_JSON, "w", encoding="utf-8") as f:
+        json.dump(quality, f, ensure_ascii=False, indent=2)
+
+    # insights.txt
     lines: List[str] = []
     lines.append("===== Hyper Factory Memory Insights =====")
     lines.append(f"Generated at : {insights['generated_at']}")
@@ -173,9 +182,10 @@ def main():
         f.write("\n".join(lines) + "\n")
 
     print("----------------------------------------")
-    print("✅ تم بناء insights من الذاكرة:")
+    print("✅ تم بناء insights و quality من الذاكرة:")
     print(f"   - {INSIGHTS_JSON}")
     print(f"   - {INSIGHTS_TXT}")
+    print(f"   - {QUALITY_JSON}")
 
 
 if __name__ == "__main__":
