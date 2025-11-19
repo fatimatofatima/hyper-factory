@@ -1,0 +1,4 @@
+# Config for agent: quality_engine
+enabled: false
+mode: skeleton
+

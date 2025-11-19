@@ -1,0 +1,4 @@
+# Config for agent: temporal_memory
+enabled: false
+mode: skeleton
+

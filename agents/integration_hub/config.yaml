@@ -1,0 +1,4 @@
+# Config for agent: integration_hub
+enabled: false
+mode: skeleton
+
