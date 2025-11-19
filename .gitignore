@@ -42,3 +42,22 @@ data_lakehouse/
 factories/
 stack/
 integrations/
+
+# البيانات التشغيلية والذاكرة
+ai/memory/
+ai/patterns/  
+ai/quality/
+data/
+config_changes/
+reports/
+data_lakehouse/
+factories/
+stack/
+integrations/
+priority_tasks.txt
+logs/
+
+# ملفات النظام
+*.backup.*
+*.tmp
+*.log
