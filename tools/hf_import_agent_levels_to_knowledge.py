@@ -13,8 +13,18 @@ hf_import_agent_levels_to_knowledge.py
   data/knowledge/knowledge.db
   جدول: knowledge_items
 
-- يعتمد على introspection عبر PRAGMA table_info
-- يستخدم الأعمدة المتاحة فقط (بدون افتراض وجود عمود key).
+- يعتمد على PRAGMA table_info لاكتشاف الأعمدة المتاحة.
+- يملأ الأعمدة القياسية في سكيمة Hyper Factory:
+    id          (AUTOINCREMENT)   -> يتركه لقاعدة البيانات
+    source_id   (NOT NULL)        -> "hf_roles_engine"
+    item_type                       "agent_level"
+    item_key                        agent_id
+    title                           اسم العامل
+    body                            JSON بالتفاصيل كاملة
+    importance                      قيمة افتراضية 0.8
+    tags                            "agent,level,pipeline"
+    created_at / updated_at         timestamp الآن
+    meta_json                       JSON إضافي (kind/family/role)
 """
 
 import json
@@ -84,6 +94,10 @@ def main():
         print(f"⚠️ العمود 'item_type' غير موجود في {TABLE_NAME}، لا يمكن الإدخال.")
         conn.close()
         return
+    if "source_id" not in cols:
+        print(f"⚠️ العمود 'source_id' غير موجود في {TABLE_NAME}، لا يمكن الإدخال.")
+        conn.close()
+        return
 
     # حذف أي عناصر قديمة من نوع agent_level (لو أمكن)
     try:
@@ -111,7 +125,6 @@ def main():
         success_runs = item.get("success_runs")
         failed_runs = item.get("failed_runs")
 
-        # payload الأساسي داخل content / extra_json
         details = {
             "agent": agent_id,
             "family": family,
@@ -126,30 +139,35 @@ def main():
         }
 
         row = {}
-        # أعمدة قياسية إن وجدت
+
+        # أعمدة أساسية
+        if "source_id" in cols:
+            row["source_id"] = "hf_roles_engine"
         if "item_type" in cols:
             row["item_type"] = "agent_level"
+        if "item_key" in cols:
+            row["item_key"] = str(agent_id)
         if "title" in cols:
             row["title"] = f"مستوى العامل {display_name} ({agent_id})"
-        if "content" in cols:
-            row["content"] = json.dumps(
+        if "body" in cols:
+            row["body"] = json.dumps(
                 details, ensure_ascii=False, separators=(",", ":")
             )
-        if "source" in cols:
-            row["source"] = "hf_roles_engine"
-        if "created_at" in cols:
-            row["created_at"] = now
+        if "importance" in cols:
+            row["importance"] = 0.8
         if "tags" in cols:
             row["tags"] = "agent,level,pipeline"
-        if "key" in cols:
-            # نستخدم agent_id كمفتاح لو العمود موجود
-            row["key"] = str(agent_id)
-        if "extra_json" in cols:
-            row["extra_json"] = json.dumps(
-                {"kind": "agent_level", "agent": agent_id}, ensure_ascii=False
+        if "created_at" in cols:
+            row["created_at"] = now
+        if "updated_at" in cols:
+            row["updated_at"] = now
+        if "meta_json" in cols:
+            row["meta_json"] = json.dumps(
+                {"kind": "agent_level", "family": family, "role": role},
+                ensure_ascii=False,
             )
 
-        if len(row) <= 1:  # فقط item_type تقريبًا
+        if len(row) <= 2:  # تقريبًا فقط source_id + item_type
             print(f"⚠️ تخطي agent={agent_id}: لا توجد أعمدة كافية للإدخال.")
             continue
 
