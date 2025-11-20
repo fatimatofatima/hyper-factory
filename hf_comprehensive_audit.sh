@@ -124,7 +124,7 @@ print_section "5. فحص البنية التحتية المتقدمة"
 check_component "مصنع البيانات" "data_lakehouse/" "dir_exists"
 if [ -d "data_lakehouse" ]; then
     echo -e "   📊 محتويات data_lakehouse:"
-    find data_lakehouse -type d -maxdepth 2 2>/dev/null | head -10 | while read dir; do
+    find data_lakehouse -maxdepth 2 -type d 2>/dev/null | head -10 | while read dir; do
         echo -e "      📁 $dir"
     done
 fi

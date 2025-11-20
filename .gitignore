@@ -17,3 +17,15 @@ Thumbs.db
 # ملفات النسخ الاحتياطي
 *.backup
 *.bak
+
+# Hyper Factory – data & artefacts (auto-added)
+data/factory/factory.db
+data/knowledge/knowledge.db
+data/inbox/
+data/raw/
+data/processed/
+data/semantic/
+data/serving/
+reports/
+logs/
+*.sqlite
