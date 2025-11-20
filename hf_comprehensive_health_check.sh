@@ -1,27 +1,34 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-echo "🔍 Hyper Factory - Comprehensive Health Check"
-echo "============================================"
-echo "⏰ $(date '+%Y-%m-%d %H:%M:%S')"
-echo
+cd /root/hyper-factory
 
-# تشغيل فحوصات الصحة الأساسية
-echo "📊 1. Basic Health Check..."
-./hf_health_check_fixed.sh
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
-echo
-echo "🏗️ 2. Infrastructure Check..."
-./hf_check_advanced_infra.sh
+log "🏥 Hyper Factory – Comprehensive Health Check"
 
-echo
-echo "🔍 3. Advanced Gaps Check..."
-./hf_check_missing_advanced.sh
+# 1) فحص البنية الأساسية
+if [[ -x ./hf_check_infra.sh ]]; then
+  log "🔎 تشغيل hf_check_infra.sh ..."
+  ./hf_check_infra.sh
+else
+  log "⚠️ hf_check_infra.sh غير موجود أو غير قابل للتنفيذ."
+fi
 
-echo
-echo "📈 4. System Performance..."
-./hf_performance_dashboard.sh
+# 2) فحص البنية المتقدمة
+if [[ -x ./hf_check_advanced_infra.sh ]]; then
+  log "🔎 تشغيل hf_check_advanced_infra.sh ..."
+  ./hf_check_advanced_infra.sh | sed 's/\x1b\[[0-9;]*m//g' | tee reports/diagnostics/hf_advanced_infra_check.txt
+else
+  log "⚠️ hf_check_advanced_infra.sh غير موجود أو غير قابل للتنفيذ."
+fi
 
-echo
-echo "✅ Comprehensive health check completed!"
-echo "📊 View detailed reports in: reports/health/"
+# 3) تقرير أقفال SQLite
+if [[ -x ./tools/hf_db_lock_report.sh ]]; then
+  log "🔎 تشغيل tools/hf_db_lock_report.sh ..."
+  ./tools/hf_db_lock_report.sh | tee "reports/diagnostics/hf_db_lock_report_$(date +%Y%m%d_%H%M%S).txt"
+else
+  log "⚠️ tools/hf_db_lock_report.sh غير موجود أو غير قابل للتنفيذ."
+fi
+
+log "✅ Hyper Factory – Comprehensive Health Check انتهى."

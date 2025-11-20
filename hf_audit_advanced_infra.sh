@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-echo "🔍 Hyper Factory - Advanced Infrastructure Audit"
-echo "================================================"
-echo "⏰ $(date '+%Y-%m-%d %H:%M:%S')"
-echo
+cd /root/hyper-factory
 
-# فحص الهيكل المتقدم
-echo "📁 1. Directory Structure Audit..."
-find . -mindepth 1 -maxdepth 3 -type d -name "*agent*" -o -name "*factory*" | head -20
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
-echo
-echo "🔧 2. Scripts Health Check..."
-find . -mindepth 1 -maxdepth 2 -type f -name "*.sh" -exec test -x {} \; -print | head -15
+log "🧾 Hyper Factory – Advanced Infra Audit"
 
-echo
-echo "📊 3. Database Health..."
-./hf_run_db_health.sh
+# 1) فحص الفجوة بين التصميم والواقع
+if [[ -x ./hf_validate_design_vs_reality.sh ]]; then
+  log "🔎 تشغيل hf_validate_design_vs_reality.sh ..."
+  ./hf_validate_design_vs_reality.sh | tee "reports/diagnostics/hf_design_vs_reality_$(date +%Y%m%d_%H%M%S).txt"
+else
+  log "⚠️ hf_validate_design_vs_reality.sh غير موجود أو غير قابل للتنفيذ."
+fi
 
-echo
-echo "✅ Advanced infrastructure audit completed!"
+# 2) فحص جميع العمال
+if [[ -x ./hf_find_all_agents.sh ]]; then
+  log "🔎 تشغيل hf_find_all_agents.sh ..."
+  ./hf_find_all_agents.sh | tee "reports/diagnostics/hf_all_agents_$(date +%Y%m%d_%H%M%S).txt"
+else
+  log "⚠️ hf_find_all_agents.sh غير موجود أو غير قابل للتنفيذ."
+fi
+
+log "✅ Hyper Factory – Advanced Infra Audit انتهى."
