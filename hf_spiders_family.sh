@@ -25,29 +25,12 @@ for spider_type in "${SPIDER_TYPES[@]}"; do
         'queued'
     );"
     
-    # إسناد لمهمة spider المناسب
-    case "$spider_type" in
-        "code")
-            AGENT="knowledge_spider"
-            ;;
-        "data") 
-            AGENT="knowledge_spider_2"
-            ;;
-        "devops")
-            AGENT="knowledge_spider_3"
-            ;;
-        "docs")
-            AGENT="knowledge_spider"
-            ;;
-    esac
-    
-    echo "✅ تم إنشاء مهمة $spider_type للعامل $AGENT"
+    echo "✅ تم إنشاء مهمة $spider_type"
 done
 
 echo "📊 إحصائيات الـ Spiders:"
 sqlite3 "$DB_PATH" "
-SELECT 
-    '🕷️ عائلة الـ Spiders: ' || COUNT(*) || ' مهمة معرفة نشطة'
+SELECT '🕷️ عائلة الـ Spiders: ' || COUNT(*) || ' مهمة معرفة نشطة' 
 FROM tasks 
 WHERE task_type = 'knowledge' 
 AND status IN ('queued', 'assigned')

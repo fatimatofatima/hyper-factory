@@ -15,20 +15,19 @@ WITH failure_patterns AS (
     SELECT 
         ta.agent_id,
         t.task_type,
-        COUNT(*) as fail_count,
-        ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM task_assignments WHERE agent_id = ta.agent_id), 2) as fail_percentage
+        COUNT(*) as fail_count
     FROM task_assignments ta
     JOIN tasks t ON ta.task_id = t.id
     WHERE ta.result_status = 'fail'
     GROUP BY ta.agent_id, t.task_type
-    HAVING fail_count >= 2 AND fail_percentage > 30.0
+    HAVING fail_count >= 2
 )
 -- إنشاء مهام جودة للأنماط الخطيرة
 INSERT INTO tasks (created_at, source, description, task_type, priority, status)
 SELECT 
     CURRENT_TIMESTAMP,
     'quality_system',
-    'تحسين أداء العامل ' || fp.agent_id || ' في مهام ' || fp.task_type || ' (معدل فشل ' || fp.fail_percentage || '%)',
+    'تحسين أداء العامل ' || fp.agent_id || ' في مهام ' || fp.task_type || ' (فشل ' || fp.fail_count || ' مرات)',
     'quality',
     'high',
     'queued'
@@ -45,26 +44,6 @@ SELECT '✅ تم إنشاء ' || changes() || ' مهمة جودة' AS result;
 # 2. تحسين قرارات المدير
 echo "2. 🧠 تحسين قرارات التوزيع..."
 sqlite3 "$DB_PATH" "
--- إضافة عمود priority_weight إذا لم يكن موجود
-CREATE TABLE IF NOT EXISTS agents_temp AS SELECT * FROM agents;
-DROP TABLE IF EXISTS agents;
-CREATE TABLE agents (
-    id TEXT PRIMARY KEY,
-    display_name TEXT,
-    family TEXT,
-    role TEXT,
-    level TEXT,
-    success_rate REAL DEFAULT 0.0,
-    total_runs INTEGER DEFAULT 0,
-    last_updated TIMESTAMP,
-    priority_weight REAL DEFAULT 1.0
-);
-INSERT INTO agents SELECT 
-    id, display_name, family, role, level, success_rate, total_runs, 
-    last_updated, 1.0 as priority_weight 
-FROM agents_temp;
-DROP TABLE agents_temp;
-
 -- خفض أولوية العمال ذوي الأداء الضعيف
 UPDATE agents 
 SET priority_weight = 
