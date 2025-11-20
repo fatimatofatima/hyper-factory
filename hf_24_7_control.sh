@@ -46,7 +46,7 @@ while true; do
     fi
   done
   echo "===== SLEEP 300s ====="
-  sleep 300
+  sleep 30
 done
 ' >> "$LOG_FILE" 2>&1 &
     echo $! > "$PID_FILE"
