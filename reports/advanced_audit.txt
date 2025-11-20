@@ -1,5 +1,5 @@
 📊 Advanced Architecture Audit - Hyper Factory
-⏰ 2025-11-19T20:44:44
+⏰ 2025-11-20T09:28:12
 
 1) Data Lakehouse
    - data_lakehouse موجودة ✅
@@ -38,8 +38,8 @@
    - knowledge.db: ✅ موجود
    - الجداول وعدد السجلات:
      • sources: 9
-     • sqlite_sequence: 7
-     • knowledge_items: 14
+     • sqlite_sequence: 12
+     • knowledge_items: 10
      • debug_knowledge: 5
      • web_knowledge: 1083
      • programming_patterns: 4
@@ -47,6 +47,15 @@
      • system_patterns: 0
      • agent_memory: 0
      • debug_solutions: 6
+     • knowledge_snapshots: 0
+     • db_architect_runs: 20
+     • research_topics: 7
+     • knowledge_base: 7
+     • training_recommendations: 16
+     • performance_evaluations: 32
+     • db_health_reports: 0
+     • schema_review_reports: 0
+     • knowledge_linking_reports: 0
    ⚠️ system_patterns فارغ → نظام الأنماط غير مفعّل بعد.
    ⚠️ agent_memory فارغ → الذاكرة الزمنية غير مفعّلة.
 

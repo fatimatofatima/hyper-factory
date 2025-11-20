@@ -1,0 +1,215 @@
+{
+  "timestamp": "2025-11-20T11:02:20.523594",
+  "agents": [
+    {
+      "id": "analyzer_basic",
+      "name": "Data Analyzer",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "debug_expert",
+      "name": "Debug Expert",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "debug_expert_boost_1",
+      "name": "debug_expert Boost 1",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "debug_expert_boost_2",
+      "name": "debug_expert Boost 2",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "debug_expert_boost_3",
+      "name": "debug_expert Boost 3",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "debug_expert_boost_4",
+      "name": "debug_expert Boost 4",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "debug_expert_boost_5",
+      "name": "debug_expert Boost 5",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "ingestor_basic",
+      "name": "Data Ingestor",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider",
+      "name": "Knowledge Spider",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_1",
+      "name": "knowledge_spider Boost 1",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_2",
+      "name": "knowledge_spider Boost 2",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_3",
+      "name": "knowledge_spider Boost 3",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_4",
+      "name": "knowledge_spider Boost 4",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_5",
+      "name": "knowledge_spider Boost 5",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_6",
+      "name": "knowledge_spider Boost 6",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "knowledge_spider_boost_7",
+      "name": "knowledge_spider Boost 7",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "processor_basic",
+      "name": "Data Processor",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "quality_engine",
+      "name": "Quality Engine",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "quality_engine_boost_1",
+      "name": "quality_engine Boost 1",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "quality_engine_boost_2",
+      "name": "quality_engine Boost 2",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "reporter_basic",
+      "name": "Data Reporter",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "system_architect",
+      "name": "System Architect",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "system_architect_boost_1",
+      "name": "system_architect Boost 1",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "system_architect_boost_2",
+      "name": "system_architect Boost 2",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "system_architect_boost_3",
+      "name": "system_architect Boost 3",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "technical_coach",
+      "name": "Technical Coach",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "technical_coach_boost_1",
+      "name": "technical_coach Boost 1",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "technical_coach_boost_2",
+      "name": "technical_coach Boost 2",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "technical_coach_boost_3",
+      "name": "technical_coach Boost 3",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    },
+    {
+      "id": "technical_coach_boost_4",
+      "name": "technical_coach Boost 4",
+      "average_score": 0,
+      "feedback_count": 0,
+      "performance_level": "يحتاج تحسين ⭐"
+    }
+  ]
+}

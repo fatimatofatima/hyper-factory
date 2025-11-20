@@ -1,6 +1,6 @@
 🕵️ بدء البحث الشامل عن جميع العمال في النظام...
 ==================================================
-⏰ الوقت: Thu Nov 20 02:14:19 +03 2025
+⏰ الوقت: Thu Nov 20 09:23:04 +03 2025
 📍 المسار: /root/hyper-factory
 
 \033[0;32m1. 🔧 العمال في ملفات التكوين\033[0m
@@ -16,6 +16,7 @@
 [0;36m🚀 [SCRIPT] apply_lessons[0m - ./hf_run_apply_lessons.sh
 [0;36m🚀 [SCRIPT] crawler_health[0m - ./hf_run_crawler_health.sh
 [0;36m🚀 [SCRIPT] daily_ops[0m - ./hf_run_daily_ops.sh
+[0;36m🚀 [SCRIPT] db_health[0m - ./hf_run_db_health.sh
 [0;36m🚀 [SCRIPT] debug_expert[0m - ./hf_run_debug_expert.sh
 [0;36m🚀 [SCRIPT] debug_expert_final[0m - ./hf_run_debug_expert_final.sh
 [0;36m🚀 [SCRIPT] enhanced_debug_expert[0m - ./hf_run_enhanced_debug_expert.sh
@@ -23,6 +24,7 @@
 [0;36m🚀 [SCRIPT] full_checks[0m - ./hf_run_full_checks.sh
 [0;36m🚀 [SCRIPT] full_crawler_cycle[0m - ./hf_run_full_crawler_cycle.sh
 [0;36m🚀 [SCRIPT] import_agent_levels_to_knowledge[0m - ./hf_run_import_agent_levels_to_knowledge.sh
+[0;36m🚀 [SCRIPT] knowledge_linking[0m - ./hf_run_knowledge_linking.sh
 [0;36m🚀 [SCRIPT] knowledge_spider[0m - ./hf_run_knowledge_spider.sh
 [0;36m🚀 [SCRIPT] learning_cycle[0m - ./hf_run_learning_cycle.sh
 [0;36m🚀 [SCRIPT] manager_dashboard[0m - ./hf_run_manager_dashboard.sh
@@ -32,6 +34,7 @@
 [0;36m🚀 [SCRIPT] quality_engine[0m - ./hf_run_quality_engine.sh
 [0;36m🚀 [SCRIPT] quality_worker[0m - ./hf_run_quality_worker.sh
 [0;36m🚀 [SCRIPT] roles_engine[0m - ./hf_run_roles_engine.sh
+[0;36m🚀 [SCRIPT] schema_review[0m - ./hf_run_schema_review.sh
 [0;36m🚀 [SCRIPT] set_phase[0m - ./hf_run_set_phase.sh
 [0;36m🚀 [SCRIPT] smart_worker[0m - ./hf_run_smart_worker.sh
 [0;36m🚀 [SCRIPT] system_architect[0m - ./hf_run_system_architect.sh
@@ -58,8 +61,8 @@
 [0;32m4. 🔥 العمال النشطين في الذاكرة[0m
 ----------------------------------------
 🐍 عمليات Python نشطة:
-[0;36m🚀 [PROCESS] run_health[0m - PID: 3413464 -          11:24 /opt/smartfriend-suite/venv/bin/python /opt/smartfriend-suite/run_health.py
-[0;36m🚀 [PROCESS] run_web[0m - PID: 3522178 -          10:52 /opt/smartfriend-suite/venv/bin/python /opt/smartfriend-suite/run_web.py
+[0;36m🚀 [PROCESS] run_health[0m - PID: 3413464 -          12:45 /opt/smartfriend-suite/venv/bin/python /opt/smartfriend-suite/run_health.py
+[0;36m🚀 [PROCESS] run_web[0m - PID: 3522178 -          12:10 /opt/smartfriend-suite/venv/bin/python /opt/smartfriend-suite/run_web.py
 
 [0;32m5. 📊 السجلات والذاكرة[0m
 ----------------------------------------
@@ -79,7 +82,7 @@
 ----------------------------------------
 📊 إحصائيات العمال:
    🔧 العمال في التكوين: 2
-   🚀 سكريبتات التشغيل: 29
+   🚀 سكريبتات التشغيل: 32
    📁 مجلدات العمال: 10
    🔥 العمليات النشطة: 4
 

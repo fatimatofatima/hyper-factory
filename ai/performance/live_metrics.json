@@ -1,0 +1,224 @@
+{
+  "timestamp": "2025-11-20T11:02:20.439895",
+  "agents": {
+    "system_architect": {
+      "name": "System Architect",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "debug_expert": {
+      "name": "Debug Expert",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider": {
+      "name": "Knowledge Spider",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "technical_coach": {
+      "name": "Technical Coach",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "quality_engine": {
+      "name": "Quality Engine",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "ingestor_basic": {
+      "name": "Data Ingestor",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "processor_basic": {
+      "name": "Data Processor",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "analyzer_basic": {
+      "name": "Data Analyzer",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "reporter_basic": {
+      "name": "Data Reporter",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "quality_engine_boost_1": {
+      "name": "quality_engine Boost 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "quality_engine_boost_2": {
+      "name": "quality_engine Boost 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "technical_coach_boost_1": {
+      "name": "technical_coach Boost 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "technical_coach_boost_2": {
+      "name": "technical_coach Boost 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "technical_coach_boost_3": {
+      "name": "technical_coach Boost 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "technical_coach_boost_4": {
+      "name": "technical_coach Boost 4",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "debug_expert_boost_1": {
+      "name": "debug_expert Boost 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "debug_expert_boost_2": {
+      "name": "debug_expert Boost 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "debug_expert_boost_3": {
+      "name": "debug_expert Boost 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "debug_expert_boost_4": {
+      "name": "debug_expert Boost 4",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "debug_expert_boost_5": {
+      "name": "debug_expert Boost 5",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_1": {
+      "name": "knowledge_spider Boost 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_2": {
+      "name": "knowledge_spider Boost 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_3": {
+      "name": "knowledge_spider Boost 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_4": {
+      "name": "knowledge_spider Boost 4",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_5": {
+      "name": "knowledge_spider Boost 5",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_6": {
+      "name": "knowledge_spider Boost 6",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "knowledge_spider_boost_7": {
+      "name": "knowledge_spider Boost 7",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "system_architect_boost_1": {
+      "name": "system_architect Boost 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "system_architect_boost_2": {
+      "name": "system_architect Boost 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    },
+    "system_architect_boost_3": {
+      "name": "system_architect Boost 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "status": "active",
+      "performance_score": 19.5
+    }
+  },
+  "system": {
+    "active_agents": 30,
+    "total_tasks": 1227,
+    "completion_rate": 0.0
+  },
+  "tasks": {
+    "assigned": 571,
+    "queued": 656
+  }
+}

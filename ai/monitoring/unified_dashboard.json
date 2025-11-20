@@ -1,0 +1,328 @@
+{
+  "timestamp": "2025-11-20T21:16:49.693156",
+  "overview": {
+    "active_agents": 30,
+    "total_tasks": 16683,
+    "completion_rate": 3.3207456692441406
+  },
+  "agents": [
+    {
+      "id": "analyzer_basic",
+      "name": "Data Analyzer",
+      "display_name": "عامل التحليل الدلالي",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "debug_expert",
+      "name": "Debug Expert",
+      "display_name": "خبير التصحيح",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "debug_expert_boost_1",
+      "name": "debug_expert Boost 1",
+      "display_name": "debug_expert معزز 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "debug_expert_boost_2",
+      "name": "debug_expert Boost 2",
+      "display_name": "debug_expert معزز 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "debug_expert_boost_3",
+      "name": "debug_expert Boost 3",
+      "display_name": "debug_expert معزز 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "debug_expert_boost_4",
+      "name": "debug_expert Boost 4",
+      "display_name": "debug_expert معزز 4",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "debug_expert_boost_5",
+      "name": "debug_expert Boost 5",
+      "display_name": "debug_expert معزز 5",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "ingestor_basic",
+      "name": "Data Ingestor",
+      "display_name": "عامل إدخال البيانات",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider",
+      "name": "Knowledge Spider",
+      "display_name": "جامع المعرفة",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_1",
+      "name": "knowledge_spider Boost 1",
+      "display_name": "knowledge_spider معزز 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_2",
+      "name": "knowledge_spider Boost 2",
+      "display_name": "knowledge_spider معزز 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_3",
+      "name": "knowledge_spider Boost 3",
+      "display_name": "knowledge_spider معزز 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_4",
+      "name": "knowledge_spider Boost 4",
+      "display_name": "knowledge_spider معزز 4",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_5",
+      "name": "knowledge_spider Boost 5",
+      "display_name": "knowledge_spider معزز 5",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_6",
+      "name": "knowledge_spider Boost 6",
+      "display_name": "knowledge_spider معزز 6",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "knowledge_spider_boost_7",
+      "name": "knowledge_spider Boost 7",
+      "display_name": "knowledge_spider معزز 7",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "processor_basic",
+      "name": "Data Processor",
+      "display_name": "عامل معالجة البيانات",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "quality_engine",
+      "name": "Quality Engine",
+      "display_name": "محرك الجودة",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "quality_engine_boost_1",
+      "name": "quality_engine Boost 1",
+      "display_name": "quality_engine معزز 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "quality_engine_boost_2",
+      "name": "quality_engine Boost 2",
+      "display_name": "quality_engine معزز 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "reporter_basic",
+      "name": "Data Reporter",
+      "display_name": "عامل التقارير والتقديم",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "system_architect",
+      "name": "System Architect",
+      "display_name": "مهندس النظام",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "system_architect_boost_1",
+      "name": "system_architect Boost 1",
+      "display_name": "system_architect معزز 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "system_architect_boost_2",
+      "name": "system_architect Boost 2",
+      "display_name": "system_architect معزز 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "system_architect_boost_3",
+      "name": "system_architect Boost 3",
+      "display_name": "system_architect معزز 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "technical_coach",
+      "name": "Technical Coach",
+      "display_name": "مدرب تقني",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "technical_coach_boost_1",
+      "name": "technical_coach Boost 1",
+      "display_name": "technical_coach معزز 1",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "technical_coach_boost_2",
+      "name": "technical_coach Boost 2",
+      "display_name": "technical_coach معزز 2",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "technical_coach_boost_3",
+      "name": "technical_coach Boost 3",
+      "display_name": "technical_coach معزز 3",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    },
+    {
+      "id": "technical_coach_boost_4",
+      "name": "technical_coach Boost 4",
+      "display_name": "technical_coach معزز 4",
+      "success_rate": 15.0,
+      "total_runs": 30,
+      "assigned_tasks": 0,
+      "performance_level": "يحتاج تحسين",
+      "efficiency": 4.5
+    }
+  ],
+  "tasks": {
+    "assigned": 43,
+    "done": 554,
+    "queued": 16086
+  },
+  "performance": {},
+  "alerts": [
+    {
+      "type": "warning",
+      "message": "📉 أداء منخفض: معدل إنجاز المهام أقل من 30%",
+      "suggestion": "زيادة عدد العوامل النشطة وتحسين توزيع المهام"
+    },
+    {
+      "type": "warning",
+      "message": "📥 طابور طويل: أكثر من 100 مهمة في الانتظار",
+      "suggestion": "تشغيل عوامل إضافية وتسريع المعالجة"
+    }
+  ]
+}

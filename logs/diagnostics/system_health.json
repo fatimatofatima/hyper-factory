@@ -1,12 +1,12 @@
 {
-  "timestamp": "2025-11-19T13:09:42.946900",
-  "disk_usage": "49.8%",
-  "memory_usage": "41.2%",
+  "timestamp": "2025-11-20T10:10:46.249417",
+  "disk_usage": "51.1%",
+  "memory_usage": "65.2%",
   "knowledge_db": {
     "status": "healthy",
-    "message": "\u0642\u0627\u0639\u062f\u0629 \u0645\u0639\u0631\u0641\u0629 \u0633\u0644\u064a\u0645\u0629 (10 \u062c\u062f\u0648\u0644, 1024 \u0633\u062c\u0644)",
-    "tables": 10,
-    "records": 1024
+    "message": "\u0642\u0627\u0639\u062f\u0629 \u0645\u0639\u0631\u0641\u0629 \u0633\u0644\u064a\u0645\u0629 (20 \u062c\u062f\u0648\u0644, 1226 \u0633\u062c\u0644)",
+    "tables": 20,
+    "records": 1226
   },
   "essential_files": {
     "hf_master_dashboard.sh": {
@@ -15,7 +15,7 @@
     },
     "data/knowledge/knowledge.db": {
       "exists": true,
-      "size": 12038144
+      "size": 15728640
     },
     "tools/hf_debug_expert_enhanced.py": {
       "exists": true,
@@ -23,9 +23,9 @@
     },
     "config/agents.yaml": {
       "exists": true,
-      "size": 6505
+      "size": 9934
     }
   },
-  "active_agents": 4,
-  "system_load": "1.08, 1.54, 1.44"
+  "active_agents": 0,
+  "system_load": "0.70, 0.79, 0.93"
 }

@@ -1,15 +1,15 @@
 {
-  "generated_at": "2025-11-20T01:17:00.455579Z",
+  "generated_at": "2025-11-20T20:51:46.614130Z",
   "db_path": "/root/hyper-factory/data/knowledge/knowledge.db",
-  "total_records": 1128,
+  "total_records": 1124,
   "tables": {
     "sources": {
       "count": 9,
       "ratio": 0.008
     },
     "knowledge_items": {
-      "count": 14,
-      "ratio": 0.0124
+      "count": 10,
+      "ratio": 0.0089
     },
     "debug_knowledge": {
       "count": 5,
@@ -17,11 +17,11 @@
     },
     "web_knowledge": {
       "count": 1083,
-      "ratio": 0.9601
+      "ratio": 0.9635
     },
     "programming_patterns": {
       "count": 4,
-      "ratio": 0.0035
+      "ratio": 0.0036
     },
     "knowledge_index": {
       "count": 7,

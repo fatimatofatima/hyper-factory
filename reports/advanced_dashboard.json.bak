@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2025-11-19T20:31:43",
+    "timestamp": "2025-11-20T09:27:59",
     "base_dir": "/root/hyper-factory"
   },
   "summary": {
@@ -54,15 +54,24 @@
       "db_exists": true,
       "tables": {
         "sources": 9,
-        "sqlite_sequence": 7,
-        "knowledge_items": 14,
+        "sqlite_sequence": 12,
+        "knowledge_items": 10,
         "debug_knowledge": 5,
         "web_knowledge": 1083,
         "programming_patterns": 4,
         "knowledge_index": 7,
         "system_patterns": 0,
         "agent_memory": 0,
-        "debug_solutions": 6
+        "debug_solutions": 6,
+        "knowledge_snapshots": 0,
+        "db_architect_runs": 20,
+        "research_topics": 7,
+        "knowledge_base": 7,
+        "training_recommendations": 16,
+        "performance_evaluations": 32,
+        "db_health_reports": 0,
+        "schema_review_reports": 0,
+        "knowledge_linking_reports": 0
       }
     }
   }
