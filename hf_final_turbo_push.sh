@@ -1,32 +1,45 @@
-#!/bin/bash
-echo "🎯 FINAL TURBO PUSH - لتحقيق 20%+ معدل إنجاز"
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# توزيع 10,000 مهمة إضافية
-sqlite3 data/factory/factory.db "
--- توزيع مكثف على جميع العوامل
-UPDATE tasks SET agent_id = 'system_architect' 
-WHERE agent_id = 'knowledge_spider' AND status = 'queued' 
+DB="data/factory/factory.db"
+
+echo "🎯 FINAL TURBO PUSH – إعادة توزيع ~10,000 مهمة من knowledge_spider"
+
+if [[ ! -f "$DB" ]]; then
+  echo "❌ قاعدة البيانات غير موجودة: $DB"
+  exit 1
+fi
+
+sqlite3 "$DB" <<'SQL'
+-- 3,000 → system_architect
+UPDATE tasks
+SET agent_id = 'system_architect'
+WHERE agent_id = 'knowledge_spider' AND status = 'queued'
 LIMIT 3000;
 
-UPDATE tasks SET agent_id = 'debug_expert' 
-WHERE agent_id = 'knowledge_spider' AND status = 'queued' 
+-- 3,000 → debug_expert
+UPDATE tasks
+SET agent_id = 'debug_expert'
+WHERE agent_id = 'knowledge_spider' AND status = 'queued'
 LIMIT 3000;
 
-UPDATE tasks SET agent_id = 'technical_coach' 
-WHERE agent_id = 'knowledge_spider' AND status = 'queued' 
+-- 2,000 → technical_coach
+UPDATE tasks
+SET agent_id = 'technical_coach'
+WHERE agent_id = 'knowledge_spider' AND status = 'queued'
 LIMIT 2000;
 
-UPDATE tasks SET agent_id = 'quality_engine' 
-WHERE agent_id = 'knowledge_spider' AND status = 'queued' 
+-- 1,000 → quality_engine
+UPDATE tasks
+SET agent_id = 'quality_engine'
+WHERE agent_id = 'knowledge_spider' AND status = 'queued'
 LIMIT 1000;
 
-UPDATE tasks SET agent_id = 'system_architect_boost_1' 
-WHERE agent_id = 'knowledge_spider' AND status = 'queued' 
-LIMIT 500;
+-- 1,000 → system_architect_boost_1
+UPDATE tasks
+SET agent_id = 'system_architect_boost_1'
+WHERE agent_id = 'knowledge_spider' AND status = 'queued'
+LIMIT 1000;
+SQL
 
-UPDATE tasks SET agent_id = 'debug_expert_boost_1' 
-WHERE agent_id = 'knowledge_spider' AND status = 'queued' 
-LIMIT 500;
-"
-
-echo "✅ تم توزيع 10,000 مهمة نهائية"
+echo "✅ تم توزيع المهام على العوامل المتقدمة بنجاح"
