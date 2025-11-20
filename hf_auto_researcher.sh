@@ -19,69 +19,62 @@ fi
 
 mkdir -p "$(dirname "$KNOW_DB")"
 
+# إنشاء/تحديث هيكل قاعدة المعرفة
 sqlite3 "$KNOW_DB" "
 ATTACH DATABASE '$DB_PATH' AS factory;
 
 -- جدول مواضيع البحث
 CREATE TABLE IF NOT EXISTS research_topics (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    topic TEXT UNIQUE NOT NULL,
-    source TEXT,
-    importance TEXT,
+    topic TEXT NOT NULL,
+    category TEXT,
+    importance INTEGER DEFAULT 1,
     tasks_count INTEGER DEFAULT 0,
-    last_seen TEXT,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    last_updated TEXT DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- جدول المعرفة العامة
+-- جدول قاعدة المعرفة
 CREATE TABLE IF NOT EXISTS knowledge_base (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     topic TEXT NOT NULL,
     content TEXT,
+    quality_score REAL DEFAULT 0.0,
     source_type TEXT,
-    quality_score INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    last_updated TEXT DEFAULT CURRENT_TIMESTAMP
+    related_tasks_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- مواضيع بحث مبنية على أنواع المهام في المصنع
-INSERT INTO research_topics (topic, source, importance, tasks_count, last_seen, last_updated)
-SELECT
-    'factory.task_type.' || t.task_type AS topic,
-    'factory.tasks' AS source,
-    CASE 
-        WHEN COUNT(*) >= 80 THEN 'critical'
-        WHEN COUNT(*) >= 40 THEN 'high'
-        ELSE 'normal'
-    END AS importance,
-    COUNT(*) AS tasks_count,
-    MAX(t.created_at) AS last_seen,
-    CURRENT_TIMESTAMP AS last_updated
+-- تحديث مواضيع البحث من المهام
+INSERT OR REPLACE INTO research_topics (topic, category, importance, tasks_count)
+SELECT 
+    task_type as topic,
+    'task_type' as category,
+    COUNT(*) as importance,
+    COUNT(*) as tasks_count
+FROM factory.tasks 
+GROUP BY task_type
+ORDER BY COUNT(*) DESC;
+
+-- تحديث قاعدة المعرفة من المهام المكتملة
+INSERT OR REPLACE INTO knowledge_base (topic, content, quality_score, source_type, related_tasks_count)
+SELECT 
+    t.task_type as topic,
+    'تم جمع معرفة من ' || COUNT(*) || ' مهمة من نوع ' || t.task_type as content,
+    (COUNT(*) * 1.0 / (SELECT COUNT(*) FROM factory.tasks WHERE status='done')) as quality_score,
+    'task_analysis' as source_type,
+    COUNT(*) as related_tasks_count
 FROM factory.tasks t
-GROUP BY t.task_type
-ON CONFLICT(topic) DO UPDATE SET
-    tasks_count    = excluded.tasks_count,
-    importance     = excluded.importance,
-    last_seen      = excluded.last_seen,
-    last_updated   = excluded.last_updated;
+WHERE t.status = 'done'
+GROUP BY t.task_type;
 
--- ملخص عام لحمل المصنع
-INSERT INTO knowledge_base (topic, content, source_type, quality_score, last_updated)
-VALUES (
-    'factory.load_overview',
-    'ملخص تلقائي: إجمالي المهام = ' ||
-        (SELECT COUNT(*) FROM factory.tasks) ||
-    ', المكتملة = ' ||
-        (SELECT COUNT(*) FROM factory.tasks WHERE status = ''done'') ||
-    ', الفاشلة = ' ||
-        (SELECT COUNT(*) FROM factory.tasks WHERE status = ''failed'') ||
-    ', في الطابور = ' ||
-        (SELECT COUNT(*) FROM factory.tasks WHERE status IN (''queued'',''assigned'')),
-    'auto_researcher',
-    85,
-    CURRENT_TIMESTAMP
-);
+-- تحديث وقت التعديل
+UPDATE research_topics SET updated_at = CURRENT_TIMESTAMP;
+UPDATE knowledge_base SET updated_at = CURRENT_TIMESTAMP;
 "
 
-echo "✅ Auto Researcher اكتمل (research_topics + knowledge_base تم تحديثهم)"
+echo "✅ تم تحديث البحث والمعرفة:"
+echo "   - مواضيع البحث: $(sqlite3 "$KNOW_DB" "SELECT COUNT(*) FROM research_topics;")"
+echo "   - عناصر المعرفة: $(sqlite3 "$KNOW_DB" "SELECT COUNT(*) FROM knowledge_base;")"
+
