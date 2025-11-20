@@ -1,38 +1,25 @@
-# مصادر المعرفة لـ Knowledge Spider
-knowledge_sources:
-  # مصادر الويب
-  web_sources:
-    - url: "https://github.com/topics/python-programming"
-      type: "programming"
-      priority: "high"
-    - url: "https://stackoverflow.com/questions/tagged/python"
-      type: "qna" 
-      priority: "high"
-    - url: "https://docs.python.org/3/"
-      type: "documentation"
-      priority: "medium"
-    - url: "https://realpython.com/"
-      type: "tutorials"
-      priority: "medium"
+# تعريف مصادر المعرفة الخارجية والمحلية لـ Knowledge Spider
+sources:
+  hyper_factory_repo:
+    enabled: true
+    kind: github_repo
+    url: "https://github.com/fatimatofatima/hyper-factory"
+    notes: "المستودع الأساسي لمشروع Hyper Factory"
 
-  # الملفات المحلية
-  local_sources:
-    - path: "docs/"
-      type: "documentation"
-    - path: "examples/"
-      type: "code_samples"
-    - path: "config/"
-      type: "configuration"
+  smartfriend_repo:
+    enabled: false
+    kind: github_repo
+    url: "https://github.com/fatimatofatima/smartfriend-complete-system"
+    notes: "يمكن تفعيله لاحقًا إذا احتجت دمج SmartFriend"
 
-  # قواعد البيانات
-  database_sources:
-    - path: "data/knowledge/knowledge.db"
-      type: "knowledge_base"
+  local_docs:
+    enabled: false
+    kind: local_dir
+    path: "docs"
+    notes: "مجلد توثيق محلي (إن وُجد داخل المشروع)"
 
-  # الكلمات المفتاحية للبحث
-  search_keywords:
-    - "Python programming"
-    - "debugging techniques"
-    - "system architecture"
-    - "AI agents"
-    - "machine learning"
+  extra_url_example:
+    enabled: false
+    kind: url
+    url: "https://example.com/knowledge"
+    notes: "مثال لمصدر HTTP عام – غيّره لما تحتاج"
