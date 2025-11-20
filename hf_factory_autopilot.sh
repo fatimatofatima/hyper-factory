@@ -15,6 +15,8 @@ RUN_REPORTER="$ROOT/hf_run_reporter_basic.sh"
 PATTERNS_RUN="$ROOT/hf_run_patterns_engine.sh"
 QUALITY_RUN="$ROOT/hf_run_quality_engine.sh"
 
+LEARNING_PY="$ROOT/tools/hf_factory_learning.py"
+
 echo "🤖 Hyper Factory – Full Autopilot Cycle"
 echo "======================================="
 echo "⏰ $(date)"
@@ -84,6 +86,14 @@ if [ -x "$QUALITY_RUN" ]; then
   "$QUALITY_RUN" || echo "   ⚠️ محرك الجودة انتهى بتحذير."
 else
   echo "   ℹ️ hf_run_quality_engine.sh غير موجود."
+fi
+
+echo ""
+echo "4) تطبيق التعلم التلقائي من نتائج المهام (رفع Skills/إحصائيات)..."
+if [ -f "$LEARNING_PY" ]; then
+  python3 "$LEARNING_PY" apply || echo "   ⚠️ learning engine انتهى بتحذير."
+else
+  echo "   ℹ️ tools/hf_factory_learning.py غير موجود – تخطى خطوة التعلم."
 fi
 
 echo ""

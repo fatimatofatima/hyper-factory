@@ -62,9 +62,10 @@ def init_agents_from_json():
 def classify_task(description: str) -> str:
     text = description.lower()
     debug_kw = ["خطأ", "اخطاء", "bug", "error", "traceback", "crash"]
-    arch_kw = ["تصميم", "معماري", "architecture", "system design"]
-    coach_kw = ["تعلم", "تعليمي", "مسار", "كورسات", "course", "learning", "track"]
-    know_kw = ["معرفة", "documentation", "docs", "بحث", "research"]
+    arch_kw = ["تصميم", "معماري", "architecture", "system design", "دمج", "integration"]
+    coach_kw = ["تعلم", "تعليمي", "مسار", "كورسات", "course", "learning", "track", "تدريب", "coaching"]
+    know_kw = ["معرفة", "documentation", "docs", "بحث", "research", "spider", "crawler"]
+    pipe_kw = ["pipeline", "ingest", "ingestor", "processor", "analyzer", "reporter"]
 
     if any(k in text for k in debug_kw):
         return "debug"
@@ -74,6 +75,8 @@ def classify_task(description: str) -> str:
         return "coaching"
     if any(k in text for k in know_kw):
         return "knowledge"
+    if any(k in text for k in pipe_kw):
+        return "pipeline"
     return "general"
 
 
@@ -105,25 +108,53 @@ def new_task(description: str, priority: str = "normal", source: str = "cli"):
 
 
 def pick_agent_for_task(task_type: str, conn):
-    mapping = {
-        "debug": "debug_expert",
-        "architecture": "system_architect",
-        "coaching": "technical_coach",
-        "knowledge": "knowledge_spider",
+    """
+    اختيار Agent بناءً على العائلة (family) ثم الأفضلية حسب success_rate ثم total_runs.
+    هذا يسمح بوجود أكثر من سبايدر، أكثر من كوتش، أكثر من محلل، إلخ.
+    """
+    family_map = {
+        "debug": "debugging",
+        "architecture": "architecture",
+        "coaching": "training",
+        "knowledge": "knowledge",
+        "pipeline": "pipeline",
     }
-    preferred = mapping.get(task_type)
+    family = family_map.get(task_type)
 
     cur = conn.cursor()
-    if preferred:
-        cur.execute("SELECT id, display_name, success_rate FROM agents WHERE id = ?", (preferred,))
+
+    # أولًا: حاول اختيار أفضل Agent داخل العائلة
+    if family:
+        cur.execute(
+            """
+            SELECT id, COALESCE(display_name,''), COALESCE(success_rate,0.0) AS sr,
+                   COALESCE(total_runs,0) AS tr
+            FROM agents
+            WHERE family = ?
+            ORDER BY sr DESC, tr DESC
+            LIMIT 1;
+            """,
+            (family,),
+        )
         row = cur.fetchone()
         if row:
-            return row
+            return row[0], row[1], row[2], family
 
+    # ثانيًا: fallback على أفضل Agent على مستوى المصنع كاملًا
     cur.execute(
-        "SELECT id, display_name, success_rate FROM agents ORDER BY success_rate DESC, total_runs DESC LIMIT 1"
+        """
+        SELECT id, COALESCE(display_name,''), COALESCE(success_rate,0.0) AS sr,
+               COALESCE(total_runs,0) AS tr
+        FROM agents
+        ORDER BY sr DESC, tr DESC
+        LIMIT 1;
+        """
     )
-    return cur.fetchone()
+    row = cur.fetchone()
+    if row:
+        return row[0], row[1], row[2], "any"
+
+    return None
 
 
 def assign_next():
@@ -152,22 +183,22 @@ def assign_next():
         return
 
     task_id, desc, task_type, priority, created_at = task
-    agent = pick_agent_for_task(task_type, conn)
-    if not agent:
+    picked = pick_agent_for_task(task_type, conn)
+    if not picked:
         print("⚠️ لا يوجد عمال في جدول agents، لا يمكن التوزيع.")
         conn.close()
         return
 
-    agent_id, display_name, success_rate = agent
+    agent_id, display_name, success_rate, family = picked
     assigned_at = datetime.now().isoformat(timespec="seconds")
-    reason = f"task_type={task_type}, priority={priority}, picked_agent={agent_id}"
+    reason = f"task_type={task_type}, family={family}, priority={priority}, picked_agent={agent_id}"
 
     cur.execute("UPDATE tasks SET status = 'assigned' WHERE id = ?", (task_id,))
     cur.execute(
         """
         INSERT INTO task_assignments
-        (task_id, agent_id, decision_reason, assigned_at, result_status)
-        VALUES (?, ?, ?, ?, NULL)
+        (task_id, agent_id, decision_reason, assigned_at, completed_at, result_status)
+        VALUES (?, ?, ?, ?, NULL, NULL)
         """,
         (task_id, agent_id, reason, assigned_at),
     )
@@ -177,10 +208,13 @@ def assign_next():
     print("✅ تم إسناد مهمة:")
     print(f"   task_id    : {task_id}")
     print(f"   type       : {task_type}")
+    print(f"   family     : {family}")
     print(f"   priority   : {priority}")
     print(f"   agent      : {agent_id} ({display_name})")
     print(f"   reason     : {reason}")
     print("")
+
+    # أمر التنفيذ المقترح – يظل كما هو، لكن الآن ممكن يختار أكثر من Agent من نفس العائلة
     if task_type == "debug":
         cmd = f"./hf_run_debug_expert.sh '{desc}'"
     elif task_type == "architecture":
@@ -189,6 +223,8 @@ def assign_next():
         cmd = f"./hf_run_technical_coach.sh '{desc}'"
     elif task_type == "knowledge":
         cmd = f"./hf_run_knowledge_spider.sh '{desc}'"
+    elif task_type == "pipeline":
+        cmd = f"./hf_run_pipeline_manager.sh '{desc}'"
     else:
         cmd = f"./hf_smart_decision_engine.sh '{desc}'"
 
@@ -221,7 +257,7 @@ def list_queue():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Hyper Factory Orchestrator")
+    parser = argparse.ArgumentParser(description="Hyper Factory Orchestrator (multi-agent families)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("init-agents", help="تحميل العمال من all_agents_complete.json إلى قاعدة البيانات")
