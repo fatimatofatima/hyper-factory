@@ -30,11 +30,17 @@ SET
     success_rate = ap.new_success_rate,
     total_runs = ap.total_tasks,
     last_updated = CURRENT_TIMESTAMP
-FROM agent_performance ap
-WHERE agents.id = ap.agent_id;
+WHERE agents.id IN (SELECT agent_id FROM agent_performance);
 
 -- عرض التغييرات
 SELECT '✅ تم تحديث أداء ' || changes() || ' عامل' AS result;
 "
+
+echo "📊 أداء العمال المحدث:"
+sqlite3 "$DB_PATH" "
+SELECT id, success_rate, total_runs, datetime(last_updated) as last_updated 
+FROM agents 
+WHERE total_runs > 0
+ORDER BY success_rate DESC;"
 
 echo "✅ Auto Performance Update اكتمل"
