@@ -45,6 +45,26 @@ SELECT '✅ تم إنشاء ' || changes() || ' مهمة جودة' AS result;
 # 2. تحسين قرارات المدير
 echo "2. 🧠 تحسين قرارات التوزيع..."
 sqlite3 "$DB_PATH" "
+-- إضافة عمود priority_weight إذا لم يكن موجود
+CREATE TABLE IF NOT EXISTS agents_temp AS SELECT * FROM agents;
+DROP TABLE IF EXISTS agents;
+CREATE TABLE agents (
+    id TEXT PRIMARY KEY,
+    display_name TEXT,
+    family TEXT,
+    role TEXT,
+    level TEXT,
+    success_rate REAL DEFAULT 0.0,
+    total_runs INTEGER DEFAULT 0,
+    last_updated TIMESTAMP,
+    priority_weight REAL DEFAULT 1.0
+);
+INSERT INTO agents SELECT 
+    id, display_name, family, role, level, success_rate, total_runs, 
+    last_updated, 1.0 as priority_weight 
+FROM agents_temp;
+DROP TABLE agents_temp;
+
 -- خفض أولوية العمال ذوي الأداء الضعيف
 UPDATE agents 
 SET priority_weight = 

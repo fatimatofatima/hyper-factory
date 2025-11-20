@@ -57,9 +57,13 @@ case "$AGENT_ID" in
     "knowledge_spider")
         SCRIPT="./hf_run_knowledge_spider.sh"
         ;;
+    "ingestor_basic")
+        SCRIPT="./hf_run_debug_expert.sh"  # استخدام بديل
+        ;;
     *)
         echo "❌ عامل غير معروف: $AGENT_ID"
-        exit 1
+        echo "📝 استخدام عامل افتراضي..."
+        SCRIPT="./hf_run_debug_expert.sh"
         ;;
 esac
 
