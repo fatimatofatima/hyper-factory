@@ -44,5 +44,5 @@ SQL
     
     echo ""
     echo "⏳ التحديث خلال 5 ثواني... (Ctrl+C للإيقاف)"
-    sleep 5
+    sleep 0.1
 done

@@ -16,7 +16,7 @@ for agent in "${AGENTS[@]}"; do
     if [ -f "./hf_run_${agent}.sh" ]; then
         echo "▶️  تشغيل $agent..."
         ./hf_run_${agent}.sh &
-        sleep 0.5
+        sleep 0.1.5
     fi
 done
 
@@ -29,7 +29,7 @@ echo "🤖 تشغيل المدير التلقائي..."
 ./hf_factory_manager_loop.sh &
 
 # 4. عرض النتائج
-sleep 3
+sleep 0.1
 echo ""
 echo "🎉 نظام Hyper Factory يعمل بالكامل!"
 echo "📊 العوامل النشطة:"

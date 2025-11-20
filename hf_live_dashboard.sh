@@ -26,5 +26,5 @@ while true; do
     LIMIT 5;
     "
     
-    sleep 10
+    sleep 0.1
 done

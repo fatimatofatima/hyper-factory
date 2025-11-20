@@ -17,7 +17,7 @@ echo "[$TS] agent=technical_coach TASK_ID=$TASK_ID" >> "$LOG_FILE"
 echo "DESC: $DESC" >> "$LOG_FILE"
 
 # محاكاة عمل العامل
-sleep 2
+sleep 0.1
 
 echo "RESULT: success" >> "$LOG_FILE"
 echo "========================================" >> "$LOG_FILE"

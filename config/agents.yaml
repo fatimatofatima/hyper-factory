@@ -252,3 +252,19 @@ agents:
       يبني وثائق المالك والمدير والتصميم المعماري (Owner Reports, Manager Overviews,
       Architecture Docs) داخل reports/ai و reports/management، ليحوّل خبرة المصنع
       إلى معرفة مكتوبة قابلة للمراجعة.
+
+knowledge_spider_2:
+  name: "جامع المعرفة 2"
+  family: "knowledge"
+  role: "knowledge_collection"
+  level: "intermediate"
+  priority: 8
+  enabled: true
+
+technical_coach_2:
+  name: "مدرب تقني 2"
+  family: "training"
+  role: "technical_training"
+  level: "intermediate"
+  priority: 7
+  enabled: true

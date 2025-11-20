@@ -31,7 +31,7 @@ for agent in "${!AGENT_COPIES[@]}"; do
                     'active');"
             
             ./hf_run_${AGENT_COPY}.sh &
-            sleep 0.3
+            sleep 0.1.3
         fi
     done
 done
@@ -61,7 +61,7 @@ echo "🤖 تشغيل الموزع الذكي للمهام..."
 ./hf_factory_manager_loop.sh &
 
 # نتائج فورية
-sleep 5
+sleep 0.1
 echo ""
 echo "💥 نظام الإنتاجية القصوى يعمل!"
 echo "📊 الإحصائيات:"

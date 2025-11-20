@@ -8,7 +8,7 @@ for agent in "${AGENTS[@]}"; do
     if [ -f "./hf_run_${agent}.sh" ]; then
         echo "▶️  تشغيل $agent..."
         ./hf_run_${agent}.sh &
-        sleep 1
+        sleep 0.1
     fi
 done
 

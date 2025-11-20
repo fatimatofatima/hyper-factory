@@ -42,5 +42,5 @@ while true; do
     fi
     
     echo "📊 الحالة: $completed/$total مكتملة ($completion_rate%) | $active عامل نشط | $queued في الطابور"
-    sleep 30
+    sleep 0.1
 done

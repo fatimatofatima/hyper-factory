@@ -15,7 +15,7 @@ for i in {1..3}; do
     ./hf_run_knowledge_spider.sh &
     ./hf_run_technical_coach.sh &
     ./hf_run_quality_engine.sh &
-    sleep 0.2
+    sleep 0.1.2
 done
 
 # 3. توليد مهام سريعة
@@ -41,7 +41,7 @@ echo "📊 تشغيل مراقبة الأداء..."
 ./hf_24_7_monitor.sh &
 
 # 6. عرض النتائج السريعة
-sleep 3
+sleep 0.1
 echo ""
 echo "🎉 نظام الضغط العالي يعمل!"
 echo "📈 إحصائيات فورية:"

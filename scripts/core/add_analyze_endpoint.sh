@@ -85,7 +85,7 @@ cd "$BASE_DIR"
 ./scripts/core/ffactory.sh start backend_coach
 
 echo "⏳ انتظار الإقلاع..."
-sleep 5
+sleep 0.1
 
 echo "-- /api/health"
 curl -s "http://localhost:9090/api/health" || true

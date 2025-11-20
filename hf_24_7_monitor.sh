@@ -45,5 +45,5 @@ while true; do
     
     echo ""
     echo "⏳ التحديث خلال 10 ثواني... (Ctrl+C للإيقاف)"
-    sleep 10
+    sleep 0.1
 done
