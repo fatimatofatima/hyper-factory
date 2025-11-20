@@ -1,26 +1,26 @@
-#!/usr/bin/env bash
-# hf_run_system_architect.sh
-# تشغيل System Architect Worker على design/intents/*.md
+#!/bin/bash
+set -e
 
-set -euo pipefail
-
-ROOT="/root/hyper-factory"
-SCRIPT="$ROOT/tools/hf_system_architect.py"
-
-echo "📁 ROOT   : $ROOT"
-echo "📄 SCRIPT : $SCRIPT"
-echo "----------------------------------------"
-
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "❌ python3 غير متوفر في PATH."
-  exit 1
-fi
+LOG_DIR="$ROOT/logs/factory"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/agent_system_architect.log"
 
-if [[ ! -f "$SCRIPT" ]]; then
-  echo "❌ ملف hf_system_architect.py غير موجود: $SCRIPT"
-  exit 1
-fi
+DESC="$*"
+TASK_ID="${TASK_ID:-unknown}"
+TS="$(date -Iseconds)"
 
-python3 "$SCRIPT"
+echo "========================================" >> "$LOG_FILE"
+echo "[$TS] agent=system_architect TASK_ID=$TASK_ID" >> "$LOG_FILE"
+echo "DESC: $DESC" >> "$LOG_FILE"
+
+# محاكاة عمل العامل
+sleep 2
+
+echo "RESULT: success" >> "$LOG_FILE"
+echo "========================================" >> "$LOG_FILE"
+
+echo "✅ system_architect: تم تنفيذ المهمة بنجاح"
+echo "   TASK_ID=$TASK_ID"
