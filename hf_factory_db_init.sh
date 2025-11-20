@@ -103,6 +103,13 @@ CREATE TABLE IF NOT EXISTS user_tracks (
   FOREIGN KEY(track_id) REFERENCES tracks(id)
 );
 
+-- تعيينات تمّت مزامنتها مع نظام المهارات
+CREATE TABLE IF NOT EXISTS skills_task_sync (
+  assignment_id INTEGER PRIMARY KEY,
+  processed_at TEXT NOT NULL,
+  FOREIGN KEY(assignment_id) REFERENCES task_assignments(id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_tasks_status_priority
   ON tasks(status, priority, created_at);
 
@@ -114,7 +121,6 @@ CREATE INDEX IF NOT EXISTS idx_user_skills_user
 
 CREATE INDEX IF NOT EXISTS idx_user_tracks_user
   ON user_tracks(user_id);
-
 SQL
 
 echo "✅ تم إنشاء/تحديث مخطط قاعدة البيانات."
@@ -151,6 +157,12 @@ SELECT 'skills', COUNT(*) FROM skills
 UNION ALL
 SELECT 'tracks', COUNT(*) FROM tracks
 UNION ALL
-SELECT 'track_phases', COUNT(*) FROM track_phases;"
+SELECT 'track_phases', COUNT(*) FROM track_phases
+UNION ALL
+SELECT 'user_skills', COUNT(*) FROM user_skills
+UNION ALL
+SELECT 'user_tracks', COUNT(*) FROM user_tracks
+UNION ALL
+SELECT 'skills_task_sync', COUNT(*) FROM skills_task_sync;"
 
 echo "✅ قاعدة بيانات المصنع جاهزة."

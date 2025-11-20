@@ -1,26 +1,23 @@
-#!/usr/bin/env bash
-# hf_run_debug_expert.sh
-# تشغيل عامل Debug Expert لتحليل basic_runs.log
+#!/bin/bash
+set -e
 
-set -euo pipefail
-
-ROOT="/root/hyper-factory"
-SCRIPT="$ROOT/tools/hf_debug_expert.py"
-
-echo "📁 ROOT   : $ROOT"
-echo "📄 SCRIPT : $SCRIPT"
-echo "----------------------------------------"
-
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "❌ python3 غير متوفر في PATH."
-  exit 1
-fi
+LOG_DIR="$ROOT/logs/factory"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/agent_debug_expert.log"
 
-if [[ ! -f "$SCRIPT" ]]; then
-  echo "❌ ملف hf_debug_expert.py غير موجود: $SCRIPT"
-  exit 1
-fi
+DESC="$*"
+TASK_ID="${TASK_ID:-unknown}"
+TS="$(date -Iseconds)"
 
-python3 "$SCRIPT"
+echo "========================================" >> "$LOG_FILE"
+echo "[$TS] agent=debug_expert TASK_ID=$TASK_ID" >> "$LOG_FILE"
+echo "DESC: $DESC" >> "$LOG_FILE"
+echo "NOTE: تنفيذ افتراضي (stub) – لم يتم ربط باك إند حقيقي بعد." >> "$LOG_FILE"
+echo "========================================" >> "$LOG_FILE"
+
+echo "✅ debug_expert: تم تسجيل المهمة في $LOG_FILE"
+echo "   TASK_ID=$TASK_ID"
+echo "   DESC=$DESC"

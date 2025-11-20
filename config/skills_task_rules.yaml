@@ -1,0 +1,23 @@
+# Hyper Factory – Skills Task Rules
+# عدّل skill_id / track_id بما يناسب skills_tracks_backend_complete.yaml
+
+default_user: angel
+
+task_type_rules:
+  debug:
+    skill_id: debug_skills
+    skill_delta: 5
+    track_id: backend_junior_complete
+    track_delta: 2.5
+
+  architecture:
+    skill_id: system_design
+    skill_delta: 5
+    track_id: backend_junior_complete
+    track_delta: 3.0
+
+  coaching:
+    skill_id: coaching
+    skill_delta: 3
+    track_id: backend_junior_complete
+    track_delta: 1.5
