@@ -3,146 +3,121 @@ set -e
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DB_PATH="$ROOT/data/factory/factory.db"
+REPORT_DIR="$ROOT/reports/factory"
+TS="$(date +%Y%m%d_%H%M%S)"
+OUT_FILE="$REPORT_DIR/kpi_$TS.txt"
 
-echo "📊 Hyper Factory – KPI Snapshot"
-echo "================================"
-echo "⏰ $(date)"
-echo "📄 DB: $DB_PATH"
-echo ""
+mkdir -p "$REPORT_DIR"
 
-# 0) تأكد من وجود قاعدة البيانات
+echo "📊 Hyper Factory – KPI Snapshot" | tee "$OUT_FILE"
+echo "================================" | tee -a "$OUT_FILE"
+echo "⏰ $(date)" | tee -a "$OUT_FILE"
+echo "📄 DB: $DB_PATH" | tee -a "$OUT_FILE"
+echo "" | tee -a "$OUT_FILE"
+
 if [ ! -f "$DB_PATH" ]; then
-    echo "❌ قاعدة البيانات غير موجودة: $DB_PATH"
+    echo "❌ factory.db غير موجود: $DB_PATH" | tee -a "$OUT_FILE"
     exit 1
 fi
 
-# 1) تجهيز مسار التقرير
-REPORT_DIR="$ROOT/reports/factory"
-mkdir -p "$REPORT_DIR"
-TS="$(date +%Y%m%d_%H%M%S)"
-REPORT_FILE="$REPORT_DIR/kpi_${TS}.txt"
+# 1) ملخص عام للمهام
+echo "1) ملخص عام للمهام:"            | tee -a "$OUT_FILE"
+echo "--------------------"           | tee -a "$OUT_FILE"
 
-{
-  echo "📊 Hyper Factory – KPI Snapshot"
-  echo "================================"
-  echo "⏰ $(date)"
-  echo "📄 DB: $DB_PATH"
-  echo ""
+sqlite3 -header -column "$DB_PATH" "
+SELECT COUNT(*) AS total_tasks FROM tasks;
+" | tee -a "$OUT_FILE"
 
-  ########################################
-  # 1) ملخص عام للمهام (Global Tasks)   #
-  ########################################
-  echo "1) ملخص عام للمهام:"
-  echo "--------------------"
+sqlite3 -header -column "$DB_PATH" "
+SELECT status, COUNT(*) AS count
+FROM tasks
+GROUP BY status
+ORDER BY count DESC;
+" | tee -a "$OUT_FILE"
 
-  echo "- إجمالي عدد المهام:"
-  sqlite3 -header -column "$DB_PATH" "SELECT COUNT(*) AS total_tasks FROM tasks;" \
-    || echo "⚠️ تعذر قراءة إجمالي المهام"
-  echo ""
+sqlite3 -header -column "$DB_PATH" "
+SELECT 
+    SUM(CASE WHEN status = 'done'   THEN 1 ELSE 0 END) AS done,
+    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed,
+    SUM(CASE WHEN status IN ('queued','assigned') THEN 1 ELSE 0 END) AS backlog,
+    ROUND(
+        100.0 * SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) 
+        / NULLIF(COUNT(*),0),
+        2
+    ) AS success_rate_percent
+FROM tasks;
+" | tee -a "$OUT_FILE"
 
-  echo "- توزيع الحالات (status):"
-  sqlite3 -header -column "$DB_PATH" "
-    SELECT 
-      status, 
-      COUNT(*) AS count
-    FROM tasks
-    GROUP BY status
-    ORDER BY status;
-  " || echo "⚠️ تعذر قراءة توزيع الحالات"
-  echo ""
+echo "" | tee -a "$OUT_FILE"
 
-  echo "- نسبة النجاح + الـ backlog:"
-  sqlite3 -header -column "$DB_PATH" "
-    SELECT
-      SUM(CASE WHEN status = 'done'   THEN 1 ELSE 0 END) AS done,
-      SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed,
-      SUM(CASE WHEN status IN ('assigned','queued') THEN 1 ELSE 0 END) AS backlog,
-      ROUND(
-        CASE
-          WHEN SUM(CASE WHEN status IN ('done','failed') THEN 1 ELSE 0 END) = 0
-          THEN 0.0
-          ELSE 100.0 * 
-               SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END)
-               / SUM(CASE WHEN status IN ('done','failed') THEN 1 ELSE 0 END)
-        END
-      , 2) AS success_rate_percent
-    FROM tasks;
-  " || echo "⚠️ تعذر حساب نسبة النجاح العالمية"
-  echo ""
+# 2) توزيع المهام حسب النوع (task_type)
+echo "2) توزيع المهام حسب النوع (task_type):" | tee -a "$OUT_FILE"
+echo "----------------------------------------" | tee -a "$OUT_FILE"
 
-  ########################################
-  # 2) توزيع المهام حسب النوع           #
-  ########################################
-  echo "2) توزيع المهام حسب النوع (type):"
-  echo "---------------------------------"
-  sqlite3 -header -column "$DB_PATH" "
-    SELECT
-      type,
-      COUNT(*) AS total,
-      SUM(CASE WHEN status = 'done'   THEN 1 ELSE 0 END) AS done,
-      SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed
-    FROM tasks
-    GROUP BY type
-    ORDER BY total DESC;
-  " || echo "⚠️ تعذر قراءة توزيع المهام حسب النوع"
-  echo ""
+sqlite3 -header -column "$DB_PATH" "
+SELECT task_type, COUNT(*) AS count
+FROM tasks
+GROUP BY task_type
+ORDER BY count DESC;
+" 2>>"$OUT_FILE" | tee -a "$OUT_FILE" || {
+    echo "⚠️ تعذر قراءة توزيع المهام حسب النوع" | tee -a "$OUT_FILE"
+}
 
-  ########################################
-  # 3) أفضل العمال حسب عدد التشغيل      #
-  ########################################
-  echo "3) أفضل 10 عمال حسب عدد التشغيل:"
-  echo "--------------------------------"
-  sqlite3 -header -column "$DB_PATH" "
-    SELECT
-      id           AS agent_id,
-      display_name AS name,
-      family,
-      role,
-      level,
-      success_rate,
-      total_runs
-    FROM agents
-    ORDER BY total_runs DESC
-    LIMIT 10;
-  " || echo "⚠️ تعذر قراءة أفضل العمال"
-  echo ""
+echo "" | tee -a "$OUT_FILE"
 
-  ########################################
-  # 4) أسوأ العمال حسب نسبة النجاح      #
-  ########################################
-  echo "4) أسوأ 5 عمال (total_runs >= 5) حسب نسبة النجاح:"
-  echo "--------------------------------------------------"
-  sqlite3 -header -column "$DB_PATH" "
-    SELECT
-      id           AS agent_id,
-      display_name AS name,
-      success_rate,
-      total_runs
-    FROM agents
-    WHERE total_runs >= 5
-    ORDER BY success_rate ASC, total_runs DESC
-    LIMIT 5;
-  " || echo "⚠️ تعذر قراءة أسوأ العمال"
-  echo ""
+# 3) أفضل 10 عمال حسب عدد التشغيل
+echo "3) أفضل 10 عمال حسب عدد التشغيل:" | tee -a "$OUT_FILE"
+echo "----------------------------------" | tee -a "$OUT_FILE"
 
-  ########################################
-  # 5) توزيع التعيينات على العمال       #
-  ########################################
-  echo "5) توزيع التعيينات على العمال (task_assignments):"
-  echo "--------------------------------------------------"
-  sqlite3 -header -column "$DB_PATH" "
-    SELECT
-      agent_id,
-      COUNT(*) AS assignments
-    FROM task_assignments
-    GROUP BY agent_id
-    ORDER BY assignments DESC
-    LIMIT 10;
-  " || echo "⚠️ تعذر قراءة توزيع التعيينات على العمال"
-  echo ""
+sqlite3 -header -column "$DB_PATH" "
+SELECT 
+    id AS agent_id,
+    display_name AS name,
+    family,
+    role,
+    level,
+    success_rate,
+    total_runs
+FROM agents
+ORDER BY total_runs DESC
+LIMIT 10;
+" | tee -a "$OUT_FILE"
 
-} | tee "$REPORT_FILE"
+echo "" | tee -a "$OUT_FILE"
 
-echo ""
-echo "✅ تم حفظ تقرير KPI في:"
-echo "   $REPORT_FILE"
+# 4) أسوأ العمال (>=5 runs) حسب النجاح
+echo "4) أسوأ 5 عمال (total_runs >= 5) حسب نسبة النجاح:" | tee -a "$OUT_FILE"
+echo "--------------------------------------------------" | tee -a "$OUT_FILE"
+
+sqlite3 -header -column "$DB_PATH" "
+SELECT 
+    id AS agent_id,
+    display_name AS name,
+    success_rate,
+    total_runs
+FROM agents
+WHERE total_runs >= 5
+ORDER BY success_rate ASC, total_runs DESC
+LIMIT 5;
+" | tee -a "$OUT_FILE"
+
+echo "" | tee -a "$OUT_FILE"
+
+# 5) توزيع التعيينات task_assignments
+echo "5) توزيع التعيينات على العمال (task_assignments):" | tee -a "$OUT_FILE"
+echo "--------------------------------------------------" | tee -a "$OUT_FILE"
+
+sqlite3 -header -column "$DB_PATH" "
+SELECT 
+    agent_id,
+    COUNT(*) AS assignments
+FROM task_assignments
+GROUP BY agent_id
+ORDER BY assignments DESC;
+" | tee -a "$OUT_FILE"
+
+echo "" | tee -a "$OUT_FILE"
+
+echo "" | tee -a "$OUT_FILE"
+echo "✅ تم حفظ تقرير KPI في:" | tee -a "$OUT_FILE"
+echo "   $OUT_FILE"            | tee -a "$OUT_FILE"
