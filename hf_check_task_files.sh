@@ -8,81 +8,109 @@ mkdir -p "${REPORT_DIR}"
 NOW="$(date +%Y%m%d_%H%M%S)"
 REPORT_FILE="${REPORT_DIR}/hf_tasks_check_${NOW}.txt"
 
-echo "Hyper Factory – Task Files Check (${NOW})" | tee "${REPORT_FILE}"
-echo "==========================================" | tee -a "${REPORT_FILE}"
-echo "ROOT: ${ROOT_DIR}" | tee -a "${REPORT_FILE}"
-echo >> "${REPORT_FILE}"
+DB_PATH="${ROOT_DIR}/data/knowledge/knowledge.db"
 
-# 1) ملفات المهام/المسارات/الدروس المتوقعة
+echo "Hyper Factory – Task & Knowledge Tasks Check (${NOW})" | tee "${REPORT_FILE}"
+echo "======================================================" | tee -a "${REPORT_FILE}"
+echo "ROOT: ${ROOT_DIR}" | tee -a "${REPORT_FILE}"
+echo | tee -a "${REPORT_FILE}"
+
+#############################
+# 1) فحص ملفات المهام / المسارات / الدروس
+#############################
+
 declare -a FILES=(
   "skills_rules|config/skills_task_rules.yaml|قواعد ربط المهارات بالمهام"
-  "tracks_complete|config/skills_tracks_backend_complete.yaml|مسارات المهارات الكاملة"
-  "tracks_backend|config/skills_tracks_backend.yaml|مسارات المهارات (نسخة مختصرة)"
-  "smart_actions|ai/memory/smart_actions.json|مهام/أوامر ذكية (Smart Actions)"
-  "autonomous_schedule|ai/memory/autonomous_schedule.json|جدول المهام الذاتية (Autonomous Schedule)"
-  "quality_status|ai/memory/quality_status.json|ملف حالة الجودة المرتبط بالمهام"
-  "lessons_plan|reports/management/lessons_apply_plan.md|خطة تطبيق الدروس (Lessons Apply Plan)"
-  "lessons_report|reports/management/lessons_export_report.txt|تقرير تصدير الدروس/المهام"
+  "tracks_backend|config/skills_tracks_backend.yaml|مسارات المهارات (نسخة تشغيلية)"
+  "tracks_complete|config/skills_tracks_backend_complete.yaml|مسارات المهارات (نسخة كاملة)"
+  "smart_actions|ai/memory/smart_actions.json|أوامر ذكية (Smart Actions)"
+  "autonomous_schedule|ai/memory/autonomous_schedule.json|جدولة ذاتية للمهام"
+  "learning_lessons|ai/memory/learning_lessons.json|دروس / وحدات تدريبية"
 )
 
-echo "1) فحص ملفات المهام الأساسية" | tee -a "${REPORT_FILE}"
-echo "------------------------------------------" | tee -a "${REPORT_FILE}"
+echo "1) فحص ملفات المهام / المسارات / الدروس" | tee -a "${REPORT_FILE}"
+echo "-----------------------------------------" | tee -a "${REPORT_FILE}"
 
-FOUND=0
-MISSING=0
+for item in "${FILES[@]}"; do
+  IFS='|' read -r key relpath desc <<< "${item}"
+  full="${ROOT_DIR}/${relpath}"
 
-for entry in "${FILES[@]}"; do
-  IFS='|' read -r KEY REL_PATH DESC <<<"${entry}"
-  ABS_PATH="${ROOT_DIR}/${REL_PATH}"
-
-  if [[ -f "${ABS_PATH}" ]]; then
-    SIZE_BYTES=$(stat -c '%s' "${ABS_PATH}" 2>/dev/null || echo "?")
-    MTIME=$(stat -c '%y' "${ABS_PATH}" 2>/dev/null || echo "?")
-    ((FOUND++))
-
-    echo "✅ ${KEY}" | tee -a "${REPORT_FILE}"
-    echo "   • الوصف : ${DESC}"       | tee -a "${REPORT_FILE}"
-    echo "   • المسار : ${REL_PATH}" | tee -a "${REPORT_FILE}"
-    echo "   • الحجم  : ${SIZE_BYTES} bytes" | tee -a "${REPORT_FILE}"
-    echo "   • آخر تعديل: ${MTIME}" | tee -a "${REPORT_FILE}"
-    echo "" | tee -a "${REPORT_FILE}"
+  if [[ -f "${full}" ]]; then
+    size=$(stat -c%s "${full}" 2>/dev/null || echo 0)
+    if [[ "${size}" -gt 0 ]]; then
+      echo "- ${key}: 🟢 موجود (غير فارغ) → ${relpath} | ${desc}" | tee -a "${REPORT_FILE}"
+    else
+      echo "- ${key}: ⚠️ موجود لكن فارغ → ${relpath} | ${desc}" | tee -a "${REPORT_FILE}"
+    fi
   else
-    ((MISSING++))
-    echo "❌ ${KEY}" | tee -a "${REPORT_FILE}"
-    echo "   • الوصف : ${DESC}"       | tee -a "${REPORT_FILE}"
-    echo "   • المسار : ${REL_PATH}" | tee -a "${REPORT_FILE}"
-    echo "   • الحالة: مفقود"        | tee -a "${REPORT_FILE}"
-    echo "" | tee -a "${REPORT_FILE}"
+    echo "- ${key}: 🔴 غير موجود → ${relpath} | ${desc}" | tee -a "${REPORT_FILE}"
   fi
 done
 
-echo "ملخص الملفات الأساسية:"      | tee -a "${REPORT_FILE}"
-echo "   ✅ موجود   : ${FOUND}"     | tee -a "${REPORT_FILE}"
-echo "   ❌ مفقود   : ${MISSING}"   | tee -a "${REPORT_FILE}"
-echo "" | tee -a "${REPORT_FILE}"
+echo | tee -a "${REPORT_FILE}"
 
-# 2) بحث عن أي ملفات إضافية لها علاقة بـ tasks / lessons / todo
-echo "2) بحث عن ملفات مهام/دروس إضافية (config / ai / reports)" | tee -a "${REPORT_FILE}"
-echo "---------------------------------------------------------" | tee -a "${REPORT_FILE}"
+#############################
+# 2) فحص جداول المهام والمعرفة في DB
+#############################
 
-EXTRA_FOUND=0
-while IFS= read -r f; do
-  [[ -z "${f}" ]] && continue
-  ((EXTRA_FOUND++))
-  REL="${f#${ROOT_DIR}/}"
-  SIZE_BYTES=$(stat -c '%s' "${f}" 2>/dev/null || echo "?")
-  MTIME=$(stat -c '%y' "${f}" 2>/dev/null || echo "?")
+echo "2) فحص جداول المعرفة / المهام داخل قاعدة البيانات" | tee -a "${REPORT_FILE}"
+echo "--------------------------------------------------" | tee -a "${REPORT_FILE}"
 
-  echo "🔎 ${REL}" | tee -a "${REPORT_FILE}"
-  echo "   • الحجم  : ${SIZE_BYTES} bytes" | tee -a "${REPORT_FILE}"
-  echo "   • آخر تعديل: ${MTIME}"         | tee -a "${REPORT_FILE}"
-  echo "" | tee -a "${REPORT_FILE}"
-done < <(find "${ROOT_DIR}/config" "${ROOT_DIR}/ai" "${ROOT_DIR}/reports" \
-           -type f \( -iname '*task*' -o -iname '*tasks*' -o -iname '*lesson*' -o -iname '*todo*' \) 2>/dev/null)
-
-if [[ "${EXTRA_FOUND}" -eq 0 ]]; then
-  echo "لا توجد ملفات إضافية لها أسماء مرتبطة بالمهام/الدروس/todo في المسارات المفحوصة." | tee -a "${REPORT_FILE}"
+if [[ ! -f "${DB_PATH}" ]]; then
+  echo "🔴 قاعدة المعرفة غير موجودة: ${DB_PATH}" | tee -a "${REPORT_FILE}"
+  echo "شغّل: ./hf_db_core_init.sh ثم ./hf_register_agents_from_yaml.sh" | tee -a "${REPORT_FILE}"
+  exit 0
 fi
 
-echo "" | tee -a "${REPORT_FILE}"
-echo "تم حفظ التقرير في: ${REPORT_FILE}" | tee -a "${REPORT_FILE}"
+echo "🗃️ DB: ${DB_PATH}" | tee -a "${REPORT_FILE}"
+
+check_table() {
+  local tbl="$1"
+  local label="$2"
+  local c
+
+  c=$(sqlite3 "${DB_PATH}" "SELECT COUNT(*) FROM ${tbl};" 2>/dev/null || echo "ERR")
+
+  if [[ "${c}" == "ERR" ]]; then
+    echo "- ${label} (${tbl}): 🔴 جدول غير موجود" | tee -a "${REPORT_FILE}"
+  else
+    if [[ "${c}" -gt 0 ]]; then
+      echo "- ${label} (${tbl}): 🟢 ${c} سجل" | tee -a "${REPORT_FILE}"
+    else
+      echo "- ${label} (${tbl}): ⚠️ موجود لكن بدون سجلات" | tee -a "${REPORT_FILE}"
+    fi
+  fi
+}
+
+# حالة جدول العمال (العوامل المتقدمة / البنية التحتية)
+check_table "agents"                  "جداول العمال (Agents Registry)"
+
+# جداول المعرفة/الجودة/الأنماط (من التقارير التي ظهرت في اللوج)
+check_table "knowledge_items"         "عناصر معرفة أساسية"
+check_table "web_knowledge"           "معرفة من الويب"
+check_table "programming_patterns"    "أنماط برمجية"
+check_table "debug_solutions"         "حلول تصحيح"
+check_table "training_recommendations" "توصيات تدريب"
+check_table "performance_evaluations" "تقييمات أداء"
+check_table "system_patterns"         "أنماط تشغيلية للنظام"
+check_table "agent_memory"            "ذاكرة العوامل (Agent Memory)"
+check_table "knowledge_snapshots"     "لقطات معرفة زمنية"
+check_table "db_health_reports"       "تقارير صحة قاعدة البيانات"
+check_table "schema_review_reports"   "تقارير مراجعة المخطط"
+check_table "knowledge_linking_reports" "تقارير ربط المعرفة"
+
+echo | tee -a "${REPORT_FILE}"
+
+#############################
+# 3) ملخص سريع
+#############################
+
+echo "3) ملخص سريع" | tee -a "${REPORT_FILE}"
+echo "-------------" | tee -a "${REPORT_FILE}"
+
+# عدد العمال المسجّلين فعليًا
+AGENTS_COUNT=$(sqlite3 "${DB_PATH}" "SELECT COUNT(*) FROM agents;" 2>/dev/null || echo 0)
+echo "- عدد العمال المسجّلين في agents: ${AGENTS_COUNT}" | tee -a "${REPORT_FILE}"
+
+echo | tee -a "${REPORT_FILE}"
+echo "✅ تم حفظ التقرير في: ${REPORT_FILE}" | tee -a "${REPORT_FILE}"

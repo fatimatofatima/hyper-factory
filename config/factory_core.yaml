@@ -1,258 +1,187 @@
 version: 1
 factory_root: "/root/hyper-factory"
 
-# تعريف عام للمصنع
 meta:
   name: "Hyper Factory"
-  description: "مصنع مهارات ومعرفة وجودة يعمل 24/7 لبناء خبرة حقيقية من البيانات والتقارير."
+  description: "HyperFactory – مصنع معرفة ومهارات يعمل 24/7 ويبني خبرة حقيقية من البيانات والتقارير."
   owner: "factory_owner"
   manager: "factory_manager"
 
 agents:
 
   # ============================
-  # 0) القيادة (Owner / Manager)
+  #  قيادة المصنع
   # ============================
-
   - id: factory_owner
     display_name: "مالك المصنع"
     category: "management"
+    group: "governance"
     role: "owner_cycle"
-    priority: 1        # أعلى أولوية
+    priority: 1
     enabled: true
     script: "./hf_ops_master.sh"
-    group: "governance"
-    description: >
-      يشغل دورة المالك الكاملة: يجمع تقارير AI + الإدارة + الصحة، ويتأكد أن المصنع
-      يعمل كمنظومة واحدة، ويراقب الضغط والتحمل على المدى الطويل، ويتابع إنتاج عمال جدد
-      وبناء المعرفة والخبرة التراكمية للمصنع.
 
   - id: factory_manager
     display_name: "مدير المصنع"
     category: "management"
+    group: "governance"
     role: "factory_manager"
     priority: 1
     enabled: true
-    script: "./hf_run_manager_dashboard.sh"
-    group: "governance"
-    description: >
-      مدير المصنع المسؤول عن:
-      - لوحة المهام (Task Board) لجميع العمال.
-      - متابعة المهام المفتوحة والجارية والمكتملة.
-      - ترتيب الأولويات بين الجودة/المعرفة/التدريب.
-      - تحديث لوحة الإدارة اليومية ومؤشرات الأداء.
+    script: "./hf_ops_master.sh"
 
   # ============================
-  # 1) خط الإنتاج الأساسي (Basic Pipeline)
+  #  خط الأنابيب الأساسي
   # ============================
-
   - id: ingestor_basic
     display_name: "عامل إدخال البيانات"
     category: "basic_pipeline"
+    group: "governance"
     role: "ingest_raw_data"
     priority: 2
     enabled: true
-    script: "./run_basic_cycle.sh"
-    group: "pipeline"
-    description: >
-      يسحب الملفات من inbox / المصادر الأولية، يسجلها في data/raw و data_lakehouse/raw
-      مع metadata أولية، ويفتح الطريق للمعالجة اللاحقة.
+    script: "./hf_run_ingestor_basic.sh"
 
   - id: processor_basic
     display_name: "عامل المعالجة الأساسية"
     category: "basic_pipeline"
+    group: "pipeline"
     role: "process_raw_to_cleansed"
     priority: 2
     enabled: true
-    script: "./run_basic_with_memory.sh"
-    group: "pipeline"
-    description: >
-      ينظّف البيانات، يحولها من raw إلى cleansed، يبني metadata تفصيلية في data/processed
-      ويربط النتائج مع الذاكرة ai/memory.
+    script: "./hf_run_processor_basic.sh"
 
   - id: analyzer_basic
     display_name: "محلل الدلالات الأساسي"
     category: "basic_pipeline"
+    group: "pipeline"
     role: "semantic_analysis"
     priority: 2
     enabled: true
-    script: "./run_basic_with_report.sh"
-    group: "pipeline"
-    description: >
-      يحوّل metadata إلى تمثيل دلالي في data/semantic و data_lakehouse/semantic،
-      يكتشف حقائق بسيطة وأنماط أولية، ويرسل ملخصات إلى التقارير.
+    script: "./hf_run_analyzer_basic.sh"
 
   - id: reporter_basic
     display_name: "مولّد التقارير الأساسي"
     category: "basic_pipeline"
+    group: "pipeline"
     role: "serving_reports"
     priority: 2
     enabled: true
-    script: "./scripts/basic_pipeline/run_basic_cycle.sh"
-    group: "reporting"
-    description: >
-      يبني تقارير نهائية في data/serving و reports/semantic_*،
-      يخرّج النتائج للاستهلاك من الإدارة أو الأنظمة الأخرى.
+    script: "./hf_run_reporter_basic.sh"
 
   # ============================
-  # 2) العمال المتقدمة (Advanced Agents)
+  #  العوامل المتقدمة
   # ============================
-
   - id: debug_expert
     display_name: "خبير التصحيح"
     category: "advanced"
+    group: "reporting"
     role: "deep_debugging"
     priority: 1
     enabled: true
-    script: "./hf_run_enhanced_debug_expert.sh"
-    group: "quality"
-    description: >
-      مسؤول عن تحليل الأعطال، تتبع الأخطاء العميقة في السكربتات والـ pipelines،
-      إنتاج تقارير debug_expert_performance في ai/memory وتغذية quality_engine
-      بمشاكل حقيقية من الواقع.
+    script: "./hf_run_debug_expert.sh"
 
   - id: system_architect
     display_name: "مهندس النظام"
     category: "advanced"
+    group: "quality"
     role: "architecture_design"
     priority: 1
     enabled: true
     script: "./hf_run_system_architect.sh"
-    group: "architecture"
-    description: >
-      يراجع البنية المعمارية للمصنع (المجلدات، الـ DB، الـ pipelines)،
-      يقترح تحسينات هيكلية، ويتأكد أن Hyper Factory متوافق مع التصميم المعتمد.
 
   - id: technical_coach
     display_name: "المدرب الفني"
     category: "advanced"
+    group: "architecture"
     role: "skills_training"
     priority: 2
     enabled: true
     script: "./hf_run_technical_coach.sh"
-    group: "learning"
-    description: >
-      يبني مناهج ومهام تدريبية من skills_tracks_backend_complete.yaml
-      و skills_task_rules.yaml، يتابع تقدم العمال الافتراضيين ويحدّث
-      ملفات الدروس في reports/management/lessons_*.
 
   - id: knowledge_spider
     display_name: "زاحف المعرفة"
     category: "advanced"
+    group: "learning"
     role: "knowledge_crawling"
     priority: 2
     enabled: true
     script: "./hf_run_knowledge_spider.sh"
-    group: "knowledge"
-    description: >
-      يجمع المعرفة من المصادر المعرفة في knowledge_sources.yaml،
-      يحوّلها إلى snippets وأنماط في knowledge/ و data/semantic،
-      ويحدّث ملخصات المعرفة في ai/memory/knowledge_summary.json.
 
   - id: patterns_engine
     display_name: "محرك الأنماط"
     category: "advanced"
+    group: "knowledge"
     role: "pattern_mining"
     priority: 2
     enabled: true
     script: "./hf_run_patterns_engine.sh"
-    group: "analytics"
-    description: >
-      يحلّل البيانات التاريخية في data_lakehouse/semantic و knowledge/،
-      يكتشف أنماط تكرار وسلوك طويل المدى، ويسجّل النتائج في تقارير diagnostics
-      وملفات أنماط مهيكلة.
 
   - id: quality_engine
     display_name: "محرك الجودة"
     category: "advanced"
+    group: "analytics"
     role: "quality_management"
     priority: 2
     enabled: true
     script: "./hf_run_quality_engine.sh"
-    group: "quality"
-    description: >
-      يقيس جودة المدخلات والمخرجات، يقرأ quality_status.json،
-      يقيّم نجاح العمال المختلفة، ويولّد تقارير جودة في reports/quality/*.
 
   - id: temporal_memory
     display_name: "ذاكرة زمنية"
     category: "advanced"
+    group: "quality"
     role: "temporal_memory_manager"
     priority: 3
     enabled: true
     script: "./hf_run_temporal_memory.sh"
-    group: "memory"
-    description: >
-      يدير الذاكرة الزمنية (تطور الحالة عبر الأيام)، يربط الأحداث بالتواريخ
-      ويُغذي تقارير الزمن في diagnostics/brain_diagnostic.
 
   - id: smart_worker
     display_name: "العامل الذكي"
     category: "advanced"
+    group: "memory"
     role: "smart_actions_executor"
     priority: 3
     enabled: true
     script: "./hf_run_smart_worker.sh"
-    group: "operations"
-    description: >
-      ينفّذ smart_actions المولدة في ai/memory/smart_actions.json،
-      يطبق الدروس المستخلصة على التشغيل اليومي، ويربط النتائج بلوحة الإدارة.
 
   - id: offline_learner
     display_name: "متعلم غير متصل"
     category: "advanced"
+    group: "operations"
     role: "offline_learning"
     priority: 3
     enabled: true
     script: "./hf_run_offline_learner.sh"
-    group: "learning"
-    description: >
-      يقوم بتعلم عميق من بيانات قديمة (history / archive) بدون التأثير على
-      التشغيل المباشر، ويحدث نماذج ومعرفة في الخلفية.
 
   # ============================
-  # 3) مهندس قواعد البيانات / المعرفة
+  #  البنية التحتية
   # ============================
-
   - id: db_architect
     display_name: "مهندس قواعد البيانات والمعرفة"
     category: "infrastructure"
+    group: "learning"
     role: "database_and_knowledge_architect"
     priority: 1
     enabled: true
-    script: "./hf_db_architect_brain.sh"
-    group: "infrastructure"
-    description: >
-      مسؤول عن تصميم وتنظيم جداول قاعدة المعرفة وقواعد البيانات للمصنع،
-      توحيد مسارات الـ DB (knowledge.db وغيرها)، كشف التناقضات مثل ملفات $DB_PATH،
-      وتوليد تقارير معمارية عن حالة الـ schema والجداول والمفاتيح.
-
-  # ============================
-  # 4) التكامل والتوثيق
-  # ============================
+    script: "./hf_run_db_architect.sh"
 
   - id: integration_hub
     display_name: "مركز التكامل"
     category: "infrastructure"
+    group: "infrastructure"
     role: "integration_orchestrator"
     priority: 3
     enabled: true
     script: "./hf_run_integration_hub.sh"
-    group: "integration"
-    description: >
-      يربط Hyper Factory مع الأنظمة الخارجية (إن وُجدت)، ينظم تدفق البيانات بين
-      المصانع الفرعية والـ stack (GPU / Model Serving / Vector DB)، ويضمن تناسق
-      تعريفات الـ APIs والـ connectors.
 
+  # ============================
+  #  التوثيق
+  # ============================
   - id: document_generator
     display_name: "مولّد الوثائق"
     category: "documentation"
+    group: "integration"
     role: "documentation_engine"
     priority: 4
     enabled: true
     script: "./hf_run_document_generator.sh"
-    group: "documentation"
-    description: >
-      يبني وثائق المالك والمدير والتصميم المعماري (Owner Reports, Manager Overviews,
-      Architecture Docs) داخل reports/ai و reports/management، ليحوّل خبرة المصنع
-      إلى معرفة مكتوبة قابلة للمراجعة.

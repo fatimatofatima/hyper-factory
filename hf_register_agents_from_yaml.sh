@@ -12,61 +12,124 @@ if [[ ! -f "${CFG}" ]]; then
 fi
 
 if [[ ! -f "${DB_PATH}" ]]; then
-  echo "[HF-AGENTS] DB غير موجود، تشغيل hf_db_core_init.sh أولاً"
+  echo "[HF-AGENTS] DB غير موجود: ${DB_PATH}"
+  echo "شغّل أولاً: ./hf_db_core_init.sh"
   exit 1
 fi
 
 echo "[HF-AGENTS] Registering agents from ${CFG} into ${DB_PATH}"
 
+# نفضّي جدول agents عشان تكون الحالة مرآة لملف YAML الحالي
+sqlite3 "${DB_PATH}" "DELETE FROM agents;"
+
+SQL_FILE="${ROOT_DIR}/reports/diagnostics/hf_agents_sync.sql"
+mkdir -p "$(dirname "${SQL_FILE}")"
+
 awk '
+  BEGIN {
+    id = ""
+    display_name = ""
+    category = ""
+    group_name = ""
+    role = ""
+    priority = 0
+    enabled = "true"
+    script = ""
+  }
+
   # بداية تعريف عامل جديد
   $1=="-" && $2=="id:" {
-    id=$3; gsub(/"/,"",id)
-    name=""; cat=""; role=""; prio=0; ena="true"; script=""; grp="";
+    # لو في عامل سابق، نطلّع له INSERT
+    if (id != "") {
+      enabled_val = (enabled == "true" || enabled == "True" || enabled == "1") ? 1 : 0
+
+      # escaping للأبستروف داخل النصوص
+      gsub(/\047/, "\047\047", display_name)
+      gsub(/\047/, "\047\047", category)
+      gsub(/\047/, "\047\047", group_name)
+      gsub(/\047/, "\047\047", role)
+      gsub(/\047/, "\047\047", script)
+
+      printf "INSERT OR REPLACE INTO agents (id, display_name, category, group_name, role, priority, enabled, script) VALUES ("
+      printf "'%s','%s','%s','%s','%s',%d,%d,'%s');\n", id, display_name, category, group_name, role, priority, enabled_val, script
+    }
+
+    # نجهز تعريف العامل الجديد
+    id = $3
+    gsub(/"/, "", id)
+    display_name = ""
+    category = ""
+    group_name = ""
+    role = ""
+    priority = 0
+    enabled = "true"
+    script = ""
+
+    next
   }
+
   $1=="display_name:" {
     sub(/display_name:[ ]*/, "", $0)
-    name=$0
-    gsub(/^"[ ]*/, "", name)
-    gsub(/"[ ]*$/, "", name)
-    gsub(/\047/, "\047\047", name)  # هروب single quote لو موجود
+    display_name = $0
+    sub(/^"[ ]*/, "", display_name)
+    sub(/"[ ]*$/, "", display_name)
+    next
   }
+
   $1=="category:" {
-    cat=$2; gsub(/"/,"",cat)
+    category = $2
+    gsub(/"/, "", category)
+    next
   }
+
+  $1=="group:" {
+    group_name = $2
+    gsub(/"/, "", group_name)
+    next
+  }
+
   $1=="role:" {
-    role=$2; gsub(/"/,"",role)
+    role = $2
+    gsub(/"/, "", role)
+    next
   }
+
   $1=="priority:" {
-    prio=$2; gsub(/"/,"",prio)
+    priority = $2
+    next
   }
+
   $1=="enabled:" {
-    ena=$2; gsub(/"/,"",ena)
+    enabled = $2
+    gsub(/,/, "", enabled)
+    next
   }
+
   $1=="script:" {
     sub(/script:[ ]*/, "", $0)
-    script=$0
-    gsub(/^"[ ]*/, "", script)
-    gsub(/"[ ]*$/, "", script)
-    gsub(/\047/, "\047\047", script)
+    script = $0
+    sub(/^"[ ]*/, "", script)
+    sub(/"[ ]*$/, "", script)
+    next
   }
-  # group هو آخر سطر قبل description → هنا ننفّذ INSERT
-  $1=="group:" {
-    grp=$2; gsub(/"/,"",grp)
-    enabled_val = (ena=="true" ? 1 : 0)
-    prio_val = (prio=="" ? 0 : prio+0)
 
-    printf "INSERT OR REPLACE INTO agents (id, display_name, category, role, group_name, priority, enabled, script) VALUES ("
-    printf "\047%s\047,", id
-    printf "\047%s\047,", name
-    printf "\047%s\047,", cat
-    printf "\047%s\047,", role
-    printf "\047%s\047,", grp
-    printf "%d,", prio_val
-    printf "%d,", enabled_val
-    printf "\047%s\047);\n", script
+  END {
+    # آخر عامل في الملف
+    if (id != "") {
+      enabled_val = (enabled == "true" || enabled == "True" || enabled == "1") ? 1 : 0
+
+      gsub(/\047/, "\047\047", display_name)
+      gsub(/\047/, "\047\047", category)
+      gsub(/\047/, "\047\047", group_name)
+      gsub(/\047/, "\047\047", role)
+      gsub(/\047/, "\047\047", script)
+
+      printf "INSERT OR REPLACE INTO agents (id, display_name, category, group_name, role, priority, enabled, script) VALUES ("
+      printf "'%s','%s','%s','%s','%s',%d,%d,'%s');\n", id, display_name, category, group_name, role, priority, enabled_val, script
+    }
   }
-' "${CFG}" | sqlite3 "${DB_PATH}"
+' "${CFG}" > "${SQL_FILE}"
 
-echo "[HF-AGENTS] Done. Current agents in DB:"
-sqlite3 "${DB_PATH}" "SELECT id, category, group_name, priority, enabled FROM agents ORDER BY category, priority, id;"
+echo "[HF-AGENTS] Generated SQL: ${SQL_FILE}"
+sqlite3 "${DB_PATH}" < "${SQL_FILE}"
+echo "[HF-AGENTS] Done. Agents synchronized with YAML."
