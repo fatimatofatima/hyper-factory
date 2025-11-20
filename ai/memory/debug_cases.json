@@ -1,0 +1,19 @@
+{
+  "generated_at": "2025-11-19T10:07:28.893478Z",
+  "total_runs": 39,
+  "runs_with_failures": 1,
+  "failed_steps": {
+    "reporter_basic": 1
+  },
+  "cases": [
+    {
+      "timestamp": "2025-11-19T01:03:14",
+      "timestamp_str": "2025-11-19 01:03:14",
+      "step": "reporter_basic",
+      "status": "MISSING",
+      "severity": "MEDIUM",
+      "suggestion": "تأكد من وجود ملفات semantic في data/semantic قبل تشغيل reporter_basic.",
+      "raw_line": "2025-11-19 01:03:14 | ingestor_basic=OK | processor_basic=OK | analyzer_basic=OK | reporter_basic=MISSING"
+    }
+  ]
+}

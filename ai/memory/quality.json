@@ -1,0 +1,37 @@
+{
+  "updated_at": "2025-11-19T06:28:40.779154Z",
+  "total_runs": 37,
+  "success_runs": 37,
+  "failed_runs": 0,
+  "success_rate": 1.0,
+  "steps": {
+    "ingestor_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    },
+    "processor_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    },
+    "analyzer_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    },
+    "reporter_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    }
+  }
+}

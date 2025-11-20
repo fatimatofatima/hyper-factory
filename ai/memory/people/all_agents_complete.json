@@ -1,0 +1,110 @@
+[
+  {
+    "agent": "ingestor_basic",
+    "family": "pipeline",
+    "role": "data_ingestor",
+    "display_name": "عامل إدخال البيانات",
+    "level": "senior",
+    "salary_index": 1.2,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "processor_basic",
+    "family": "pipeline",
+    "role": "data_processor",
+    "display_name": "عامل معالجة البيانات",
+    "level": "senior",
+    "salary_index": 1.32,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "analyzer_basic",
+    "family": "pipeline",
+    "role": "data_analyzer",
+    "display_name": "عامل التحليل الدلالي",
+    "level": "senior",
+    "salary_index": 1.44,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "reporter_basic",
+    "family": "pipeline",
+    "role": "data_reporter",
+    "display_name": "عامل التقارير والتقديم",
+    "level": "senior",
+    "salary_index": 1.32,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "debug_expert",
+    "family": "debugging",
+    "display_name": "خبير التصحيح",
+    "level": "advanced",
+    "experience": 85,
+    "skills": [
+      "python_errors_handling",
+      "debug_skills",
+      "python_basics",
+      "python_control_flow"
+    ],
+    "current_track": "backend_junior_complete",
+    "current_phase": "بايثون المتقدمة للمشاريع"
+  },
+  {
+    "agent": "system_architect",
+    "family": "architecture",
+    "display_name": "مهندس النظام",
+    "level": "advanced",
+    "experience": 80,
+    "skills": [
+      "rest_api_concepts",
+      "backend_framework_intro",
+      "python_oop_basics",
+      "web_http_fundamentals"
+    ],
+    "current_track": "backend_junior_complete",
+    "current_phase": "أساسيات الـ Backend Web"
+  },
+  {
+    "agent": "technical_coach",
+    "family": "training",
+    "display_name": "مدرب تقني",
+    "level": "intermediate",
+    "experience": 70,
+    "skills": [
+      "python_syntax_basics",
+      "python_control_flow",
+      "python_functions_basics",
+      "python_collections_basics"
+    ],
+    "current_track": "backend_junior_complete",
+    "current_phase": "أساسيات بايثون"
+  },
+  {
+    "agent": "knowledge_spider",
+    "family": "knowledge",
+    "display_name": "جامع المعرفة",
+    "level": "intermediate",
+    "experience": 65,
+    "skills": [
+      "computer_basics",
+      "terminal_basics",
+      "git_basics",
+      "python_modules_packages"
+    ],
+    "current_track": "backend_junior_complete",
+    "current_phase": "أساسيات العمل كمبرمج"
+  }
+]

@@ -1,0 +1,8 @@
+🔗 Hyper Factory – Knowledge Linking Runner
+==========================================
+⏰ Thu Nov 20 07:02:29 +03 2025
+📄 FACTORY DB : /root/hyper-factory/data/factory/factory.db
+📄 KNOWLEDGE DB: /root/hyper-factory/data/knowledge/knowledge.db
+
+🔎 اختيار مهمة knowledge_linking مفتوحة لـ db_architect...
+ℹ️ لا توجد مهمة knowledge_linking مفتوحة لـ db_architect.

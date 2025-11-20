@@ -1,0 +1,46 @@
+{
+  "date": "2025-11-19",
+  "generated_at": "2025-11-19T07:26:05.390912Z",
+  "notes": [
+    "كل الدورات في هذا اليوم ناجحة. يمكن اعتبار هذا اليوم مرجعًا للاستقرار."
+  ],
+  "step_risks": [
+    {
+      "step": "ingestor_basic",
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "risk": "LOW"
+    },
+    {
+      "step": "processor_basic",
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "risk": "LOW"
+    },
+    {
+      "step": "analyzer_basic",
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "risk": "LOW"
+    },
+    {
+      "step": "reporter_basic",
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "fail_rate": 0.0,
+      "risk": "LOW"
+    }
+  ],
+  "summary": {
+    "total_runs": 37,
+    "failed_runs": 0,
+    "success_rate": 1.0
+  }
+}

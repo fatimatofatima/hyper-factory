@@ -1,0 +1,247 @@
+{
+  "generated_at": "2025-11-19T06:28:40.779154Z",
+  "total_runs": 37,
+  "success_runs": 37,
+  "failed_runs": 0,
+  "success_rate": 1.0,
+  "last_run_at": "2025-11-19 09:28:40",
+  "last_status": {
+    "ingestor_basic": "OK",
+    "processor_basic": "OK",
+    "analyzer_basic": "OK",
+    "reporter_basic": "OK"
+  },
+  "steps": {
+    "ingestor_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    },
+    "processor_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    },
+    "analyzer_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    },
+    "reporter_basic": {
+      "count": 37,
+      "ok": 37,
+      "fail": 0,
+      "ok_rate": 1.0,
+      "fail_rate": 0.0
+    }
+  },
+  "recent_window_size": 20,
+  "recent_runs": [
+    {
+      "timestamp": "2025-11-19 05:25:16",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 07:34:12",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 07:38:50",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:08:38",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:18:08",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:18:38",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:19:21",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:28:38",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:31:32",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:32:22",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:33:07",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:34:30",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:38:39",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:40:28",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:48:40",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 08:58:40",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 09:07:00",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 09:08:40",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 09:18:40",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    },
+    {
+      "timestamp": "2025-11-19 09:28:40",
+      "success": true,
+      "steps": {
+        "ingestor_basic": "OK",
+        "processor_basic": "OK",
+        "analyzer_basic": "OK",
+        "reporter_basic": "OK"
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+[
+  {
+    "case_id": "adv_001",
+    "error_type": "ImportError",
+    "error_message": "ModuleNotFoundError: No module named pandas",
+    "code_snippet": "import pandas as pd\nprint(pd.DataFrame())",
+    "solution": "\u0642\u0645 \u0628\u062a\u062b\u0628\u064a\u062a \u0627\u0644\u0645\u0643\u062a\u0628\u0629: pip install pandas",
+    "difficulty": "beginner",
+    "category": "import_issues",
+    "common_patterns": [
+      "No module named",
+      "ModuleNotFoundError"
+    ]
+  },
+  {
+    "case_id": "adv_002",
+    "error_type": "TypeError",
+    "error_message": "TypeError: can only concatenate str (not 'int') to str",
+    "code_snippet": "name = 'Ahmed'\nage = 25\nprint(name + age)",
+    "solution": "\u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0631\u0642\u0645 \u0625\u0644\u0649 \u0646\u0635: print(name + str(age))",
+    "difficulty": "beginner",
+    "category": "type_conversion",
+    "common_patterns": [
+      "concatenate str",
+      "TypeError"
+    ]
+  },
+  {
+    "case_id": "adv_003",
+    "error_type": "FileNotFoundError",
+    "error_message": "FileNotFoundError: [Errno 2] No such file or directory: data.txt",
+    "code_snippet": "with open('data.txt', 'r') as f:\n    print(f.read())",
+    "solution": "\u062a\u0623\u0643\u062f \u0645\u0646 \u0648\u062c\u0648\u062f \u0627\u0644\u0645\u0644\u0641 \u0623\u0648 \u0627\u0633\u062a\u062e\u062f\u0645 \u0645\u0639\u0627\u0644\u062c\u0629 \u0627\u0644\u0627\u0633\u062a\u062b\u0646\u0627\u0621\u0627\u062a",
+    "difficulty": "intermediate",
+    "category": "file_operations",
+    "common_patterns": [
+      "No such file",
+      "FileNotFoundError"
+    ]
+  },
+  {
+    "case_id": "adv_004",
+    "error_type": "SyntaxError",
+    "error_message": "SyntaxError: invalid syntax",
+    "code_snippet": "if x > 5\n    print(x)",
+    "solution": "\u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u0646\u0642\u0637\u062a\u064a\u0646 \u0628\u0639\u062f \u0627\u0644\u0634\u0631\u0637: if x > 5:",
+    "difficulty": "beginner",
+    "category": "syntax_basics",
+    "common_patterns": [
+      "invalid syntax",
+      "SyntaxError"
+    ]
+  },
+  {
+    "case_id": "adv_005",
+    "error_type": "IndexError",
+    "error_message": "IndexError: list index out of range",
+    "code_snippet": "items = [1, 2, 3]\nprint(items[5])",
+    "solution": "\u062a\u0623\u0643\u062f \u0645\u0646 \u0623\u0646 \u0627\u0644\u0641\u0647\u0631\u0633 \u0636\u0645\u0646 \u0646\u0637\u0627\u0642 \u0627\u0644\u0642\u0627\u0626\u0645\u0629",
+    "difficulty": "intermediate",
+    "category": "list_operations",
+    "common_patterns": [
+      "index out of range",
+      "IndexError"
+    ]
+  }
+]

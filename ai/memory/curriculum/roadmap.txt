@@ -1,0 +1,21 @@
+===== Hyper Factory Technical Curriculum Roadmap =====
+Generated at : 2025-11-19T09:02:44.310074Z
+
+== Metrics Summary ==
+- Days count    : 1
+- Total runs    : 37
+- Failed runs   : 0
+- Avg success   : 100.00%
+
+== Phases ==
+[1] مرحلة المرجع المستقر (id=phase_stable_reference, priority=MEDIUM)
+    scope : pipeline
+    desc  : كل الأيام المسجّلة (1) بدون فشل (failed_runs=0). يمكن اعتبار هذه الفترة مرجعًا لاستقرار Hyper Factory، مع توثيق إصدارات الكود وإعدادات السيرفر.
+
+[2] مرحلة زيادة الحمل بشكل آمن (id=phase_scale_usage, priority=MEDIUM)
+    scope : throughput
+    desc  : متوسط نسبة النجاح عبر الأيام ≈ 100.00%. يمكن زيادة عدد الدورات أو إدخال مصادر بيانات جديدة تدريجيًا مع استمرار مراقبة quality و smart_actions.
+
+[3] مرحلة تفعيل الدروس المستفادة (id=phase_leverage_lessons, priority=MEDIUM)
+    scope : learning
+    desc  : تم تسجيل 2 درس/Actionable في ai/memory/lessons/*.json. الخطوة التالية هي تحويل هذه الدروس إلى تغييرات ملموسة في config/agents.yaml أو factory.yaml عبر مراجعات بشرية و/أو سكربت apply-lessons لاحقًا.

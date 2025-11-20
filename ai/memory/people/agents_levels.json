@@ -1,0 +1,50 @@
+[
+  {
+    "agent": "ingestor_basic",
+    "family": "pipeline",
+    "role": "data_ingestor",
+    "display_name": "عامل إدخال البيانات",
+    "level": "senior",
+    "salary_index": 1.2,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "processor_basic",
+    "family": "pipeline",
+    "role": "data_processor",
+    "display_name": "عامل معالجة البيانات",
+    "level": "senior",
+    "salary_index": 1.32,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "analyzer_basic",
+    "family": "pipeline",
+    "role": "data_analyzer",
+    "display_name": "عامل التحليل الدلالي",
+    "level": "senior",
+    "salary_index": 1.44,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  },
+  {
+    "agent": "reporter_basic",
+    "family": "pipeline",
+    "role": "data_reporter",
+    "display_name": "عامل التقارير والتقديم",
+    "level": "senior",
+    "salary_index": 1.32,
+    "success_rate": 0.9744,
+    "total_runs": 39,
+    "success_runs": 38,
+    "failed_runs": 1
+  }
+]

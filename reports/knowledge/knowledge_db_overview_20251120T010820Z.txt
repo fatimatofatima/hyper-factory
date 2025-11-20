@@ -1,0 +1,13 @@
+Knowledge DB Overview – 2025-11-20T01:08:20Z
+DB: /root/hyper-factory/data/knowledge/knowledge.db
+
+Tables:
+  - agent_memory             0
+  - knowledge_index          7
+  - sources                  9
+  - debug_knowledge          5
+  - knowledge_items          14
+  - system_patterns          0
+  - debug_solutions          6
+  - programming_patterns     4
+  - web_knowledge            1083

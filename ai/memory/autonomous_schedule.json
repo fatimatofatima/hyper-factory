@@ -1,0 +1,68 @@
+{
+  "schedule_generated": "Wed Nov 19 11:57:31 +03 2025",
+  "monday": [
+    {
+      "task": "auto_learning",
+      "time": "09:00",
+      "priority": "high"
+    },
+    {
+      "task": "quality_monitor",
+      "time": "11:00",
+      "priority": "high"
+    },
+    {
+      "task": "knowledge_update",
+      "time": "14:00",
+      "priority": "medium"
+    }
+  ],
+  "tuesday": [
+    {
+      "task": "agent_training",
+      "time": "09:00",
+      "priority": "high"
+    },
+    {
+      "task": "performance_review",
+      "time": "13:00",
+      "priority": "medium"
+    }
+  ],
+  "wednesday": [
+    {
+      "task": "auto_learning",
+      "time": "09:00",
+      "priority": "high"
+    },
+    {
+      "task": "pattern_analysis",
+      "time": "11:00",
+      "priority": "medium"
+    }
+  ],
+  "thursday": [
+    {
+      "task": "quality_monitor",
+      "time": "09:00",
+      "priority": "high"
+    },
+    {
+      "task": "knowledge_update",
+      "time": "15:00",
+      "priority": "medium"
+    }
+  ],
+  "friday": [
+    {
+      "task": "weekly_report",
+      "time": "10:00",
+      "priority": "high"
+    },
+    {
+      "task": "system_optimization",
+      "time": "14:00",
+      "priority": "medium"
+    }
+  ]
+}

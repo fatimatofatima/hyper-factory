@@ -1,0 +1,47 @@
+{
+  "generated_at": "2025-11-19T07:26:34.552944Z",
+  "status": {
+    "overall_status": "GREEN",
+    "risk_level": "LOW",
+    "summary": "Status=GREEN, risk=LOW, success_rate=100.00%, total_runs=37, failed_runs=0",
+    "total_runs": 37,
+    "success_runs": 37,
+    "failed_runs": 0,
+    "success_rate": 1.0,
+    "steps_ranked": [
+      {
+        "name": "ingestor_basic",
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "ok_rate": 1.0,
+        "fail_rate": 0.0
+      },
+      {
+        "name": "processor_basic",
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "ok_rate": 1.0,
+        "fail_rate": 0.0
+      },
+      {
+        "name": "analyzer_basic",
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "ok_rate": 1.0,
+        "fail_rate": 0.0
+      },
+      {
+        "name": "reporter_basic",
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "ok_rate": 1.0,
+        "fail_rate": 0.0
+      }
+    ],
+    "top_problems": []
+  }
+}

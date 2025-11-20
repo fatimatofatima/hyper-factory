@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2025-11-19T16:29:29.231362Z",
+    "event_type": "heartbeat",
+    "details": {
+      "source": "temporal_memory_agent",
+      "message": "دورة جديدة من محرك الذاكرة الزمنية."
+    }
+  },
+  {
+    "timestamp": "2025-11-19T17:31:44.550555Z",
+    "event_type": "heartbeat",
+    "details": {
+      "source": "temporal_memory_agent",
+      "message": "دورة جديدة من محرك الذاكرة الزمنية."
+    }
+  },
+  {
+    "timestamp": "2025-11-19T17:44:45.680227Z",
+    "event_type": "heartbeat",
+    "details": {
+      "source": "temporal_memory_agent",
+      "message": "دورة جديدة من محرك الذاكرة الزمنية."
+    }
+  }
+]

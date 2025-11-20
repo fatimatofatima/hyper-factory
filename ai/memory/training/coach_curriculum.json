@@ -1,0 +1,20 @@
+[
+  {
+    "skill": "python_advanced",
+    "topic": "Decorators and Context Managers",
+    "exercises": [
+      "إنشاء ديكوراتور لقياس وقت التنفيذ",
+      "بناء context manager لإدارة الملفات"
+    ],
+    "level": "intermediate"
+  },
+  {
+    "skill": "debugging_advanced",
+    "topic": "Performance Profiling",
+    "exercises": [
+      "تحليل أداء الكود باستخدام cProfile",
+      "تحسين استهلاك الذاكرة"
+    ],
+    "level": "advanced"
+  }
+]

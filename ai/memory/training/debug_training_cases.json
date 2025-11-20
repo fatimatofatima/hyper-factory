@@ -1,0 +1,20 @@
+[
+  {
+    "error_type": "SyntaxError",
+    "pattern": "missing parentheses in call",
+    "solution": "تأكد من وجود أقواس استدعاء الدوال",
+    "difficulty": "beginner"
+  },
+  {
+    "error_type": "NameError",
+    "pattern": "name .* is not defined",
+    "solution": "تأكد من تعريف المتغير قبل استخدامه",
+    "difficulty": "beginner"
+  },
+  {
+    "error_type": "ImportError",
+    "pattern": "No module named",
+    "solution": "تأكد من تثبيت المكتبة أو صحة اسم الوحدة",
+    "difficulty": "intermediate"
+  }
+]

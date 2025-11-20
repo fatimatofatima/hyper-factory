@@ -1,0 +1,15 @@
+===== Hyper Factory Debug Report =====
+Generated at : 2025-11-19T10:07:28.893478Z
+
+Total runs         : 39
+Runs with failures : 1
+
+⚠️ تم رصد دورات بها فشل في واحد أو أكثر من العمال.
+
+----- Failed steps summary -----
+- reporter_basic: 1 failure(s)
+
+----- Debug cases (أول 10 حالات) -----
+* [2025-11-19 01:03:14] step=reporter_basic status=MISSING
+  severity : MEDIUM
+  suggestion: تأكد من وجود ملفات semantic في data/semantic قبل تشغيل reporter_basic.

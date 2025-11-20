@@ -1,0 +1,36 @@
+{
+  "date": "2025-11-19",
+  "stats": {
+    "total_runs": 37,
+    "success_runs": 37,
+    "failed_runs": 0,
+    "success_rate": 1.0,
+    "step_stats": {
+      "ingestor_basic": {
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "last_status": "OK"
+      },
+      "processor_basic": {
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "last_status": "OK"
+      },
+      "analyzer_basic": {
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "last_status": "OK"
+      },
+      "reporter_basic": {
+        "count": 37,
+        "ok": 37,
+        "fail": 0,
+        "last_status": "OK"
+      }
+    }
+  },
+  "events_count": 37
+}

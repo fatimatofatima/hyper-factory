@@ -1,0 +1,7 @@
+# Agents Levels generated at 2025-11-19T23:14:17.781289Z
+# agent_id | display_name | family | level | success_rate | salary_index | total_runs | success_runs | failed_runs
+
+ingestor_basic | عامل إدخال البيانات | pipeline | senior | 97.44% | 1.2 | 39 | 38 | 1
+processor_basic | عامل معالجة البيانات | pipeline | senior | 97.44% | 1.32 | 39 | 38 | 1
+analyzer_basic | عامل التحليل الدلالي | pipeline | senior | 97.44% | 1.44 | 39 | 38 | 1
+reporter_basic | عامل التقارير والتقديم | pipeline | senior | 97.44% | 1.32 | 39 | 38 | 1

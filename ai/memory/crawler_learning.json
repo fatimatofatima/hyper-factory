@@ -1,0 +1,15 @@
+{
+  "successful_domains": {
+    "docs.python.org": 2,
+    "realpython.com": 2,
+    "www.w3schools.com": 2
+  },
+  "failed_domains": {},
+  "optimal_delays": {
+    "docs.python.org": 0.17592120170593262,
+    "realpython.com": 0.5274780988693237,
+    "www.w3schools.com": 0.16126227378845215
+  },
+  "learned_patterns": [],
+  "last_analysis": "2025-11-19T16:04:22.466996"
+}

@@ -1,0 +1,7 @@
+📐 Hyper Factory – Schema Review Runner
+=======================================
+⏰ Thu Nov 20 07:02:29 +03 2025
+📄 DB: /root/hyper-factory/data/factory/factory.db
+
+🔎 اختيار مهمة schema_review مفتوحة لـ db_architect...
+ℹ️ لا توجد مهمة schema_review مفتوحة لـ db_architect.

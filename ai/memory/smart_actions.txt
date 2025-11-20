@@ -1,0 +1,16 @@
+===== Hyper Factory Smart Actions =====
+Generated at : 2025-11-19T07:26:05.452430Z
+Total actions: 2
+
+[1] استقرار مرتفع - يمكن زيادة الاستخدام
+    id       : pipeline_green_scale_usage
+    priority : MEDIUM
+    tags     : pipeline, stability, scale
+    desc     : حالة الجودة GREEN ونسبة النجاح مرتفعة. يمكن زيادة عدد الدورات أو إدخال مصادر بيانات جديدة تدريجياً مع مراقبة الجودة.
+
+[2] مراجعة حداثة بيانات التشغيل
+    id       : monitor_freshness
+    priority : LOW
+    tags     : freshness
+    desc     : آخر تشغيل مسجّل في insights عند: 2025-11-19 09:28:40. تأكد أن هذا التوقيت متوافق مع نمط التشغيل المتوقع (مثلاً تشغيل كل X دقائق/ساعات).
+

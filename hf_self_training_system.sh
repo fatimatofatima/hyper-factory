@@ -17,49 +17,51 @@ if [ ! -f "$DB_PATH" ]; then
     exit 1
 fi
 
-mkdir -p "$ROOT/data/knowledge"
+mkdir -p "$(dirname "$KNOW_DB")"
 
 echo "📌 توليد توصيات تدريبية بناءً على أداء العمال..."
+
+# تحديث هيكل جدول training_recommendations إذا لزم الأمر
+sqlite3 "$KNOW_DB" "
+CREATE TABLE IF NOT EXISTS training_recommendations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id TEXT NOT NULL,
+    display_name TEXT,
+    current_success REAL DEFAULT 0.0,
+    total_runs INTEGER DEFAULT 0,
+    recommended_focus TEXT,
+    recommendation_type TEXT DEFAULT 'skill_improvement',
+    priority INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"
+
+# تحديث توصيات التدريب من أداء العمال
 sqlite3 "$KNOW_DB" "
 ATTACH DATABASE '$DB_PATH' AS factory;
 
--- جدول توصيات التدريب
-CREATE TABLE IF NOT EXISTS training_recommendations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    agent_id TEXT,
-    display_name TEXT,
-    current_success REAL,
-    total_runs INTEGER,
-    recommended_focus TEXT,
-    reason TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+DELETE FROM training_recommendations;
 
--- إنشاء توصيات للعمال ذوي الأداء الأقل من 80% مع وجود تشغيل فعلي
-INSERT INTO training_recommendations (
-    agent_id,
-    display_name,
-    current_success,
-    total_runs,
-    recommended_focus,
-    reason
-)
-SELECT
-    a.id,
+INSERT INTO training_recommendations (agent_id, display_name, current_success, total_runs, recommended_focus, priority)
+SELECT 
+    a.id as agent_id,
     a.display_name,
-    a.success_rate,
+    a.success_rate as current_success,
     a.total_runs,
-    CASE
-        WHEN a.success_rate < 50 THEN 'خطة تدريب مكثفة + مهام debug/quality'
-        ELSE 'خطة تحسين متدرجة + مهام coaching/quality'
-    END AS recommended_focus,
-    'success_rate=' || printf('%.2f', a.success_rate) || ', runs=' || a.total_runs
+    CASE 
+        WHEN a.total_runs = 0 THEN 'بدء التشغيل الأول للمهام البسيطة'
+        WHEN a.success_rate < 80 THEN 'تحسين نسبة النجاح عبر المهام التدريبية'
+        WHEN a.total_runs < 5 THEN 'زيادة عدد المهام لاكتساب الخبرة'
+        WHEN a.success_rate >= 95 THEN 'الحفاظ على الأداء المتميز'
+        ELSE 'تحسين الكفاءة العامة'
+    END as recommended_focus,
+    CASE 
+        WHEN a.total_runs = 0 THEN 1
+        WHEN a.success_rate < 80 THEN 1
+        ELSE 2
+    END as priority
 FROM factory.agents a
-WHERE a.total_runs >= 3
-  AND a.success_rate < 80;
-
-DETACH DATABASE factory;
+WHERE a.id IS NOT NULL;
 "
 
-echo ""
-echo "✅ Self Training System اكتمل (تم توليد توصيات تدريبية في training_recommendations)"
+echo "✅ Self Training System اكتمل (تم توليد $(sqlite3 "$KNOW_DB" "SELECT COUNT(*) FROM training_recommendations;") توصية تدريبية)"

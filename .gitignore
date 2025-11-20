@@ -1,53 +1,19 @@
-# --- Python / Env ---
-venv/
-.env
-.env.*
-*.pyc
-*.pyo
-*.pyd
-__pycache__/
+# قاعدة البيانات - لا نرفعها للجيل
+data/
+
+# التقارير - كبيرة ولا داعي لرفعها
+reports/
+
+# الملفات المؤقتة
+*.tmp
 *.log
-
-# --- IDE / System ---
-.idea/
-.vscode/
-*.code-workspace
-.DS_Store
-
-# --- Databases / Knowledge ---
-*.sqlite3
 *.db
-data/knowledge/knowledge.db
+*.db-*
 
-# --- Runtime Data (Factory + Lakehouse) ---
-data/raw/
-data/processed/
-data/semantic/
-data/serving/
-data/tmp/
-data_lakehouse/
+# ملفات النظام
+.DS_Store
+Thumbs.db
 
-# --- AI runtime data ---
-ai/memory/
-ai/datasets/messages.jsonl
-ai/datasets/train_backend.jsonl
-ai/datasets/quality.json
-
-# --- Logs & Generated Reports (تشغيلية) ---
-logs/
-reports/ai/
-reports/management/
-reports/diagnostics/
-reports/tmp/
-
-# --- Config backups & potential secrets ---
-config/backup/
-config/*secret*.yaml
-config/*secrets*.yaml
-config/secure.env
-config/local_*.yml
-config/local_*.yaml
-
-# SQLite journal files
-data/knowledge/*.db-shm
-data/knowledge/*.db-wal
+# ملفات النسخ الاحتياطي
+*.backup
+*.bak

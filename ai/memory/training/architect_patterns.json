@@ -1,0 +1,29 @@
+[
+  {
+    "pattern_name": "MVP Architecture",
+    "description": "تصميم الحد الأدنى للمنتج القابل للتطبيق",
+    "components": [
+      "Backend API",
+      "Database",
+      "Frontend",
+      "Authentication"
+    ],
+    "best_for": [
+      "startups",
+      "rapid_prototyping"
+    ]
+  },
+  {
+    "pattern_name": "Microservices",
+    "description": "هيكلة التطبيق كخدمات صغيرة مستقلة",
+    "components": [
+      "API Gateway",
+      "Service Discovery",
+      "Load Balancer"
+    ],
+    "best_for": [
+      "large_apps",
+      "team_collaboration"
+    ]
+  }
+]

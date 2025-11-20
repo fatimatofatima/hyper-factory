@@ -1,0 +1,38 @@
+===== Hyper Factory Memory Insights =====
+Generated at : 2025-11-19T06:28:40.779154Z
+
+Total runs   : 37
+Success runs : 37
+Failed runs  : 0
+Success rate : 100.00%
+
+Last run at  : 2025-11-19 09:28:40
+Last status  : {'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+
+----- Per-step stats -----
+- ingestor_basic: count=37, ok=37, fail=0, ok_rate=100.00%
+- processor_basic: count=37, ok=37, fail=0, ok_rate=100.00%
+- analyzer_basic: count=37, ok=37, fail=0, ok_rate=100.00%
+- reporter_basic: count=37, ok=37, fail=0, ok_rate=100.00%
+
+----- Recent 20 runs -----
+2025-11-19 05:25:16 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 07:34:12 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 07:38:50 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:08:38 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:18:08 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:18:38 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:19:21 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:28:38 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:31:32 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:32:22 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:33:07 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:34:30 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:38:39 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:40:28 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:48:40 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 08:58:40 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 09:07:00 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 09:08:40 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 09:18:40 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
+2025-11-19 09:28:40 | success=True | steps={'ingestor_basic': 'OK', 'processor_basic': 'OK', 'analyzer_basic': 'OK', 'reporter_basic': 'OK'}
