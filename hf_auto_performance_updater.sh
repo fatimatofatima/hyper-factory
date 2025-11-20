@@ -7,42 +7,73 @@ DB_PATH="$ROOT/data/factory/factory.db"
 echo "🔄 Hyper Factory – Auto Performance Updater"
 echo "==========================================="
 echo "⏰ $(date)"
+echo "📄 DB: $DB_PATH"
+echo ""
 
-# تحديث أداء العمال بناءً على المهام المكتملة
+# 0) تأكد أن ملف قاعدة البيانات موجود
+if [ ! -f "$DB_PATH" ]; then
+    echo "❌ قاعدة البيانات غير موجودة: $DB_PATH"
+    exit 1
+fi
+
+echo "📋 فحص الجداول في قاعدة البيانات..."
+TABLES=$(sqlite3 "$DB_PATH" ".tables" 2>/dev/null || echo "")
+echo "   Tables: $TABLES"
+echo ""
+
+# نحتاج agents + tasks + task_assignments
+for tbl in agents tasks task_assignments; do
+    if ! echo "$TABLES" | grep -qw "$tbl"; then
+        echo "❌ جدول $tbl غير موجود في $DB_PATH"
+        exit 1
+    fi
+done
+
+echo "📈 تحديث success_rate و total_runs لكل عامل بناءً على المهام المكتملة/الفاشلة..."
+echo ""
+
 sqlite3 "$DB_PATH" "
--- حساب أداء كل عامل
-WITH agent_stats AS (
-    SELECT 
-        agent_id,
-        COUNT(*) as total_tasks,
-        SUM(CASE WHEN result_status = 'success' THEN 1 ELSE 0 END) as success_tasks
-    FROM task_assignments 
-    WHERE completed_at IS NOT NULL
-    GROUP BY agent_id
-)
--- تحديث جدول agents
 UPDATE agents
-SET 
-    success_rate = CASE 
-        WHEN (SELECT total_tasks FROM agent_stats WHERE agent_id = agents.id) > 0 
-        THEN ROUND(
-            (SELECT success_tasks FROM agent_stats WHERE agent_id = agents.id) * 100.0 / 
-            (SELECT total_tasks FROM agent_stats WHERE agent_id = agents.id), 
-        2)
-        ELSE 0.0
-    END,
-    total_runs = COALESCE((SELECT total_tasks FROM agent_stats WHERE agent_id = agents.id), 0),
-    last_updated = CURRENT_TIMESTAMP
-WHERE id IN (SELECT agent_id FROM agent_stats);
-
-SELECT '✅ تم تحديث أداء ' || changes() || ' عامل' AS result;
+SET
+  total_runs = COALESCE((
+    SELECT COUNT(*)
+    FROM task_assignments ta
+    JOIN tasks t ON t.id = ta.task_id
+    WHERE ta.agent_id = agents.id
+      AND t.status IN ('done','failed')
+  ), 0),
+  success_rate = COALESCE((
+    SELECT 
+      CASE 
+        WHEN COUNT(*) = 0 THEN 0
+        ELSE ROUND(
+          100.0 * SUM(CASE WHEN t.status = 'done' THEN 1 ELSE 0 END)
+                / COUNT(*)
+          , 2
+        )
+      END
+    FROM task_assignments ta
+    JOIN tasks t ON t.id = ta.task_id
+    WHERE ta.agent_id = agents.id
+      AND t.status IN ('done','failed')
+  ), 0),
+  last_updated = CURRENT_TIMESTAMP;
 "
 
-echo "📊 أداء العمال المحدث:"
-sqlite3 "$DB_PATH" "
-SELECT id, display_name, success_rate, total_runs 
-FROM agents 
-WHERE total_runs > 0
-ORDER BY success_rate DESC;"
+echo "📊 أعلى 5 عمال حسب عدد التشغيل:"
+sqlite3 -header -column "$DB_PATH" "
+SELECT
+  id            AS agent_id,
+  display_name  AS name,
+  family,
+  role,
+  level,
+  success_rate,
+  total_runs
+FROM agents
+ORDER BY total_runs DESC
+LIMIT 5;
+" 2>/dev/null || echo "⚠️ تعذر عرض أعلى العمال (تابع العمل بدون إيقاف)."
 
+echo ""
 echo "✅ Auto Performance Update اكتمل"
